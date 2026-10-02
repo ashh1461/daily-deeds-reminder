@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
 
 @Composable
 fun FilterChipRow(
@@ -44,7 +44,7 @@ fun FilterChipRow(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = PurplePrimary,
+                    selectedContainerColor = NavyPrimary,
                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     labelColor = MaterialTheme.colorScheme.onSurfaceVariant

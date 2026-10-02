@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import java.util.Locale
 
@@ -105,7 +105,7 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = PurplePrimary
+                    containerColor = NavyPrimary
                 )
             )
         },
@@ -123,7 +123,7 @@ fun SettingsScreen(
                 text = "مواعيد التنبيهات اليومية",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = PurplePrimary
+                    color = NavyPrimary
                 )
             )
 
@@ -175,7 +175,7 @@ fun SettingsScreen(
                             Switch(
                                 checked = morningEnabled,
                                 onCheckedChange = { viewModel.setMorningReminder(it, morningTime.first, morningTime.second) },
-                                colors = SwitchDefaults.colors(checkedThumbColor = PurplePrimary)
+                                colors = SwitchDefaults.colors(checkedThumbColor = NavyPrimary)
                             )
                         }
                     }
@@ -191,7 +191,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.AccessTime,
                                 contentDescription = null,
-                                tint = PurplePrimary
+                                tint = NavyPrimary
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
@@ -224,7 +224,7 @@ fun SettingsScreen(
                             Switch(
                                 checked = eveningEnabled,
                                 onCheckedChange = { viewModel.setEveningReminder(it, eveningTime.first, eveningTime.second) },
-                                colors = SwitchDefaults.colors(checkedThumbColor = PurplePrimary)
+                                colors = SwitchDefaults.colors(checkedThumbColor = NavyPrimary)
                             )
                         }
                     }
@@ -235,7 +235,7 @@ fun SettingsScreen(
                 text = "التفاعل والحواس",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = PurplePrimary
+                    color = NavyPrimary
                 )
             )
 
@@ -254,7 +254,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.Vibration,
                                 contentDescription = null,
-                                tint = PurplePrimary
+                                tint = NavyPrimary
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
@@ -265,7 +265,7 @@ fun SettingsScreen(
                         Switch(
                             checked = hapticsEnabled,
                             onCheckedChange = { viewModel.toggleHaptics(it) },
-                            colors = SwitchDefaults.colors(checkedThumbColor = PurplePrimary)
+                            colors = SwitchDefaults.colors(checkedThumbColor = NavyPrimary)
                         )
                     }
 
@@ -280,7 +280,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.VolumeUp,
                                 contentDescription = null,
-                                tint = PurplePrimary
+                                tint = NavyPrimary
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
@@ -291,7 +291,7 @@ fun SettingsScreen(
                         Switch(
                             checked = soundEnabled,
                             onCheckedChange = { viewModel.toggleSound(it) },
-                            colors = SwitchDefaults.colors(checkedThumbColor = PurplePrimary)
+                            colors = SwitchDefaults.colors(checkedThumbColor = NavyPrimary)
                         )
                     }
                 }
@@ -309,7 +309,7 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
-                        tint = PurplePrimary,
+                        tint = NavyPrimary,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -317,7 +317,7 @@ fun SettingsScreen(
                         Text(
                             text = "عن هذا العمل المبارك",
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                            color = PurplePrimary
+                            color = NavyPrimary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(

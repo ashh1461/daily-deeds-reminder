@@ -57,9 +57,9 @@ import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.ui.theme.GoldDark
 import com.dailydeeds.reminder.ui.theme.GoldLight
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurpleDark
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
-import com.dailydeeds.reminder.ui.theme.PurpleSecondary
+import com.dailydeeds.reminder.ui.theme.NavyDark
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
+import com.dailydeeds.reminder.ui.theme.NavySecondary
 import com.dailydeeds.reminder.ui.theme.SuccessGreen
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 
@@ -120,7 +120,7 @@ fun ReaderCounterScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = PurplePrimary
+                    containerColor = NavyPrimary
                 )
             )
         },
@@ -220,7 +220,7 @@ fun ReaderCounterScreen(
                     onClick = { viewModel.toggleDeedCompleted(deedId) },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isCompleted) SuccessGreen else PurplePrimary
+                        containerColor = if (isCompleted) SuccessGreen else NavyPrimary
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -297,7 +297,7 @@ fun ReaderCounterScreen(
                                 colors = if (isCompleted) {
                                     listOf(SuccessGreen, SuccessGreen.copy(alpha = 0.8f))
                                 } else {
-                                    listOf(PurpleSecondary, PurplePrimary, PurpleDark)
+                                    listOf(NavySecondary, NavyPrimary, NavyDark)
                                 }
                             )
                         )

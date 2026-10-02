@@ -44,8 +44,8 @@ import com.dailydeeds.reminder.ui.components.CircularProgressBar
 import com.dailydeeds.reminder.ui.components.DeedCard
 import com.dailydeeds.reminder.ui.components.FilterChipRow
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurpleDark
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
+import com.dailydeeds.reminder.ui.theme.NavyDark
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +99,7 @@ fun HomeScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = PurplePrimary
+                    containerColor = NavyPrimary
                 )
             )
         },
@@ -117,7 +117,7 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(PurplePrimary, PurpleDark)
+                                colors = listOf(NavyPrimary, NavyDark)
                             )
                         )
                         .padding(horizontal = 20.dp, vertical = 18.dp)

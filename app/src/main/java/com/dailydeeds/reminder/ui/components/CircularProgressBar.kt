@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
 
 @Composable
 fun CircularProgressBar(
@@ -31,7 +31,7 @@ fun CircularProgressBar(
     size: Dp = 130.dp,
     strokeWidth: Dp = 10.dp,
     progressColor: Color = GoldPrimary,
-    trackColor: Color = PurplePrimary.copy(alpha = 0.2f)
+    trackColor: Color = NavyPrimary.copy(alpha = 0.2f)
 ) {
     val progress = if (total > 0) completed.toFloat() / total.toFloat() else 0f
     val animatedProgress by animateFloatAsState(

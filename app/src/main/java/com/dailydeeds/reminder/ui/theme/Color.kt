@@ -2,12 +2,12 @@ package com.dailydeeds.reminder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Spiritual Deep Purple Palette
-val PurpleDark = Color(0xFF280B2B)
-val PurplePrimary = Color(0xFF4A154B)
-val PurpleSecondary = Color(0xFF6B21A8)
-val PurpleAccent = Color(0xFF9333EA)
-val PurpleLight = Color(0xFFE9D5FF)
+// Spiritual Elegant Navy Palette
+val NavyDark = Color(0xFF0F1E36)
+val NavyPrimary = Color(0xFF1B3B6F) // Deep refined royal navy
+val NavySecondary = Color(0xFF284B85)
+val NavyAccent = Color(0xFF3B6DAF)
+val NavyLight = Color(0xFFDCE7F5)
 
 // Islamic Gold Palette
 val GoldPrimary = Color(0xFFD4AF37)
@@ -15,21 +15,29 @@ val GoldLight = Color(0xFFF3C649)
 val GoldDark = Color(0xFFA87F0D)
 
 // Surfaces & Backgrounds - Light
-val BackgroundLight = Color(0xFFFDFBF7)
+val BackgroundLight = Color(0xFFF6F8FB)
 val SurfaceLight = Color(0xFFFFFFFF)
-val SurfaceVariantLight = Color(0xFFF4EFEA)
-val TextPrimaryLight = Color(0xFF201A1E)
-val TextSecondaryLight = Color(0xFF5A5258)
+val SurfaceVariantLight = Color(0xFFEBF1F7)
+val TextPrimaryLight = Color(0xFF0F1B2B)
+val TextSecondaryLight = Color(0xFF4A5568)
 
 // Surfaces & Backgrounds - Dark
-val BackgroundDark = Color(0xFF140F16)
-val SurfaceDark = Color(0xFF201723)
-val SurfaceVariantDark = Color(0xFF2E2232)
-val TextPrimaryDark = Color(0xFFF6F0F6)
-val TextSecondaryDark = Color(0xFFB5A8B2)
+val BackgroundDark = Color(0xFF0A111A)
+val SurfaceDark = Color(0xFF101C2B)
+val SurfaceVariantDark = Color(0xFF17263A)
+val TextPrimaryDark = Color(0xFFF0F4F8)
+val TextSecondaryDark = Color(0xFF94A3B8)
 
 // Completion & Accent
 val SuccessGreen = Color(0xFF2E7D32)
 val SuccessGreenContainer = Color(0xFFE8F5E9)
-val CardBorderColorLight = Color(0xFFE5DDD5)
-val CardBorderColorDark = Color(0xFF3D2E42)
+val CardBorderColorLight = Color(0xFFD5DFEB)
+val CardBorderColorDark = Color(0xFF22354E)
+
+// Aliases for seamless integration
+val PurpleDark = NavyDark
+val PurplePrimary = NavyPrimary
+val PurpleSecondary = NavySecondary
+val PurpleAccent = NavyAccent
+val PurpleLight = NavyLight
+

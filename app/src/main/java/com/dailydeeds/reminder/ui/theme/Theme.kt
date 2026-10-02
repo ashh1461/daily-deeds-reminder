@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PurpleAccent,
+    primary = NavyAccent,
     onPrimary = BackgroundDark,
-    primaryContainer = PurpleSecondary,
-    onPrimaryContainer = PurpleLight,
+    primaryContainer = NavySecondary,
+    onPrimaryContainer = NavyLight,
     secondary = GoldLight,
     onSecondary = BackgroundDark,
     background = BackgroundDark,
@@ -30,10 +30,10 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PurplePrimary,
+    primary = NavyPrimary,
     onPrimary = SurfaceLight,
-    primaryContainer = PurpleLight,
-    onPrimaryContainer = PurpleDark,
+    primaryContainer = NavyLight,
+    onPrimaryContainer = NavyDark,
     secondary = GoldPrimary,
     onSecondary = SurfaceLight,
     background = BackgroundLight,

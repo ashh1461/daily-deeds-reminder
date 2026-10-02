@@ -38,7 +38,7 @@ import com.dailydeeds.reminder.model.Deed
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.ui.theme.GoldDark
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.PurplePrimary
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
 import com.dailydeeds.reminder.ui.theme.SuccessGreen
 
 @Composable
@@ -82,7 +82,7 @@ fun DeedCard(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(if (isCompleted) SuccessGreen else PurplePrimary)
+                    .background(if (isCompleted) SuccessGreen else NavyPrimary)
             ) {
                 if (isCompleted) {
                     Icon(

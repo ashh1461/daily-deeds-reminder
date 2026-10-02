@@ -91,8 +91,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun toggleDeedCompleted(deedId: Int) {
         val current = _completedMap.value[deedId] ?: false
         val newStatus = !current
+        val deed = DeedsRepository.getDeedById(deedId)
+
         prefs.setDeedCompleted(deedId, newStatus)
         _completedMap.value = _completedMap.value.toMutableMap().apply { put(deedId, newStatus) }
+
+        if (deed != null && deed.type != DeedType.READING) {
+            val count = if (newStatus) deed.targetCount else 0
+            val stage = if (newStatus && deed.stages != null) deed.stages.size - 1 else 0
+            prefs.setDeedCount(deedId, count)
+            prefs.setDeedStage(deedId, stage)
+            _countsMap.value = _countsMap.value.toMutableMap().apply { put(deedId, count) }
+            _stagesMap.value = _stagesMap.value.toMutableMap().apply { put(deedId, stage) }
+        }
+
         _dailyProgress.value = prefs.getDailyProgress()
 
         if (newStatus && _hapticsEnabled.value) {

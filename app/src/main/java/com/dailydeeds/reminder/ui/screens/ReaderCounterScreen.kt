@@ -109,6 +109,13 @@ fun ReaderCounterScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.toggleDeedCompleted(deedId) }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = if (isCompleted) "مكتمل (اضغط للإلغاء)" else "تحديد كـ مكتمل",
+                            tint = if (isCompleted) GoldPrimary else Color.White
+                        )
+                    }
                     if (deed.type != DeedType.READING) {
                         IconButton(onClick = { viewModel.resetDeedCount(deedId) }) {
                             Icon(
@@ -348,26 +355,50 @@ fun ReaderCounterScreen(
                         )
                     } else {
                         Text(
-                            text = "المس الدائرة للعدّ والتسبيح",
+                            text = "المس الدائرة للعدّ، أو اضغط الزر أدناه لتحديده كمكتمل فوراً",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
+                    Button(
+                        onClick = { viewModel.toggleDeedCompleted(deedId) },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isCompleted) SuccessGreen else NavyPrimary
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isCompleted) "أُنجز بحمد الله ✓ (اضغط لإلغاء التحديد)" else "تحديد كـ مكتمل مباشرة دون نقر",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            ),
+                            color = Color.White
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedButton(
+                        onClick = { viewModel.resetDeedCount(deedId) },
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        OutlinedButton(
-                            onClick = { viewModel.resetDeedCount(deedId) },
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "تصفير العداد")
-                        }
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = "تصفير العداد والبدء من جديد")
                     }
                 }
             }

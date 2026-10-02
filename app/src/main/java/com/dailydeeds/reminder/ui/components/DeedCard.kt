@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,19 +78,19 @@ fun DeedCard(
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
+            IconButton(
+                onClick = onToggleCompleted,
                 modifier = Modifier
-                    .size(38.dp)
+                    .size(42.dp)
                     .clip(CircleShape)
-                    .background(if (isCompleted) SuccessGreen else NavyPrimary)
+                    .background(if (isCompleted) SuccessGreen else NavyPrimary.copy(alpha = 0.9f))
             ) {
                 if (isCompleted) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "مكتمل",
+                        contentDescription = "مكتمل (اضغط للإلغاء)",
                         tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 } else {
                     Text(

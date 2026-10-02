@@ -1,6 +1,7 @@
 package com.dailydeeds.reminder.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +45,7 @@ import com.dailydeeds.reminder.data.DeedsRepository
 import com.dailydeeds.reminder.ui.components.CircularProgressBar
 import com.dailydeeds.reminder.ui.components.DeedCard
 import com.dailydeeds.reminder.ui.components.FilterChipRow
+import com.dailydeeds.reminder.ui.theme.GoldDark
 import com.dailydeeds.reminder.ui.theme.GoldPrimary
 import com.dailydeeds.reminder.ui.theme.NavyDark
 import com.dailydeeds.reminder.ui.theme.NavyPrimary
@@ -120,52 +123,79 @@ fun HomeScreen(
                                 colors = listOf(NavyPrimary, NavyDark)
                             )
                         )
-                        .padding(horizontal = 20.dp, vertical = 18.dp)
+                        .padding(horizontal = 18.dp, vertical = 18.dp)
                 ) {
                     Card(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(22.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 1.2.dp,
+                                color = GoldPrimary.copy(alpha = 0.35f),
+                                shape = RoundedCornerShape(22.dp)
+                            )
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(18.dp)
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "إنجاز الأعمال لليوم",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = if (dailyProgress.first == dailyProgress.second) {
-                                        "ما شاء الله! أتممت جميع الأعمال اليومية المباركة 🌟"
-                                    } else {
-                                        "أنجزت ${dailyProgress.first} من أصل ${dailyProgress.second} عملاً"
-                                    },
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Column(modifier = Modifier.padding(18.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "إنجاز الأوراد اليومية",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 18.sp
+                                        ),
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = if (dailyProgress.first == dailyProgress.second && dailyProgress.second > 0) {
+                                            "ما شاء الله! أتممت جميع الأوراد المباركة لليوم 🌿"
+                                        } else {
+                                            "أنجزت ${dailyProgress.first} من أصل ${dailyProgress.second} عملاً"
+                                        },
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.5.sp),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(14.dp))
+
+                                CircularProgressBar(
+                                    completed = dailyProgress.first,
+                                    total = dailyProgress.second,
+                                    size = 82.dp,
+                                    strokeWidth = 9.dp
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                            CircularProgressBar(
-                                completed = dailyProgress.first,
-                                total = dailyProgress.second,
-                                size = 80.dp,
-                                strokeWidth = 8.dp
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(GoldPrimary.copy(alpha = 0.08f))
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                            ) {
+                                Text(
+                                    text = "«أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ» • دُمْ عَلَى وِرْدِكَ تَظْفَرْ بِالْبَرَكَةِ",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 11.5.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = GoldDark
+                                    ),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }

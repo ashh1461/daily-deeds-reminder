@@ -30,5 +30,9 @@ data class Deed(
     val category: DeedCategory,
     val content: String,
     val instructions: String? = null,
-    val stages: List<TasbeehStage>? = null
+    val stages: List<TasbeehStage>? = null,
+    val alternativeContent: String? = null,
+    val alternativeLabel: String? = null,
+    val referenceSource: String? = null,
+    val headerOrnament: String? = null
 )

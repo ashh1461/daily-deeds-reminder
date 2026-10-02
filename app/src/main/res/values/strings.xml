@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الأعمال اليومية</string>
+    <string name="app_subtitle">توصية السيد الأسمى رضوان الله عليه</string>
+    <string name="channel_reminders_name">تنبيهات الأعمال اليومية</string>
+    <string name="channel_reminders_desc">تذكير بالأوراد الصباحية والمسائية وعقيب الصلوات</string>
+</resources>

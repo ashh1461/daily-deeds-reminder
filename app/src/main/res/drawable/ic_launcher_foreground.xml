@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Golden Circle -->
+    <path
+        android:strokeColor="#D4AF37"
+        android:strokeWidth="2.5"
+        android:pathData="M 54,20 A 34,34 0 1,1 53.99,20 Z" />
+    
+    <!-- Inner Golden Crescent -->
+    <path
+        android:fillColor="#F3C649"
+        android:pathData="M 62,38 C 50,40 44,52 46,64 C 47,70 52,76 58,78 C 50,78 40,70 40,58 C 40,46 48,38 62,38 Z" />
+    
+    <!-- Golden Star / Sparkle -->
+    <path
+        android:fillColor="#F3C649"
+        android:pathData="M 64,46 L 66,51 L 71,52 L 67,55 L 68,60 L 64,57 L 60,60 L 61,55 L 57,52 L 62,51 Z" />
+</vector>

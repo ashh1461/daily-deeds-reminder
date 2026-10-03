@@ -62,8 +62,9 @@ fun HomeScreen(
     val completedMap by viewModel.completedMap.collectAsState()
     val countsMap by viewModel.countsMap.collectAsState()
     val dailyProgress by viewModel.dailyProgress.collectAsState()
+    val activeDate by viewModel.activeDate.collectAsState()
 
-    val filteredDeeds = DeedsRepository.getDeedsByCategory(selectedCategory)
+    val filteredDeeds = DeedsRepository.getDeedsByCategory(selectedCategory, activeDate)
 
     Scaffold(
         topBar = {
@@ -79,7 +80,7 @@ fun HomeScreen(
                             color = Color.White
                         )
                         Text(
-                            text = "توصية بخط يد السيد الأسمى (رض)",
+                            text = "أوراد يومية وقراءات في أوقاتها",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
                             color = GoldPrimary
                         )

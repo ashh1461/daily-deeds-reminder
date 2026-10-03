@@ -394,7 +394,7 @@ fun ReaderCounterScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "المصدر والفضل المأثور",
+                                    text = "التعليمات والمصدر",
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp
@@ -418,7 +418,7 @@ fun ReaderCounterScreen(
                             if (!deed.referenceSource.isNullOrBlank()) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "المصادر المعتمدة: ${deed.referenceSource}",
+                                    text = "المصدر: ${deed.referenceSource}",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Medium,
@@ -600,6 +600,17 @@ fun ReaderCounterScreen(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // Tactile Glowing Tasbeeh Orb
+                deed.instructions?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(8.dp))
+                }
+                deed.referenceSource?.let {
+                    Text("المصدر: $it", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(16.dp))
+                }
+
                 val interactionSource = remember { MutableInteractionSource() }
                 var isPressed by remember { mutableStateOf(false) }
                 val orbScale by animateFloatAsState(

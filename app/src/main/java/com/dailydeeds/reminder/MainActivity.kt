@@ -26,6 +26,7 @@ import com.dailydeeds.reminder.ui.screens.ReaderCounterScreen
 import com.dailydeeds.reminder.ui.screens.SettingsScreen
 import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
 import com.dailydeeds.reminder.viewmodel.MainViewModel
+import com.dailydeeds.reminder.model.DeedCategory
 
 class MainActivity : ComponentActivity() {
 
@@ -42,6 +43,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         NotificationHelper.createNotificationChannel(this)
+        intent.getStringExtra(NotificationHelper.EXTRA_CATEGORY)?.let { name ->
+            DeedCategory.values().find { it.name == name }?.let(viewModel::selectCategory)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(

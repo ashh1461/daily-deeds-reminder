@@ -4,6 +4,24 @@
 
 ---
 
+## الإصدار 1.1.0 — إضافات الصور ومواعيدها
+
+أُضيفت خمس قراءات إلى الأعمال الإحدى عشرة الأصلية، مع إبقاء أرقام الأعمال القديمة والتقدم المحفوظ كما هي:
+
+| القراءة | الموعد المذكور | التكرار |
+| --- | --- | --- |
+| الزيارة المختصرة لصاحب الزمان | لم يُذكر وقت؛ قسم «في أي وقت» | قراءة، مع وضع اليد على القلب |
+| دعاء استيداع المستقبل | لم يُذكر وقت؛ قسم «في أي وقت» | ثلاث مرات |
+| «ولكم فيها جمال حين تريحون وحين تسرحون» | قبل النوم | ثلاث مرات |
+| دعاء تغيير الحال | في الليل | تكرار من دون عدد محدد |
+| قراءات طلب الحاجة | صباح الخميس عند الخروج من المنزل لطلب الحاجة | كما وردت في النص |
+
+تنبيهات الليل (21:00)، وقبل النوم (22:00)، وصباح الخميس (07:00) قابلة للتعديل والتعطيل. هذه ساعات افتراضية للتذكير وليست ساعات منصوصاً عليها في الصور، وتستخدم المنطقة الزمنية للجهاز. لا تُضاف قراءات الخميس إلى إجمالي أعمال بقية الأيام، ويمكن تصفحها دائماً من قسمها. فتح التنبيه ينقل إلى القسم المرتبط به.
+
+نُقلت النصوص ونسبتها كما ظهرت في الصور، دون اعتماد الوعود المتداولة بالمنافع كحقائق موثقة. لم تحدد صورة الخميس أرقام الآيات المقصودة بآخر سورة آل عمران؛ يحتفظ التطبيق بهذه العبارة كما وردت.
+
+هذا الإصدار منشور من فرع `release/v1.1.0` ووسم `v1.1.0` دون دمجه في `main` أو `master`. ملف APK المرفق يستخدم نفس هوية حزمة إصدار 1.0 (`com.dailydeeds.reminder.debug`) وتوقيعه لأجل التحديث مع الاحتفاظ بالتقدم. وهو توزيع GitHub من نوع debug، وليس حزمة نشر على Google Play.
+
 ## 🌟 الميزات الرئيسية
 
 - **الأعمال الإحدى عشرة بالتشكيل الكامل:**
@@ -44,9 +62,9 @@
 - **Language:** Kotlin 1.9.22
 - **UI Toolkit:** Jetpack Compose + Material 3 (1.2.0)
 - **Architecture:** Clean MVVM with StateFlow & Coroutines
-- **Storage:** Jetpack DataStore Preferences
+- **Storage:** Android SharedPreferences
 - **Scheduling:** Android `AlarmManager` with Exact Alarms & `BroadcastReceiver`
-- **Build System:** Gradle 8.4 with Android Gradle Plugin 8.3.0
+- **Build System:** Gradle 8.4 with Android Gradle Plugin 8.2.2
 - **Target SDK:** Android 14 (API 34) | Minimum SDK: Android 8.0 (API 26)
 
 ---
@@ -61,8 +79,9 @@
 # استنساخ المستودع
 git clone https://github.com/ashh1461/daily-deeds-reminder.git
 cd daily-deeds-reminder
+git switch release/v1.1.0
 
 # بناء تطبيق الأندرويد
-./gradlew assembleDebug
+gradlew.bat testDebugUnitTest lintDebug assembleDebug
 ```
 ينتج الملف التنفيذي في: `app/build/outputs/apk/debug/app-debug.apk`.

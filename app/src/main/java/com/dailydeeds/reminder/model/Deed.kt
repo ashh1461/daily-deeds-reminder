@@ -11,7 +11,11 @@ enum class DeedCategory(val titleArabic: String) {
     MORNING_EVENING("صباحاً ومساءً"),
     AFTER_PRAYER("عقيب الصلوات"),
     TASBEEH("أذكار وتسابيح"),
-    QURAN("آيات وسور")
+    QURAN("آيات وسور"),
+    ANYTIME("في أي وقت"),
+    NIGHT("في الليل"),
+    BEDTIME("قبل النوم"),
+    THURSDAY("صباح الخميس")
 }
 
 data class TasbeehStage(

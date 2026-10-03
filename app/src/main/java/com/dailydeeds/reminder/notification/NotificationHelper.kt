@@ -9,8 +9,10 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dailydeeds.reminder.MainActivity
+import com.dailydeeds.reminder.model.DeedCategory
 
 object NotificationHelper {
+    const val EXTRA_CATEGORY = "reminder_category"
 
     const val CHANNEL_ID = "daily_deeds_channel"
     const val CHANNEL_NAME = "تنبيهات الأعمال اليومية"
@@ -37,12 +39,14 @@ object NotificationHelper {
         context: Context,
         notificationId: Int,
         title: String,
-        message: String
+        message: String,
+        category: DeedCategory? = null
     ) {
         createNotificationChannel(context)
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            category?.let { putExtra(EXTRA_CATEGORY, it.name) }
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             context,

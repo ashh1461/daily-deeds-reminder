@@ -56,7 +56,39 @@ class WeekdayRepositoryTest {
     fun get_returnsEntryForRequestedDay() {
         val friday = WeekdayRepository.get(DayContentKind.DUA, DayOfWeek.FRIDAY)
         assertEquals(DayOfWeek.FRIDAY, friday.day)
-        assertTrue(friday.isExcerpt)
+        assertFalse(friday.isExcerpt)
         assertFalse(WeekdayRepository.get(DayContentKind.DUA, DayOfWeek.SATURDAY).isExcerpt)
+    }
+
+    @Test
+    fun fridayDuaIncludesTheTestimonyAndClosingPrayerFromPrintedPage27() {
+        val friday = WeekdayRepository.get(DayContentKind.DUA, DayOfWeek.FRIDAY)
+        val text = normalize(friday.text)
+        assertTrue(text.contains(normalize("وأن محمدا صلى الله عليه وآله عبدك ورسولك")))
+        assertTrue(text.contains(normalize("ووفقني لأداء فرض الجمعات")))
+        assertTrue(text.endsWith(normalize("إنك أنت العزيز الحكيم.")))
+        assertFalse(friday.text.contains("…"))
+        assertFalse(friday.text.contains("مقتطف"))
+        assertTrue(friday.source.contains("٢٧"))
+    }
+
+    @Test
+    fun sundayZiyaratIncludesAliAndBothPrintedFatimaNarrations() {
+        val sunday = WeekdayRepository.get(DayContentKind.ZIYARAT, DayOfWeek.SUNDAY)
+        val text = normalize(sunday.text)
+        assertTrue(sunday.title.contains("أمير المؤمنين والزهراء"))
+        assertTrue(text.contains(normalize("زيارة الزهراء")))
+        assertTrue(text.contains(normalize("فاشهدي أني ظاهر بولايتك")))
+        assertTrue(text.contains(normalize("قبل أن يخلقك")))
+        assertTrue(text.contains(normalize("قد طهرنا بولايتهم")))
+        assertFalse(sunday.isExcerpt)
+        assertTrue(sunday.source.contains("٥٦–٥٧"))
+    }
+
+    @Test
+    fun sundayDuaUsesThePrintedPrepositionForRaghba() {
+        val text = normalize(WeekdayRepository.get(DayContentKind.DUA, DayOfWeek.SUNDAY).text)
+        assertTrue(text.contains(normalize("وإليك أرغب")))
+        assertFalse(text.contains(normalize("وإياك أرغب")))
     }
 }

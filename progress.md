@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
+Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Published release: `v1.1.1`. Updated: 2026-10-04.
 
 ## Completed
 
@@ -21,7 +21,7 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 
 ## Remaining
 
-- Merge the verified v1.1.1 release branch into `master` and publish the GitHub release with its compatible signed APK.
+- No implementation or publication tasks remain from the requested work.
 - Visual inspection on an Android device remains unavailable in this environment, as noted below.
 
 ## Verification limits
@@ -40,3 +40,6 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 - 2026-10-04: Located the original debug signing key and verified that its certificate matches the published v1.1.0 APK. The earlier local verification APK used a temporary key; the distribution build will use the original key. Bumped the app to version 1.1.1/code 3 and updated the Arabic README.
 - 2026-10-04: Full clean build, 25 unit tests, debug APK assembly, and Android lint passed in 8 minutes 44 seconds. Lint: 0 errors, 17 warnings. Verified version 1.1.1/code 3, unchanged application ID, and the same signing certificate as the published v1.1.0 APK. Prepared the APK and SHA-256 sidecar under `build/distributions/` and completed release notes in `docs/releases/v1.1.1.md`.
 - 2026-10-04: Refreshed graphify for release preparation: 448 nodes, 916 edges, 40 communities.
+- 2026-10-04: Merged [PR #1](https://github.com/ashh1461/daily-deeds-reminder/pull/1) into `master` as `749520c`. Confirmed the merged tree exactly matches the tested release commit `002bc58`.
+- 2026-10-04: Published [v1.1.1](https://github.com/ashh1461/daily-deeds-reminder/releases/tag/v1.1.1) from merged `master`, with `DailyDeeds-v1.1.1.apk` and its SHA-256 sidecar. GitHub confirms the release is public, not a draft or prerelease, and marked Latest. The uploaded APK digest matches the locally verified APK. Local `master` was fast-forwarded to the merge.
+- 2026-10-04: Final follow-up updates only this progress record and generated graph outputs; application source remains identical to the verified release.

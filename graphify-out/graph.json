@@ -303,16 +303,88 @@
       "source_location": "L26"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme_dailyremindertheme",
-      "label": "DailyReminderTheme()",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_circularprogressbar",
+      "label": "CircularProgressBar()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Theme.kt",
+      "community_name": "HomeScreen.kt",
       "file_type": "code",
-      "norm_label": "dailyremindertheme()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/theme/Theme.kt",
-      "source_location": "L53"
+      "norm_label": "circularprogressbar()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/CircularProgressBar.kt",
+      "source_location": "L25"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_deedcard",
+      "label": "DeedCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "deedcard()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/DeedCard.kt",
+      "source_location": "L34"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_filterchiprow",
+      "label": "FilterChipRow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "filterchiprow()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/FilterChipRow.kt",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_dailyprogresscard",
+      "label": "DailyProgressCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "dailyprogresscard()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
+      "source_location": "L122"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homecontent",
+      "label": "HomeContent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "homecontent()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
+      "source_location": "L63"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homepreview",
+      "label": "HomePreview()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "homepreview()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
+      "source_location": "L154"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homescreen",
+      "label": "HomeScreen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "homescreen()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
+      "source_location": "L41"
     },
     {
       "id": "app_src_main_java_com_dailydeeds_reminder_mainactivity_appnavigation",
@@ -351,40 +423,16 @@
       "source_location": "L95"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen_readercounterscreen",
-      "label": "ReaderCounterScreen()",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme_dailyremindertheme",
+      "label": "DailyReminderTheme()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "MainActivity.kt",
       "file_type": "code",
-      "norm_label": "readercounterscreen()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderCounterScreen.kt",
-      "source_location": "L17"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_readertopbar",
-      "label": "ReaderTopBar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "MainActivity.kt",
-      "file_type": "code",
-      "norm_label": "readertopbar()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderTopBar.kt",
-      "source_location": "L21"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_circularprogressbar",
-      "label": "CircularProgressBar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "circularprogressbar()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/CircularProgressBar.kt",
-      "source_location": "L25"
+      "norm_label": "dailyremindertheme()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/theme/Theme.kt",
+      "source_location": "L53"
     },
     {
       "id": "app_src_main_java_com_dailydeeds_reminder_data_weekdayrepository_weekdayrepository_all",
@@ -553,30 +601,6 @@
       "norm_label": ".ziyaratmentionsitsownday()",
       "source_file": "app/src/test/java/com/dailydeeds/reminder/data/WeekdayRepositoryTest.kt",
       "source_location": "L45"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_readerreadingcontent",
-      "label": "ReaderReadingContent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "ReaderReadingContent",
-      "file_type": "code",
-      "norm_label": "readerreadingcontent()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderReadingContent.kt",
-      "source_location": "L42"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertextcard_readertextcard",
-      "label": "ReaderTextCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "ReaderReadingContent",
-      "file_type": "code",
-      "norm_label": "readertextcard()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderTextCard.kt",
-      "source_location": "L29"
     },
     {
       "id": "app_src_test_java_com_dailydeeds_reminder_ui_theme_colorschemecontrasttest_colorschemecontrasttest_contrast",
@@ -1131,30 +1155,6 @@
       "source_location": "L93"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_deedcard",
-      "label": "DeedCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "deedcard()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/DeedCard.kt",
-      "source_location": "L34"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_filterchiprow",
-      "label": "FilterChipRow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "filterchiprow()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/components/FilterChipRow.kt",
-      "source_location": "L18"
-    },
-    {
       "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_counterwidgets_counterorb",
       "label": "CounterOrb()",
       "_callable": true,
@@ -1179,54 +1179,6 @@
       "source_location": "L42"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_dailyprogresscard",
-      "label": "DailyProgressCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "dailyprogresscard()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
-      "source_location": "L122"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homecontent",
-      "label": "HomeContent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "homecontent()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
-      "source_location": "L63"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homepreview",
-      "label": "HomePreview()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "homepreview()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
-      "source_location": "L154"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_homescreen",
-      "label": "HomeScreen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "homescreen()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
-      "source_location": "L41"
-    },
-    {
       "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercountercontent_readercountercontent",
       "label": "ReaderCounterContent()",
       "_callable": true,
@@ -1239,16 +1191,52 @@
       "source_location": "L37"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_viewmodel_mainviewmodel_mainviewmodel_selectcategory",
-      "label": ".selectCategory()",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen_readercounterscreen",
+      "label": "ReaderCounterScreen()",
       "_callable": true,
       "_origin": "ast",
       "community": 6,
       "community_name": "Deed",
       "file_type": "code",
-      "norm_label": ".selectcategory()",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/viewmodel/MainViewModel.kt",
-      "source_location": "L111"
+      "norm_label": "readercounterscreen()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderCounterScreen.kt",
+      "source_location": "L17"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_readerreadingcontent",
+      "label": "ReaderReadingContent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "readerreadingcontent()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderReadingContent.kt",
+      "source_location": "L42"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertextcard_readertextcard",
+      "label": "ReaderTextCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "readertextcard()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderTextCard.kt",
+      "source_location": "L29"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_readertopbar",
+      "label": "ReaderTopBar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "readertopbar()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderTopBar.kt",
+      "source_location": "L21"
     },
     {
       "id": "app_src_test_java_com_dailydeeds_reminder_data_deedsrepositorytest_deedsrepositorytest_suppliedtextshavetheirstatedtimesandcounts",
@@ -1527,6 +1515,18 @@
       "source_location": "L190"
     },
     {
+      "id": "app_src_main_java_com_dailydeeds_reminder_viewmodel_mainviewmodel_mainviewmodel_selectcategory",
+      "label": ".selectCategory()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "MainViewModel",
+      "file_type": "code",
+      "norm_label": ".selectcategory()",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/viewmodel/MainViewModel.kt",
+      "source_location": "L111"
+    },
+    {
       "id": "app_src_main_java_com_dailydeeds_reminder_viewmodel_mainviewmodel_mainviewmodel_seteveningreminder",
       "label": ".setEveningReminder()",
       "_callable": true,
@@ -1599,24 +1599,145 @@
       "source_location": "L238"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme",
-      "label": "Theme.kt",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_color",
+      "label": "Color",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Theme.kt",
+      "community_name": "HomeScreen.kt",
       "file_type": "code",
-      "norm_label": "theme.kt",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/theme/Theme.kt",
-      "source_location": "L1"
+      "norm_label": "color",
+      "source_file": "",
+      "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme_kt_composable",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_composable",
       "label": "Composable",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Theme.kt",
+      "community_name": "HomeScreen.kt",
       "file_type": "code",
       "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_optin",
+      "label": "OptIn",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "optin",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen",
+      "label": "HomeScreen.kt",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "homescreen.kt",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_optin",
+      "label": "OptIn",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "optin",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "preview",
+      "label": "Preview",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "file_type": "code",
+      "norm_label": "preview",
       "source_file": "",
       "source_location": ""
     },
@@ -1643,35 +1764,24 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen_kt_composable",
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme",
+      "label": "Theme.kt",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "file_type": "code",
+      "norm_label": "theme.kt",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/theme/Theme.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_theme_theme_kt_composable",
       "label": "Composable",
       "_origin": "ast",
       "community": 1,
       "community_name": "MainActivity.kt",
       "file_type": "code",
       "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_kt_composable",
-      "label": "Composable",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "MainActivity.kt",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_kt_optin",
-      "label": "OptIn",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "MainActivity.kt",
-      "file_type": "code",
-      "norm_label": "optin",
       "source_file": "",
       "source_location": ""
     },
@@ -1742,39 +1852,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_color",
-      "label": "Color",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "color",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_composable",
-      "label": "Composable",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_circularprogressbar_kt_modifier",
-      "label": "Modifier",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "modifier",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard",
       "label": "DeedCard.kt",
       "_origin": "ast",
@@ -1808,17 +1885,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen",
-      "label": "HomeScreen.kt",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "homescreen.kt",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/HomeScreen.kt",
-      "source_location": "L1"
-    },
-    {
       "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercountercontent",
       "label": "ReaderCounterContent.kt",
       "_origin": "ast",
@@ -1827,17 +1893,6 @@
       "file_type": "code",
       "norm_label": "readercountercontent.kt",
       "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderCounterContent.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen",
-      "label": "ReaderCounterScreen.kt",
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "file_type": "code",
-      "norm_label": "readercounterscreen.kt",
-      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderCounterScreen.kt",
       "source_location": "L1"
     },
     {
@@ -1995,37 +2050,52 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_kt_composable",
-      "label": "Composable",
+      "id": "docs_content_weekday_text_review",
+      "label": "weekday-text-review.md",
       "_origin": "ast",
-      "community": 19,
-      "community_name": "ReaderReadingContent",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
+      "community": 2,
+      "community_name": "Daily Deeds Reminder v1.1.0 release notes",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "weekday-text-review.md",
+      "source_file": "docs/content/weekday-text-review.md",
+      "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_kt_paddingvalues",
-      "label": "PaddingValues",
+      "id": "docs_content_weekday_text_review_changes_made",
+      "label": "Changes made",
       "_origin": "ast",
-      "community": 19,
-      "community_name": "ReaderReadingContent",
-      "file_type": "code",
-      "norm_label": "paddingvalues",
-      "source_file": "",
-      "source_location": ""
+      "community": 2,
+      "community_name": "Daily Deeds Reminder v1.1.0 release notes",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "changes made",
+      "source_file": "docs/content/weekday-text-review.md",
+      "source_location": "L21"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertextcard_kt_composable",
-      "label": "Composable",
+      "id": "docs_content_weekday_text_review_transcription_and_edition_notes",
+      "label": "Transcription and edition notes",
       "_origin": "ast",
-      "community": 19,
-      "community_name": "ReaderReadingContent",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
+      "community": 2,
+      "community_name": "Daily Deeds Reminder v1.1.0 release notes",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "transcription and edition notes",
+      "source_file": "docs/content/weekday-text-review.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "docs_content_weekday_text_review_weekday_text_review",
+      "label": "Weekday text review",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Daily Deeds Reminder v1.1.0 release notes",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "weekday text review",
+      "source_file": "docs/content/weekday-text-review.md",
+      "source_location": "L1"
     },
     {
       "id": "build_gradle",
@@ -2050,52 +2120,52 @@
       "source_location": "L1"
     },
     {
-      "id": "docs_content_weekday_text_review",
-      "label": "weekday-text-review.md",
+      "id": "docs_releases_v1_1_1",
+      "label": "v1.1.1.md",
       "_origin": "ast",
       "community": 3,
-      "community_name": "Weekday text review",
+      "community_name": "Daily Deeds Reminder 1.1.1",
       "file_type": "document",
       "node_kind": "page",
-      "norm_label": "weekday-text-review.md",
-      "source_file": "docs/content/weekday-text-review.md",
+      "norm_label": "v1.1.1.md",
+      "source_file": "docs/releases/v1.1.1.md",
       "source_location": "L1"
     },
     {
-      "id": "docs_content_weekday_text_review_changes_made",
-      "label": "Changes made",
+      "id": "docs_releases_v1_1_1_daily_deeds_reminder_1_1_1",
+      "label": "Daily Deeds Reminder 1.1.1",
       "_origin": "ast",
       "community": 3,
-      "community_name": "Weekday text review",
+      "community_name": "Daily Deeds Reminder 1.1.1",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "changes made",
-      "source_file": "docs/content/weekday-text-review.md",
-      "source_location": "L21"
-    },
-    {
-      "id": "docs_content_weekday_text_review_transcription_and_edition_notes",
-      "label": "Transcription and edition notes",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "Weekday text review",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "transcription and edition notes",
-      "source_file": "docs/content/weekday-text-review.md",
-      "source_location": "L27"
-    },
-    {
-      "id": "docs_content_weekday_text_review_weekday_text_review",
-      "label": "Weekday text review",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "Weekday text review",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "weekday text review",
-      "source_file": "docs/content/weekday-text-review.md",
+      "norm_label": "daily deeds reminder 1.1.1",
+      "source_file": "docs/releases/v1.1.1.md",
       "source_location": "L1"
+    },
+    {
+      "id": "docs_releases_v1_1_1_distribution",
+      "label": "Distribution",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Daily Deeds Reminder 1.1.1",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "distribution",
+      "source_file": "docs/releases/v1.1.1.md",
+      "source_location": "L10"
+    },
+    {
+      "id": "docs_releases_v1_1_1_validation",
+      "label": "Validation",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Daily Deeds Reminder 1.1.1",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "validation",
+      "source_file": "docs/releases/v1.1.1.md",
+      "source_location": "L16"
     },
     {
       "id": "app_src_test_java_com_dailydeeds_reminder_ui_theme_colorschemecontrasttest",
@@ -2538,61 +2608,6 @@
       "source_location": "L4"
     },
     {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_composable",
-      "label": "Composable",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_modifier",
-      "label": "Modifier",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "modifier",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_deedcard_kt_optin",
-      "label": "OptIn",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "optin",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_kt_composable",
-      "label": "Composable",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_components_filterchiprow_kt_modifier",
-      "label": "Modifier",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "modifier",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_counterwidgets_kt_composable",
       "label": "Composable",
       "_origin": "ast",
@@ -2600,39 +2615,6 @@
       "community_name": "Deed",
       "file_type": "code",
       "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_composable",
-      "label": "Composable",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "composable",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_modifier",
-      "label": "Modifier",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "modifier",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_homescreen_kt_optin",
-      "label": "OptIn",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "optin",
       "source_file": "",
       "source_location": ""
     },
@@ -2659,6 +2641,83 @@
       "source_location": ""
     },
     {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen",
+      "label": "ReaderCounterScreen.kt",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "readercounterscreen.kt",
+      "source_file": "app/src/main/java/com/dailydeeds/reminder/ui/screens/ReaderCounterScreen.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercounterscreen_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readerreadingcontent_kt_paddingvalues",
+      "label": "PaddingValues",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "paddingvalues",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertextcard_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_kt_composable",
+      "label": "Composable",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "composable",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readertopbar_kt_optin",
+      "label": "OptIn",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Deed",
+      "file_type": "code",
+      "norm_label": "optin",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "app_src_test_java_com_dailydeeds_reminder_data_deedsrepositorytest",
       "label": "DeedsRepositoryTest.kt",
       "_origin": "ast",
@@ -2677,17 +2736,6 @@
       "community_name": "Deed",
       "file_type": "code",
       "norm_label": "test",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "preview",
-      "label": "Preview",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Deed",
-      "file_type": "code",
-      "norm_label": "preview",
       "source_file": "",
       "source_location": ""
     },
@@ -2802,7 +2850,7 @@
       "node_kind": "heading",
       "norm_label": "ongoing log",
       "source_file": "progress.md",
-      "source_location": "L31"
+      "source_location": "L32"
     },
     {
       "id": "progress_progress",
@@ -2838,7 +2886,7 @@
       "node_kind": "heading",
       "norm_label": "verification limits",
       "source_file": "progress.md",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "docs_releases_v1_1_0_change_of_state_at_night",
@@ -3283,134 +3331,62 @@
       "source_url": null
     },
     {
+      "id": "items",
+      "label": "items",
+      "_origin": "semantic",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "items",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "lazycolumn",
+      "label": "lazycolumn",
+      "_origin": "semantic",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "lazycolumn",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "paddingvalues",
+      "label": "paddingvalues",
+      "_origin": "semantic",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "paddingvalues",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "settings",
+      "label": "settings",
+      "_origin": "semantic",
+      "community": 0,
+      "community_name": "HomeScreen.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "settings",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "activity",
       "label": "activity",
       "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
+      "community": 1,
+      "community_name": "MainActivity.kt",
       "external": true,
       "file_type": "concept",
       "norm_label": "activity",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "compositionlocalprovider",
-      "label": "compositionlocalprovider",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "compositionlocalprovider",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "darkcolorscheme",
-      "label": "darkcolorscheme",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "darkcolorscheme",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "issystemindarktheme",
-      "label": "issystemindarktheme",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "issystemindarktheme",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "layoutdirection",
-      "label": "layoutdirection",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "layoutdirection",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "lightcolorscheme",
-      "label": "lightcolorscheme",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "lightcolorscheme",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "locallayoutdirection",
-      "label": "locallayoutdirection",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "locallayoutdirection",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "localview",
-      "label": "localview",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "localview",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "sideeffect",
-      "label": "sideeffect",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "sideeffect",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "toargb",
-      "label": "toargb",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "toargb",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "windowcompat",
-      "label": "windowcompat",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "Theme.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "windowcompat",
       "source_file": "",
       "type": "external"
     },
@@ -3451,6 +3427,18 @@
       "type": "external"
     },
     {
+      "id": "compositionlocalprovider",
+      "label": "compositionlocalprovider",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "compositionlocalprovider",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "contextcompat",
       "label": "contextcompat",
       "_origin": "semantic",
@@ -3471,6 +3459,78 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "currentbackstackentryasstate",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "darkcolorscheme",
+      "label": "darkcolorscheme",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "darkcolorscheme",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "issystemindarktheme",
+      "label": "issystemindarktheme",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "issystemindarktheme",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "layoutdirection",
+      "label": "layoutdirection",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "layoutdirection",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "lightcolorscheme",
+      "label": "lightcolorscheme",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "lightcolorscheme",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "locallayoutdirection",
+      "label": "locallayoutdirection",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "locallayoutdirection",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "localview",
+      "label": "localview",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "localview",
       "source_file": "",
       "type": "external"
     },
@@ -3607,6 +3667,18 @@
       "type": "external"
     },
     {
+      "id": "sideeffect",
+      "label": "sideeffect",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "sideeffect",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "surface",
       "label": "surface",
       "_origin": "semantic",
@@ -3619,6 +3691,18 @@
       "type": "external"
     },
     {
+      "id": "toargb",
+      "label": "toargb",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "toargb",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "viewmodels",
       "label": "viewmodels",
       "_origin": "semantic",
@@ -3627,6 +3711,18 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "viewmodels",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "windowcompat",
+      "label": "windowcompat",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "MainActivity.kt",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "windowcompat",
       "source_file": "",
       "type": "external"
     },
@@ -3943,18 +4039,6 @@
       "type": "external"
     },
     {
-      "id": "collectasstate",
-      "label": "collectasstate",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "collectasstate",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "column",
       "label": "column",
       "_origin": "semantic",
@@ -4171,30 +4255,6 @@
       "type": "external"
     },
     {
-      "id": "items",
-      "label": "items",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "items",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "lazycolumn",
-      "label": "lazycolumn",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "lazycolumn",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "lazyrow",
       "label": "lazyrow",
       "_origin": "semantic",
@@ -4267,18 +4327,6 @@
       "type": "external"
     },
     {
-      "id": "mutablefloatstateof",
-      "label": "mutablefloatstateof",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "mutablefloatstateof",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "mutableinteractionsource",
       "label": "mutableinteractionsource",
       "_origin": "semantic",
@@ -4339,18 +4387,6 @@
       "type": "external"
     },
     {
-      "id": "paddingvalues",
-      "label": "paddingvalues",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "paddingvalues",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "refresh",
       "label": "refresh",
       "_origin": "semantic",
@@ -4359,18 +4395,6 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "refresh",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "remember",
-      "label": "remember",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "remember",
       "source_file": "",
       "type": "external"
     },
@@ -4435,18 +4459,6 @@
       "type": "external"
     },
     {
-      "id": "scaffold",
-      "label": "scaffold",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "scaffold",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "scale",
       "label": "scale",
       "_origin": "semantic",
@@ -4467,18 +4479,6 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "semantics",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "settings",
-      "label": "settings",
-      "_origin": "semantic",
-      "community": 16,
-      "community_name": "WeekdayContentScreen.kt",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "settings",
       "source_file": "",
       "type": "external"
     },
@@ -5191,6 +5191,18 @@
       "type": "external"
     },
     {
+      "id": "collectasstate",
+      "label": "collectasstate",
+      "_origin": "semantic",
+      "community": 6,
+      "community_name": "Deed",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "collectasstate",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "localdate",
       "label": "localdate",
       "_origin": "semantic",
@@ -5199,6 +5211,42 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "localdate",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "mutablefloatstateof",
+      "label": "mutablefloatstateof",
+      "_origin": "semantic",
+      "community": 6,
+      "community_name": "Deed",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "mutablefloatstateof",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "remember",
+      "label": "remember",
+      "_origin": "semantic",
+      "community": 6,
+      "community_name": "Deed",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "remember",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "scaffold",
+      "label": "scaffold",
+      "_origin": "semantic",
+      "community": 6,
+      "community_name": "Deed",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "scaffold",
       "source_file": "",
       "type": "external"
     },
@@ -16076,6 +16124,39 @@
       "weight": 1.0
     },
     {
+      "source": "docs_releases_v1_1_1",
+      "target": "docs_releases_v1_1_1_daily_deeds_reminder_1_1_1",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/releases/v1.1.1.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_releases_v1_1_1_daily_deeds_reminder_1_1_1",
+      "target": "docs_releases_v1_1_1_distribution",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/releases/v1.1.1.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_releases_v1_1_1_daily_deeds_reminder_1_1_1",
+      "target": "docs_releases_v1_1_1_validation",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/releases/v1.1.1.md",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
       "source": "progress",
       "target": "progress_progress",
       "relation": "contains",
@@ -16105,7 +16186,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "progress.md",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -16116,7 +16197,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "progress.md",
-      "source_location": "L31",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
@@ -17143,6 +17224,17 @@
       "weight": 1.0
     },
     {
+      "source": "readme_daily_deeds_reminder",
+      "target": "docs_content_weekday_text_review",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_dailydeeds_reminder_ui_screens_readercountercontent_readercountercontent",
       "target": "app_src_main_java_com_dailydeeds_reminder_ui_screens_counterwidgets_counterorb",
       "relation": "calls",
@@ -17590,5 +17682,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "41f449d10106b2956b3c695dad3721d6fd8d6259"
+  "built_at_commit": "a59f8330b240e05f073584d4519f5d6a836f01c0"
 }

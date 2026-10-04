@@ -21,7 +21,8 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 
 ## Remaining
 
-- No implementation tasks remain from the requested list. Visual inspection on an Android device remains unavailable in this environment, as noted below.
+- Merge the verified v1.1.1 release branch into `master` and publish the GitHub release with its compatible signed APK.
+- Visual inspection on an Android device remains unavailable in this environment, as noted below.
 
 ## Verification limits
 
@@ -35,3 +36,7 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 - 2026-10-04: All 25 tests and debug APK assembly passed. Updated the graph and confirmed no empty Kotlin files or whitespace errors. Text changes are ready for publication.
 - 2026-10-04: Published text commit `d860ead` to `origin/release/v1.1.0`. This final documentation-only update records completion; the verified application source and generated graph are unchanged.
 - 2026-10-04: Refreshed graphify again at the user's request from commit `41f449d`. Regenerated `GRAPH_REPORT.md`, `graph.json`, and `graph.html`: 444 nodes, 912 edges, 41 communities. Application source is unchanged; the existing 25-test and APK verification still applies.
+- 2026-10-04: Confirmed that GitHub's latest published release was still v1.1.0 and no pull request existed for the release branch. The user authorized merging into `master` and publishing v1.1.1.
+- 2026-10-04: Located the original debug signing key and verified that its certificate matches the published v1.1.0 APK. The earlier local verification APK used a temporary key; the distribution build will use the original key. Bumped the app to version 1.1.1/code 3 and updated the Arabic README.
+- 2026-10-04: Full clean build, 25 unit tests, debug APK assembly, and Android lint passed in 8 minutes 44 seconds. Lint: 0 errors, 17 warnings. Verified version 1.1.1/code 3, unchanged application ID, and the same signing certificate as the published v1.1.0 APK. Prepared the APK and SHA-256 sidecar under `build/distributions/` and completed release notes in `docs/releases/v1.1.1.md`.
+- 2026-10-04: Refreshed graphify for release preparation: 448 nodes, 916 edges, 40 communities.

@@ -27,6 +27,27 @@ import com.dailydeeds.reminder.ui.screens.SettingsScreen
 import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.model.DeedCategory
+import com.dailydeeds.reminder.model.DayContentKind
+import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
+import com.dailydeeds.reminder.ui.theme.NavyPrimary
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Mosque
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 class MainActivity : ComponentActivity() {
 
@@ -79,43 +100,97 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private data class BottomTab(
+    val route: String,
+    val label: String,
+    val icon: ImageVector
+)
+
+private val bottomTabs = listOf(
+    BottomTab("home", "الأعمال", Icons.Default.Checklist),
+    BottomTab("duas", "الأدعية", Icons.Default.AutoStories),
+    BottomTab("ziyarat", "الزيارات", Icons.Default.Mosque)
+)
+
 @Composable
 fun AppNavigation(viewModel: MainViewModel) {
     val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    val showBottomBar = bottomTabs.any { it.route == currentRoute }
 
-    NavHost(
-        navController = navController,
-        startDestination = "home"
-    ) {
-        composable("home") {
-            HomeScreen(
-                viewModel = viewModel,
-                onNavigateToDeed = { deedId ->
-                    navController.navigate("deed/$deedId")
-                },
-                onNavigateToSettings = {
-                    navController.navigate("settings")
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 6.dp
+                ) {
+                    bottomTabs.forEach { tab ->
+                        NavigationBarItem(
+                            selected = currentRoute == tab.route,
+                            onClick = {
+                                navController.navigate(tab.route) {
+                                    popUpTo("home") { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { Icon(tab.icon, contentDescription = tab.label) },
+                            label = { Text(tab.label, fontWeight = FontWeight.SemiBold) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Color.White,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                indicatorColor = NavyPrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
                 }
-            )
-        }
+            }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("home") {
+                HomeScreen(
+                    viewModel = viewModel,
+                    onNavigateToDeed = { deedId ->
+                        navController.navigate("deed/$deedId")
+                    },
+                    onNavigateToSettings = {
+                        navController.navigate("settings")
+                    }
+                )
+            }
 
-        composable(
-            route = "deed/{deedId}",
-            arguments = listOf(navArgument("deedId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val deedId = backStackEntry.arguments?.getInt("deedId") ?: 1
-            ReaderCounterScreen(
-                deedId = deedId,
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
+            composable("duas") { WeekdayContentScreen(DayContentKind.DUA) }
 
-        composable("settings") {
-            SettingsScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT) }
+
+            composable(
+                route = "deed/{deedId}",
+                arguments = listOf(navArgument("deedId") { type = NavType.IntType })
+            ) { entry ->
+                val deedId = entry.arguments?.getInt("deedId") ?: 1
+                ReaderCounterScreen(
+                    deedId = deedId,
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable("settings") {
+                SettingsScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

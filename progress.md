@@ -17,10 +17,11 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 - Applied all three text corrections, documented printed sources and edition variants, and added three regression tests.
 - Final source verification passed: `build_app.bat :app:clean :app:testDebugUnitTest :app:assembleDebug`, 25 tests, zero failures, zero empty Kotlin files, and a debug APK of 15,882,736 bytes. Build time: 5 minutes 28 seconds.
 - Updated the final code graph: 444 nodes, 912 edges, 41 communities.
+- Committed and pushed the reviewed text changes, source documentation, tests, and graph as `d860ead`.
 
 ## Remaining
 
-- Commit and push the verified text changes and final progress record.
+- No implementation tasks remain from the requested list. Visual inspection on an Android device remains unavailable in this environment, as noted below.
 
 ## Verification limits
 
@@ -32,3 +33,4 @@ Branch: `release/v1.1.0`. Starting commit: `8e5ca15`. Updated: 2026-10-04.
 - 2026-10-04: Created this log at the user's request. Recorded completed UI work, successful reader verification, prepared text corrections, and remaining publication steps.
 - 2026-10-04: Applied the complete Friday dua, added both printed Sunday Fatima narrations, corrected Sunday's dua preposition, and removed both excerpt flags. Added printed-page provenance in `docs/content/weekday-text-review.md` and three regression tests. Verification is next.
 - 2026-10-04: All 25 tests and debug APK assembly passed. Updated the graph and confirmed no empty Kotlin files or whitespace errors. Text changes are ready for publication.
+- 2026-10-04: Published text commit `d860ead` to `origin/release/v1.1.0`. This final documentation-only update records completion; the verified application source and generated graph are unchanged.

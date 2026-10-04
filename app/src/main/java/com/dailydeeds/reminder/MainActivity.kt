@@ -29,7 +29,6 @@ import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
-import com.dailydeeds.reminder.ui.theme.NavyPrimary
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -43,7 +42,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -139,9 +137,9 @@ fun AppNavigation(viewModel: MainViewModel) {
                             icon = { Icon(tab.icon, contentDescription = tab.label) },
                             label = { Text(tab.label, fontWeight = FontWeight.SemiBold) },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color.White,
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                indicatorColor = NavyPrimary,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )

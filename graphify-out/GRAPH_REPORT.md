@@ -1,17 +1,16 @@
 # Graph Report - Daily Reminder  (2026-10-04)
 
 ## Corpus Check
-- 34 files · ~16,426 words
+- 35 files · ~16,270 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 13 file(s) not represented in the graph (top: .xml 6, (none) 2, .bat 2)
 
 ## Summary
-- 395 nodes · 790 edges · 29 communities (6 shown, 23 thin omitted)
+- 387 nodes · 651 edges · 44 communities (19 shown, 25 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f8ba4365`
+- Built from commit: `8e5ca15c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,27 +18,56 @@
 - DeedCard.kt
 - MainActivity.kt
 - Daily Deeds Reminder v1.1.0 release notes
+- WeekdayContentScreen.kt
 - PreferencesManager
 - NotificationHelper.kt
 - DeedCategory
-- .nextOccurrence
+- ReminderTimeCalculatorTest
 - MainViewModel
 - Theme.kt
 - CircularProgressBar.kt
+- ReaderCounterScreen.kt
+- accesstime
+- alertdialog
 - FilterChipRow.kt
+- HomeScreen.kt
+- daycontentkind
 - DayContentKind
+- ReminderType
+- DeedsRepositoryTest
+- fontweight
+- calendar
+- divider
+- notifications
+- switch
+- switchdefaults
+- textbutton
+- vibration
+- volumeup
+- ColorSchemeContrastTest.kt
+- brush
+- chevronleft
+- fillmaxheight
+- golddark
+- goldlight
+- goldprimary
+- navydark
+- navyprimary
+- navysecondary
+- successgreen
+- textoverflow
 
 ## God Nodes (most connected - your core abstractions)
 1. `PreferencesManager` - 36 edges
-2. `MainViewModel` - 30 edges
-3. `DeedCategory` - 24 edges
-4. `ReminderType` - 20 edges
+2. `MainViewModel` - 29 edges
+3. `DeedCategory` - 23 edges
+4. `ReminderType` - 19 edges
 5. `Daily Deeds Reminder v1.1.0 release notes` - 15 edges
-6. `Deed` - 12 edges
-7. `DayContentKind` - 11 edges
-8. `DeedsRepository` - 10 edges
-9. `DeedType` - 10 edges
-10. `HomeScreen()` - 10 edges
+6. `Deed` - 11 edges
+7. `DeedsRepository` - 10 edges
+8. `DayContentKind` - 10 edges
+9. `ReminderTimeCalculatorTest` - 10 edges
+10. `DeedType` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Implementation plan selects SharedPreferences for daily state and rollover` --semantically_similar_to--> `Current documented persistence: SharedPreferences`  [INFERRED] [semantically similar]
@@ -56,51 +84,91 @@
 ## Import Cycles
 - None detected.
 
-## Communities (29 total, 23 thin omitted)
+## Communities (44 total, 25 thin omitted)
+
+### Community 0 - "DeedCard.kt"
+Cohesion: 0.20
+Nodes (10): animatecolorasstate, DeedCard(), Modifier, borderstroke, card, carddefaults, check, experimentalmaterial3api (+2 more)
 
 ### Community 1 - "MainActivity.kt"
-Cohesion: 0.06
-Nodes (5): AppNavigation(), BottomTab, MainActivity, HomeScreen(), ReaderCounterScreen()
+Cohesion: 0.07
+Nodes (31): activityresultcontracts, AppNavigation(), BottomTab, MainActivity, HomeContent(), HomePreview(), HomeScreen(), ReaderCounterScreen() (+23 more)
 
 ### Community 2 - "Daily Deeds Reminder v1.1.0 release notes"
 Cohesion: 0.08
-Nodes (17): Historical completion report: original 11 deeds, successful unit tests and debug assembly, Change-of-state supplication at night: no fixed repetition count, v1.1.0: release/v1.1.0 branch, debug application ID, version code 2, Supplication entrusting one's future to Allah: anytime, three repetitions, Quran 16:6 before sleep: three repetitions, Daily Deeds Reminder v1.1.0 release notes, Short ziyara of Sahib al-Zaman: anytime, hand over heart, Thursday morning readings when leaving home to seek a need (+9 more)
+Nodes (29): Historical completion report: original 11 deeds, successful unit tests and debug assembly, Change-of-state supplication at night: no fixed repetition count, Date changes refresh progress; counter actions check date before saving, v1.1.0: release/v1.1.0 branch, debug application ID, version code 2, Release limitation: installation, UI and device notification delivery unverified, Editable defaults: night 21:00, bedtime 22:00, Thursday 07:00 in device time zone, Supplication entrusting one's future to Allah: anytime, three repetitions, Quran 16:6 before sleep: three repetitions (+21 more)
 
-### Community 4 - "PreferencesManager"
-Cohesion: 0.05
-Nodes (10): PreferencesManager, ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY (+2 more)
+### Community 3 - "WeekdayContentScreen.kt"
+Cohesion: 0.11
+Nodes (18): annotatedstring, background, border, clip, contentcopy, height, lazyrow, localclipboardmanager (+10 more)
 
 ### Community 5 - "NotificationHelper.kt"
 Cohesion: 0.10
-Nodes (4): AlarmScheduler, NotificationHelper, BootReceiver, DailyReminderReceiver
+Nodes (20): alarmmanager, AlarmScheduler, Context, Context, NotificationHelper, BootReceiver, BroadcastReceiver, Context (+12 more)
 
 ### Community 6 - "DeedCategory"
-Cohesion: 0.10
-Nodes (18): DeedsRepository, Deed, DeedCategory, AFTER_PRAYER, ALL, ANYTIME, BEDTIME, MORNING_EVENING (+10 more)
+Cohesion: 0.11
+Nodes (19): DeedsRepository, Deed, DeedCategory, AFTER_PRAYER, ALL, ANYTIME, BEDTIME, MORNING_EVENING (+11 more)
+
+### Community 8 - "MainViewModel"
+Cohesion: 0.11
+Nodes (13): AndroidViewModel, MainViewModel, application, asstateflow, delay, isactive, launch, mutablestateflow (+5 more)
+
+### Community 9 - "Theme.kt"
+Cohesion: 0.15
+Nodes (12): activity, compositionlocalprovider, darkcolorscheme, issystemindarktheme, layoutdirection, lightcolorscheme, locallayoutdirection, localview (+4 more)
+
+### Community 10 - "CircularProgressBar.kt"
+Cohesion: 0.15
+Nodes (15): alignment, animatefloatasstate, CircularProgressBar(), Color, Modifier, box, canvas, column (+7 more)
+
+### Community 11 - "ReaderCounterScreen.kt"
+Cohesion: 0.13
+Nodes (13): animatedvisibility, arrowforward, button, buttondefaults, circleshape, clickable, info, mutablefloatstateof (+5 more)
+
+### Community 15 - "FilterChipRow.kt"
+Cohesion: 0.20
+Nodes (10): FilterChipRow(), Modifier, arrangement, fillmaxwidth, filterchip, filterchipdefaults, horizontalscroll, padding (+2 more)
+
+### Community 16 - "HomeScreen.kt"
+Cohesion: 0.15
+Nodes (13): DailyProgressCard(), Modifier, collectasstate, fillmaxsize, iconbutton, items, lazycolumn, paddingvalues (+5 more)
 
 ### Community 18 - "DayContentKind"
-Cohesion: 0.15
-Nodes (8): WeekdayRepository, DayContent, DayContentKind, DUA, ZIYARAT, DaySelectorRow(), WeekdayContentScreen(), WeekdayRepositoryTest
+Cohesion: 0.10
+Nodes (13): WeekdayRepository, DayContent, DayContentKind, DUA, ZIYARAT, ReminderTimeCalculator, WeekdayRepositoryTest, assertequals (+5 more)
+
+### Community 19 - "ReminderType"
+Cohesion: 0.09
+Nodes (23): ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY, ReminderSettingCard() (+15 more)
+
+### Community 21 - "fontweight"
+Cohesion: 0.33
+Nodes (5): fontfamily, fontweight, sp, textstyle, typography
+
+### Community 32 - "ColorSchemeContrastTest.kt"
+Cohesion: 0.47
+Nodes (3): ColorSchemeContrastTest, Color, asserttrue
 
 ## Knowledge Gaps
-- **27 isolated node(s):** `DUA`, `ZIYARAT`, `READING`, `COUNTER`, `MULTI_STAGE_COUNTER` (+22 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 159 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **28 isolated node(s):** `BottomTab`, `DUA`, `ZIYARAT`, `READING`, `COUNTER` (+23 more)
+  These have ≤1 connection - possible missing edges or undocumented components.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `MainViewModel` connect `MainViewModel` to `MainActivity.kt`, `WeekdayContentScreen.kt`, `PreferencesManager`, `NotificationHelper.kt`, `DeedCategory`, `ReaderCounterScreen.kt`, `HomeScreen.kt`?**
-  _High betweenness centrality (0.183) - this node is a cross-community bridge._
-- **Why does `PreferencesManager` connect `PreferencesManager` to `MainViewModel`, `NotificationHelper.kt`, `DeedCategory`?**
-  _High betweenness centrality (0.136) - this node is a cross-community bridge._
-- **Why does `DeedCategory` connect `DeedCategory` to `DeedCard.kt`, `MainActivity.kt`, `PreferencesManager`, `NotificationHelper.kt`, `MainViewModel`, `FilterChipRow.kt`?**
-  _High betweenness centrality (0.121) - this node is a cross-community bridge._
-- **What connects `DUA`, `ZIYARAT`, `READING` to the rest of the system?**
-  _27 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `DeedCard.kt` be split into smaller, more focused modules?**
-  _Cohesion score 0.11695906432748537 - nodes in this community are weakly interconnected._
+- **Why does `MainViewModel` connect `MainViewModel` to `MainActivity.kt`, `PreferencesManager`, `DeedCategory`, `ReaderCounterScreen.kt`, `HomeScreen.kt`, `ReminderType`?**
+  _High betweenness centrality (0.176) - this node is a cross-community bridge._
+- **Why does `PreferencesManager` connect `PreferencesManager` to `MainViewModel`, `ReminderType`, `NotificationHelper.kt`?**
+  _High betweenness centrality (0.139) - this node is a cross-community bridge._
+- **Why does `DeedCategory` connect `DeedCategory` to `MainActivity.kt`, `NotificationHelper.kt`, `MainViewModel`, `FilterChipRow.kt`, `HomeScreen.kt`?**
+  _High betweenness centrality (0.106) - this node is a cross-community bridge._
+- **What connects `BottomTab`, `DUA`, `ZIYARAT` to the rest of the system?**
+  _28 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `MainActivity.kt` be split into smaller, more focused modules?**
-  _Cohesion score 0.06258890469416785 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07308377896613191 - nodes in this community are weakly interconnected._
 - **Should `Daily Deeds Reminder v1.1.0 release notes` be split into smaller, more focused modules?**
   _Cohesion score 0.08374384236453201 - nodes in this community are weakly interconnected._
+- **Should `WeekdayContentScreen.kt` be split into smaller, more focused modules?**
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._

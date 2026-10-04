@@ -20,8 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.NavyPrimary
+import androidx.compose.material3.LocalContentColor
 
 @Composable
 fun CircularProgressBar(
@@ -30,8 +29,8 @@ fun CircularProgressBar(
     modifier: Modifier = Modifier,
     size: Dp = 130.dp,
     strokeWidth: Dp = 10.dp,
-    progressColor: Color = GoldPrimary,
-    trackColor: Color = NavyPrimary.copy(alpha = 0.2f)
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
 ) {
     val progress = if (total > 0) completed.toFloat() / total.toFloat() else 0f
     val animatedProgress by animateFloatAsState(
@@ -66,13 +65,13 @@ fun CircularProgressBar(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = LocalContentColor.current
             )
             val percent = (progress * 100).toInt()
             Text(
                 text = "$percent%",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.secondary
+                color = LocalContentColor.current
             )
         }
     }

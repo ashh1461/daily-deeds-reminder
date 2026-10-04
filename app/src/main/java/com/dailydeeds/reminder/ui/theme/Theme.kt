@@ -14,13 +14,16 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = NavyAccent,
+internal val DarkColorScheme = darkColorScheme(
+    primary = NavyLight,
     onPrimary = BackgroundDark,
     primaryContainer = NavySecondary,
     onPrimaryContainer = NavyLight,
     secondary = GoldLight,
     onSecondary = BackgroundDark,
+    tertiary = SuccessGreenContainer,
+    onTertiary = BackgroundDark,
+    outlineVariant = CardBorderColorDark,
     background = BackgroundDark,
     onBackground = TextPrimaryDark,
     surface = SurfaceDark,
@@ -29,13 +32,16 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = TextSecondaryDark
 )
 
-private val LightColorScheme = lightColorScheme(
+internal val LightColorScheme = lightColorScheme(
     primary = NavyPrimary,
     onPrimary = SurfaceLight,
     primaryContainer = NavyLight,
     onPrimaryContainer = NavyDark,
-    secondary = GoldPrimary,
+    secondary = GoldText,
     onSecondary = SurfaceLight,
+    tertiary = SuccessGreen,
+    onTertiary = SurfaceLight,
+    outlineVariant = CardBorderColorLight,
     background = BackgroundLight,
     onBackground = TextPrimaryLight,
     surface = SurfaceLight,
@@ -55,8 +61,8 @@ fun DailyReminderTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.statusBarColor = NavyPrimary.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+                window.statusBarColor = colorScheme.surface.toArgb()
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             }
         }
     }

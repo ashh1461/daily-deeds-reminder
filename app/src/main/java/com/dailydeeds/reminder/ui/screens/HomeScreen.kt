@@ -1,22 +1,14 @@
 package com.dailydeeds.reminder.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -29,29 +21,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.data.DeedsRepository
+import com.dailydeeds.reminder.model.Deed
+import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.ui.components.CircularProgressBar
 import com.dailydeeds.reminder.ui.components.DeedCard
 import com.dailydeeds.reminder.ui.components.FilterChipRow
-import com.dailydeeds.reminder.ui.theme.GoldDark
-import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.NavyDark
-import com.dailydeeds.reminder.ui.theme.NavyPrimary
+import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel,
@@ -63,166 +49,120 @@ fun HomeScreen(
     val countsMap by viewModel.countsMap.collectAsState()
     val dailyProgress by viewModel.dailyProgress.collectAsState()
     val activeDate by viewModel.activeDate.collectAsState()
+    val filteredDeeds = remember(selectedCategory, activeDate) {
+        DeedsRepository.getDeedsByCategory(selectedCategory, activeDate)
+    }
 
-    val filteredDeeds = DeedsRepository.getDeedsByCategory(selectedCategory, activeDate)
+    HomeContent(
+        selectedCategory, filteredDeeds, completedMap, countsMap, dailyProgress,
+        viewModel::selectCategory, viewModel::resetToday, viewModel::toggleDeedCompleted,
+        onNavigateToDeed, onNavigateToSettings
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeContent(
+    selectedCategory: DeedCategory,
+    deeds: List<Deed>,
+    completedMap: Map<Int, Boolean>,
+    countsMap: Map<Int, Int>,
+    dailyProgress: Pair<Int, Int>,
+    onCategorySelected: (DeedCategory) -> Unit,
+    onResetToday: () -> Unit,
+    onToggleCompleted: (Int) -> Unit,
+    onNavigateToDeed: (Int) -> Unit,
+    onNavigateToSettings: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "الأعمال اليومية",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 21.sp
-                            ),
-                            color = Color.White
-                        )
-                        Text(
-                            text = "أوراد يومية وقراءات في أوقاتها",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
-                            color = GoldPrimary
-                        )
-                    }
-                },
+                title = { Text("الأعمال اليومية", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { viewModel.resetToday() }) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "إعادة ضبط اليوم",
-                            tint = Color.White
-                        )
+                    IconButton(onClick = onResetToday) {
+                        Icon(Icons.Default.Refresh, contentDescription = "إعادة ضبط اليوم")
                     }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "الإعدادات",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NavyPrimary
-                )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 24.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(NavyPrimary, NavyDark)
-                            )
-                        )
-                        .padding(horizontal = 18.dp, vertical = 18.dp)
-                ) {
-                    Card(
-                        shape = RoundedCornerShape(22.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f)
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.2.dp,
-                                color = GoldPrimary.copy(alpha = 0.35f),
-                                shape = RoundedCornerShape(22.dp)
-                            )
-                    ) {
-                        Column(modifier = Modifier.padding(18.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "إنجاز الأوراد اليومية",
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 18.sp
-                                        ),
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = if (dailyProgress.first == dailyProgress.second && dailyProgress.second > 0) {
-                                            "ما شاء الله! أتممت جميع الأوراد المباركة لليوم 🌿"
-                                        } else {
-                                            "أنجزت ${dailyProgress.first} من أصل ${dailyProgress.second} عملاً"
-                                        },
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.5.sp),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(14.dp))
-
-                                CircularProgressBar(
-                                    completed = dailyProgress.first,
-                                    total = dailyProgress.second,
-                                    size = 82.dp,
-                                    strokeWidth = 9.dp
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(GoldPrimary.copy(alpha = 0.08f))
-                                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                            ) {
-                                Text(
-                                    text = "«أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ» • دُمْ عَلَى وِرْدِكَ تَظْفَرْ بِالْبَرَكَةِ",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 11.5.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = GoldDark
-                                    ),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
+                        Icon(Icons.Default.Settings, contentDescription = "الإعدادات")
                     }
                 }
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            contentPadding = PaddingValues(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
+        ) {
+            item(key = "daily_progress", contentType = "summary") {
+                DailyProgressCard(dailyProgress.first, dailyProgress.second,
+                    modifier = Modifier.padding(horizontal = 16.dp))
             }
-
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                FilterChipRow(
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = { viewModel.selectCategory(it) }
-                )
-                Spacer(modifier = Modifier.height(6.dp))
+            item(key = "categories", contentType = "filters") {
+                FilterChipRow(selectedCategory, onCategorySelected)
             }
-
-            items(filteredDeeds, key = { it.id }) { deed ->
-                val isCompleted = completedMap[deed.id] ?: false
-                val currentCount = countsMap[deed.id] ?: 0
-
+            item(key = "section_title", contentType = "heading") {
+                Text(selectedCategory.titleArabic, style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
+            }
+            items(deeds, key = { it.id }, contentType = { "deed" }) { deed ->
                 DeedCard(
                     deed = deed,
-                    isCompleted = isCompleted,
-                    currentCount = currentCount,
+                    isCompleted = completedMap[deed.id] ?: false,
+                    currentCount = countsMap[deed.id] ?: 0,
                     onClick = { onNavigateToDeed(deed.id) },
-                    onToggleCompleted = { viewModel.toggleDeedCompleted(deed.id) }
+                    onToggleCompleted = { onToggleCompleted(deed.id) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DailyProgressCard(completed: Int, total: Int, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    ) {
+        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text("أوراد يومية وقراءات في أوقاتها", style = MaterialTheme.typography.labelLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("إنجاز الأوراد اليومية", style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold)
+                    Text(
+                        if (completed == total && total > 0) {
+                            "ما شاء الله! أتممت جميع الأوراد المباركة لليوم 🌿"
+                        } else {
+                            "أنجزت $completed من أصل $total عملاً"
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                CircularProgressBar(completed, total, size = 80.dp, strokeWidth = 6.dp)
+            }
+            Text("«أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ»", style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Preview(name = "Arabic light", locale = "ar", showBackground = true)
+@Preview(name = "Arabic dark", locale = "ar", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Arabic large text", locale = "ar", fontScale = 1.5f, widthDp = 360)
+@Composable
+private fun HomePreview() {
+    DailyReminderTheme {
+        HomeContent(
+            selectedCategory = DeedCategory.ALL,
+            deeds = DeedsRepository.getDeedsByCategory(DeedCategory.ALL),
+            completedMap = mapOf(1 to true), countsMap = mapOf(2 to 12), dailyProgress = 1 to 16,
+            onCategorySelected = {}, onResetToday = {}, onToggleCompleted = {},
+            onNavigateToDeed = {}, onNavigateToSettings = {}
+        )
     }
 }

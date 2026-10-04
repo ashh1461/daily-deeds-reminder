@@ -57,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
@@ -66,13 +65,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.data.DeedsRepository
 import com.dailydeeds.reminder.model.DeedType
-import com.dailydeeds.reminder.ui.theme.GoldDark
-import com.dailydeeds.reminder.ui.theme.GoldLight
-import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.NavyDark
-import com.dailydeeds.reminder.ui.theme.NavyPrimary
-import com.dailydeeds.reminder.ui.theme.NavySecondary
-import com.dailydeeds.reminder.ui.theme.SuccessGreen
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,13 +108,13 @@ fun ReaderCounterScreen(
                                 fontSize = 17.sp
                             ),
                             maxLines = 1,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = deed.subtitle,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp,
-                                color = GoldLight.copy(alpha = 0.9f)
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
                             ),
                             maxLines = 1
                         )
@@ -133,7 +125,7 @@ fun ReaderCounterScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = "رجوع",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -142,7 +134,7 @@ fun ReaderCounterScreen(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = if (isCompleted) "مكتمل (اضغط للإلغاء)" else "تحديد كـ مكتمل",
-                            tint = if (isCompleted) GoldPrimary else Color.White
+                            tint = if (isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     if (deed.type != DeedType.READING) {
@@ -150,13 +142,13 @@ fun ReaderCounterScreen(
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "إعادة ضبط العداد",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NavyPrimary
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
@@ -186,14 +178,14 @@ fun ReaderCounterScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(NavyPrimary.copy(alpha = 0.1f))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                             .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
                         Text(
                             text = deed.category.titleArabic,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = NavyPrimary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         )
                     }
@@ -247,14 +239,14 @@ fun ReaderCounterScreen(
                                 onClick = { useAlternativeVariant = false },
                                 label = { Text("الرواية المشهورة الأولى") },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = NavyPrimary,
-                                    selectedLabelColor = Color.White
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 border = if (!useAlternativeVariant) {
                                     FilterChipDefaults.filterChipBorder(
                                         enabled = true,
                                         selected = true,
-                                        selectedBorderColor = GoldPrimary
+                                        selectedBorderColor = MaterialTheme.colorScheme.secondary
                                     )
                                 } else null
                             )
@@ -264,14 +256,14 @@ fun ReaderCounterScreen(
                                 onClick = { useAlternativeVariant = true },
                                 label = { Text(deed.alternativeLabel ?: "الرواية الأخرى") },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = NavyPrimary,
-                                    selectedLabelColor = Color.White
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 border = if (useAlternativeVariant) {
                                     FilterChipDefaults.filterChipBorder(
                                         enabled = true,
                                         selected = true,
-                                        selectedBorderColor = GoldPrimary
+                                        selectedBorderColor = MaterialTheme.colorScheme.secondary
                                     )
                                 } else null
                             )
@@ -290,9 +282,7 @@ fun ReaderCounterScreen(
                         .fillMaxWidth()
                         .border(
                             width = 1.5.dp,
-                            brush = Brush.verticalGradient(
-                                listOf(GoldPrimary, GoldLight, GoldDark, GoldPrimary)
-                            ),
+                            color = MaterialTheme.colorScheme.secondary,
                             shape = RoundedCornerShape(22.dp)
                         )
                 ) {
@@ -308,7 +298,7 @@ fun ReaderCounterScreen(
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
-                                color = GoldPrimary
+                                color = MaterialTheme.colorScheme.secondary
                             ),
                             textAlign = TextAlign.Center
                         )
@@ -325,11 +315,11 @@ fun ReaderCounterScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(1.dp)
-                                    .background(GoldPrimary.copy(alpha = 0.35f))
+                                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f))
                             )
                             Text(
                                 text = " ✤ ✦ ✤ ",
-                                color = GoldPrimary,
+                                color = MaterialTheme.colorScheme.secondary,
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
@@ -337,7 +327,7 @@ fun ReaderCounterScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(1.dp)
-                                    .background(GoldPrimary.copy(alpha = 0.35f))
+                                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f))
                             )
                         }
 
@@ -363,7 +353,7 @@ fun ReaderCounterScreen(
                                 .width(80.dp)
                                 .height(2.dp)
                                 .clip(RoundedCornerShape(1.dp))
-                                .background(GoldPrimary.copy(alpha = 0.4f))
+                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f))
                         )
                     }
                 }
@@ -380,7 +370,7 @@ fun ReaderCounterScreen(
                             .fillMaxWidth()
                             .border(
                                 width = 1.dp,
-                                color = GoldPrimary.copy(alpha = 0.2f),
+                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
                                 shape = RoundedCornerShape(16.dp)
                             )
                     ) {
@@ -389,7 +379,7 @@ fun ReaderCounterScreen(
                                 Icon(
                                     imageVector = Icons.Default.Info,
                                     contentDescription = null,
-                                    tint = GoldPrimary,
+                                    tint = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -399,7 +389,7 @@ fun ReaderCounterScreen(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp
                                     ),
-                                    color = GoldDark
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             }
 
@@ -422,7 +412,7 @@ fun ReaderCounterScreen(
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = NavyPrimary.copy(alpha = 0.8f)
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                                     )
                                 )
                             }
@@ -437,7 +427,8 @@ fun ReaderCounterScreen(
                     onClick = { viewModel.toggleDeedCompleted(deedId) },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isCompleted) SuccessGreen else NavyPrimary
+                        containerColor = if (isCompleted) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                        contentColor = if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -446,7 +437,7 @@ fun ReaderCounterScreen(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = Color.White
+                        tint = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -455,7 +446,7 @@ fun ReaderCounterScreen(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp
                         ),
-                        color = Color.White
+                        color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             }
@@ -481,14 +472,14 @@ fun ReaderCounterScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp)
-                            .border(1.dp, GoldPrimary.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
                             Text(
                                 text = "مراحل التسبيح المبارك (١٠٠ تسبيحة):",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = GoldDark
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -505,16 +496,16 @@ fun ReaderCounterScreen(
                                             .clip(RoundedCornerShape(10.dp))
                                             .background(
                                                 when {
-                                                    isDone -> SuccessGreen.copy(alpha = 0.15f)
-                                                    isCurrent -> NavyPrimary.copy(alpha = 0.12f)
+                                                    isDone -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                                                    isCurrent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                                                     else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                                 }
                                             )
                                             .border(
                                                 width = if (isCurrent) 1.5.dp else 1.dp,
                                                 color = when {
-                                                    isDone -> SuccessGreen
-                                                    isCurrent -> GoldPrimary
+                                                    isDone -> MaterialTheme.colorScheme.tertiary
+                                                    isCurrent -> MaterialTheme.colorScheme.secondary
                                                     else -> Color.Transparent
                                                 },
                                                 shape = RoundedCornerShape(10.dp)
@@ -530,14 +521,14 @@ fun ReaderCounterScreen(
                                                     fontSize = 11.5.sp
                                                 ),
                                                 maxLines = 1,
-                                                color = if (isCurrent) NavyPrimary else MaterialTheme.colorScheme.onSurface
+                                                color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                             )
                                             Text(
                                                 text = "${stage.targetCount}x",
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 11.sp,
-                                                    color = GoldDark
+                                                    color = MaterialTheme.colorScheme.secondary
                                                 )
                                             )
                                         }
@@ -555,7 +546,7 @@ fun ReaderCounterScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, GoldPrimary.copy(alpha = 0.3f), RoundedCornerShape(18.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f), RoundedCornerShape(18.dp))
                 ) {
                     Column(
                         modifier = Modifier
@@ -566,7 +557,7 @@ fun ReaderCounterScreen(
                         Text(
                             text = deed.headerOrnament ?: "۞ اَلذِّكْرُ الْمُبَارَكُ ۞",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                color = GoldPrimary,
+                                color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
@@ -626,24 +617,17 @@ fun ReaderCounterScreen(
                         .scale(orbScale)
                         .clip(CircleShape)
                         .background(
-                            Brush.radialGradient(
-                                colors = if (isCompleted) {
-                                    listOf(SuccessGreen, SuccessGreen.copy(alpha = 0.85f), Color(0xFF1B5E20))
-                                } else {
-                                    listOf(NavySecondary, NavyPrimary, NavyDark)
-                                }
-                            )
+                            if (isCompleted) MaterialTheme.colorScheme.tertiary
+                            else MaterialTheme.colorScheme.primary
                         )
                         .border(
                             width = 5.dp,
-                            brush = Brush.sweepGradient(
-                                listOf(GoldPrimary, GoldLight, GoldDark, GoldLight, GoldPrimary)
-                            ),
+                            color = MaterialTheme.colorScheme.secondary,
                             shape = CircleShape
                         )
                         .clickable(
                             interactionSource = interactionSource,
-                            indication = rememberRipple(bounded = true, color = GoldLight)
+                            indication = rememberRipple(bounded = true, color = MaterialTheme.colorScheme.secondary)
                         ) {
                             viewModel.incrementDeedCount(deedId)
                         }
@@ -658,7 +642,7 @@ fun ReaderCounterScreen(
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 56.sp
                             ),
-                            color = Color.White
+                            color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
                         )
                         Text(
                             text = "من ${deed.targetCount}",
@@ -666,14 +650,14 @@ fun ReaderCounterScreen(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = GoldLight
+                            color = if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary
                         )
                         if (!isCompleted) {
                             Text(
                                 text = "بقي: ${deed.targetCount - currentCount}",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontSize = 12.sp,
-                                    color = Color.White.copy(alpha = 0.75f)
+                                    color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary).copy(alpha = 0.75f)
                                 )
                             )
                         }
@@ -692,7 +676,7 @@ fun ReaderCounterScreen(
                             text = "تم إكمال هذا العمل المبارك لليوم بنجاح تقبل الله منا ومنكم 🌿",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = SuccessGreen
+                                color = MaterialTheme.colorScheme.tertiary
                             ),
                             textAlign = TextAlign.Center
                         )
@@ -710,7 +694,8 @@ fun ReaderCounterScreen(
                         onClick = { viewModel.toggleDeedCompleted(deedId) },
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isCompleted) SuccessGreen else NavyPrimary
+                            containerColor = if (isCompleted) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                            contentColor = if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -719,7 +704,7 @@ fun ReaderCounterScreen(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
-                            tint = Color.White
+                            tint = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -728,7 +713,7 @@ fun ReaderCounterScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             ),
-                            color = Color.White
+                            color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
                         )
                     }
 

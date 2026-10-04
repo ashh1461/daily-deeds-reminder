@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -56,9 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.data.WeekdayRepository
 import com.dailydeeds.reminder.model.DayContentKind
-import com.dailydeeds.reminder.ui.theme.GoldDark
-import com.dailydeeds.reminder.ui.theme.GoldPrimary
-import com.dailydeeds.reminder.ui.theme.NavyPrimary
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -89,12 +85,12 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 21.sp
                             ),
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "من مفاتيح الجنان • أعمال أيام الأسبوع",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
-                            color = GoldPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -103,14 +99,14 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                         Icon(
                             Icons.Default.TextDecrease,
                             contentDescription = "تصغير الخط",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(onClick = { if (fontSize < 34) fontSize += 2 }) {
                         Icon(
                             Icons.Default.TextIncrease,
                             contentDescription = "تكبير الخط",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(onClick = {
@@ -120,11 +116,11 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                         Icon(
                             Icons.Default.ContentCopy,
                             contentDescription = "نسخ النص",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyPrimary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -155,7 +151,7 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(
-                            BorderStroke(1.2.dp, GoldPrimary.copy(alpha = 0.4f)),
+                            BorderStroke(1.2.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)),
                             RoundedCornerShape(22.dp)
                         )
                 ) {
@@ -164,7 +160,7 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(NavyPrimary)
+                                .background(MaterialTheme.colorScheme.primary)
                                 .padding(vertical = 12.dp, horizontal = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -175,14 +171,14 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                                         fontWeight = FontWeight.ExtraBold,
                                         fontSize = 18.sp
                                     ),
-                                    color = GoldPrimary,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
                                     text = content.honoree,
                                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                                    color = Color.White.copy(alpha = 0.85f),
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -210,7 +206,7 @@ fun WeekdayContentScreen(kind: DayContentKind) {
                                 fontSize = 11.5.sp,
                                 fontWeight = FontWeight.SemiBold
                             ),
-                            color = GoldDark,
+                            color = MaterialTheme.colorScheme.secondary,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -251,21 +247,21 @@ private fun DaySelectorRow(
                                 text = "اليوم",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (day == selected) GoldPrimary else GoldDark
+                                color = if (day == selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
                 },
                 shape = RoundedCornerShape(14.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = NavyPrimary,
-                    selectedLabelColor = Color.White
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
                     selected = day == selected,
-                    borderColor = GoldPrimary.copy(alpha = if (isToday) 0.9f else 0.3f),
-                    selectedBorderColor = GoldPrimary
+                    borderColor = MaterialTheme.colorScheme.secondary.copy(alpha = if (isToday) 0.9f else 0.3f),
+                    selectedBorderColor = MaterialTheme.colorScheme.secondary
                 )
             )
         }

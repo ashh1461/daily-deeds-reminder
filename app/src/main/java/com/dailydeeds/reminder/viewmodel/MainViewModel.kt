@@ -7,18 +7,29 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.data.DeedsRepository
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.model.DeedType
+import com.dailydeeds.reminder.model.ReminderType
+import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.notification.AlarmScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val prefs = PreferencesManager(application)
+    private val _activeDate = MutableStateFlow(LocalDate.now())
+    val activeDate = _activeDate.asStateFlow()
+    private val _reminders = MutableStateFlow<Map<ReminderType, ReminderSettings>>(emptyMap())
+    val reminders = _reminders.asStateFlow()
 
     private val _selectedCategory = MutableStateFlow(DeedCategory.ALL)
     val selectedCategory: StateFlow<DeedCategory> = _selectedCategory.asStateFlow()
@@ -32,7 +43,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _stagesMap = MutableStateFlow<Map<Int, Int>>(emptyMap())
     val stagesMap: StateFlow<Map<Int, Int>> = _stagesMap.asStateFlow()
 
-    private val _dailyProgress = MutableStateFlow(Pair(0, 11))
+    private val _dailyProgress = MutableStateFlow(Pair(0, DeedsRepository.getDailyDeeds().size))
     val dailyProgress: StateFlow<Pair<Int, Int>> = _dailyProgress.asStateFlow()
 
     private val _hapticsEnabled = MutableStateFlow(true)
@@ -55,10 +66,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         loadDailyState()
+        viewModelScope.launch {
+            while (isActive) {
+                delay(30_000)
+                refreshDateIfNeeded()
+            }
+        }
+    }
+
+    private fun refreshDateIfNeeded() {
+        if (_activeDate.value != LocalDate.now()) loadDailyState()
     }
 
     fun loadDailyState() {
-        prefs.checkAndResetDaily()
+        val today = LocalDate.now()
+        _activeDate.value = today
+        prefs.checkAndResetDaily(today.toString())
 
         val allDeeds = DeedsRepository.getAllDeeds()
         val completed = mutableMapOf<Int, Boolean>()
@@ -66,15 +89,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val stages = mutableMapOf<Int, Int>()
 
         for (deed in allDeeds) {
-            completed[deed.id] = prefs.isDeedCompleted(deed.id)
-            counts[deed.id] = prefs.getDeedCount(deed.id)
-            stages[deed.id] = prefs.getDeedStage(deed.id)
+            completed[deed.id] = prefs.isDeedCompleted(deed.id, today.toString())
+            counts[deed.id] = prefs.getDeedCount(deed.id, today.toString())
+            stages[deed.id] = prefs.getDeedStage(deed.id, today.toString())
         }
 
         _completedMap.value = completed
         _countsMap.value = counts
         _stagesMap.value = stages
-        _dailyProgress.value = prefs.getDailyProgress()
+        _dailyProgress.value = prefs.getDailyProgress(today.toString())
+        _reminders.value = ReminderType.values().associateWith { prefs.getReminder(it) }
 
         _hapticsEnabled.value = prefs.isHapticsEnabled()
         _soundEnabled.value = prefs.isSoundEnabled()
@@ -89,6 +113,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun toggleDeedCompleted(deedId: Int) {
+        refreshDateIfNeeded()
         val current = _completedMap.value[deedId] ?: false
         val newStatus = !current
         val deed = DeedsRepository.getDeedById(deedId)
@@ -113,6 +138,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun incrementDeedCount(deedId: Int) {
+        refreshDateIfNeeded()
         val deed = DeedsRepository.getDeedById(deedId) ?: return
         val currentCount = _countsMap.value[deedId] ?: 0
 
@@ -150,6 +176,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun resetDeedCount(deedId: Int) {
+        refreshDateIfNeeded()
         prefs.setDeedCount(deedId, 0)
         prefs.setDeedStage(deedId, 0)
         prefs.setDeedCompleted(deedId, false)
@@ -179,6 +206,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _eveningEnabled.value = enabled
         _eveningTime.value = Pair(hour, minute)
         AlarmScheduler.scheduleAllReminders(getApplication())
+    }
+
+    fun setReminder(type: ReminderType, settings: ReminderSettings) {
+        prefs.setReminder(type, settings)
+        _reminders.value = _reminders.value + (type to settings)
+        AlarmScheduler.scheduleReminder(getApplication(), type)
     }
 
     fun toggleHaptics(enabled: Boolean) {

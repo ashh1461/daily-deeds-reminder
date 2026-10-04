@@ -12,6 +12,7 @@ val NavyLight = Color(0xFFDCE7F5)
 // Islamic Gold Palette
 val GoldPrimary = Color(0xFFD4AF37)
 val GoldLight = Color(0xFFF3C649)
+val GoldText = Color(0xFF806000)
 val GoldDark = Color(0xFFA87F0D)
 
 // Surfaces & Backgrounds - Light

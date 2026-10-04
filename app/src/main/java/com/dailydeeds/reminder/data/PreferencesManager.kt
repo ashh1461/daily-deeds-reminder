@@ -2,6 +2,9 @@ package com.dailydeeds.reminder.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.dailydeeds.reminder.model.ReminderSettings
+import com.dailydeeds.reminder.model.ReminderType
+import java.time.LocalDate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -76,7 +79,7 @@ class PreferencesManager(context: Context) {
     }
 
     fun getDailyProgress(date: String = getTodayDateString()): Pair<Int, Int> {
-        val allDeeds = DeedsRepository.getAllDeeds()
+        val allDeeds = DeedsRepository.getDailyDeeds(LocalDate.parse(date))
         val total = allDeeds.size
         var completedCount = 0
         for (deed in allDeeds) {
@@ -96,6 +99,21 @@ class PreferencesManager(context: Context) {
             editor.remove("deed_${deed.id}_stage_$today")
         }
         editor.apply()
+    }
+
+    fun getReminder(type: ReminderType): ReminderSettings = ReminderSettings(
+        enabled = prefs.getBoolean("pref_${type.preferenceKey}_reminder_enabled", true),
+        hour = prefs.getInt("pref_${type.preferenceKey}_hour", type.defaultHour).coerceIn(0, 23),
+        minute = prefs.getInt("pref_${type.preferenceKey}_minute", 0).coerceIn(0, 59)
+    )
+
+    fun setReminder(type: ReminderType, settings: ReminderSettings) {
+        require(settings.hour in 0..23 && settings.minute in 0..59)
+        prefs.edit()
+            .putBoolean("pref_${type.preferenceKey}_reminder_enabled", settings.enabled)
+            .putInt("pref_${type.preferenceKey}_hour", settings.hour)
+            .putInt("pref_${type.preferenceKey}_minute", settings.minute)
+            .apply()
     }
 
     fun isMorningReminderEnabled(): Boolean = prefs.getBoolean(KEY_MORNING_ENABLED, true)

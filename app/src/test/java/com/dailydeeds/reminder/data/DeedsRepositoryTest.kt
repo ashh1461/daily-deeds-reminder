@@ -6,13 +6,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.LocalDate
 
 class DeedsRepositoryTest {
 
     @Test
-    fun testAllDeedsCountIsEleven() {
+    fun testAllDeedsCountIsSixteen() {
         val deeds = DeedsRepository.getAllDeeds()
-        assertEquals(11, deeds.size)
+        assertEquals(16, deeds.size)
+        assertEquals((1..16).toList(), deeds.map { it.id })
     }
 
     @Test
@@ -61,13 +63,41 @@ class DeedsRepositoryTest {
 
     @Test
     fun testCategoryFiltering() {
-        val allDeeds = DeedsRepository.getDeedsByCategory(DeedCategory.ALL)
-        assertEquals(11, allDeeds.size)
+        val allDeeds = DeedsRepository.getDeedsByCategory(DeedCategory.ALL, LocalDate.of(2026, 10, 8))
+        assertEquals(16, allDeeds.size)
 
         val quranDeeds = DeedsRepository.getDeedsByCategory(DeedCategory.QURAN)
         assertEquals(4, quranDeeds.size)
 
         val tasbeehDeeds = DeedsRepository.getDeedsByCategory(DeedCategory.TASBEEH)
         assertEquals(3, tasbeehDeeds.size)
+    }
+
+    @Test
+    fun suppliedTextsHaveTheirStatedTimesAndCounts() {
+        assertEquals(listOf(12, 13), DeedsRepository.getDeedsByCategory(DeedCategory.ANYTIME).map { it.id })
+        assertEquals(listOf(14), DeedsRepository.getDeedsByCategory(DeedCategory.BEDTIME).map { it.id })
+        assertEquals(listOf(15), DeedsRepository.getDeedsByCategory(DeedCategory.NIGHT).map { it.id })
+        assertEquals(listOf(16), DeedsRepository.getDeedsByCategory(DeedCategory.THURSDAY).map { it.id })
+        for (id in listOf(13, 14)) {
+            assertEquals(DeedType.COUNTER, DeedsRepository.getDeedById(id)!!.type)
+            assertEquals(3, DeedsRepository.getDeedById(id)!!.targetCount)
+        }
+        assertTrue(DeedsRepository.getDeedById(12)!!.instructions!!.contains("قلبك"))
+        assertTrue(DeedsRepository.getDeedById(16)!!.content.contains("سورة القدر"))
+        assertTrue(DeedsRepository.getDeedById(16)!!.content.contains("سورة الفاتحة"))
+    }
+
+    @Test
+    fun thursdayReadingOnlyContributesToThursdayProgress() {
+        val thursday = LocalDate.of(2026, 10, 8)
+        assertEquals(16, DeedsRepository.getDailyDeeds(thursday).size)
+        for (days in 1L..6L) {
+            val date = thursday.plusDays(days)
+            assertEquals(15, DeedsRepository.getDailyDeeds(date).size)
+            assertTrue(DeedsRepository.getDailyDeeds(date).none { it.id == 16 })
+            assertEquals(15, DeedsRepository.getDeedsByCategory(DeedCategory.ALL, date).size)
+            assertEquals(16, DeedsRepository.getDeedsByCategory(DeedCategory.THURSDAY, date).single().id)
+        }
     }
 }

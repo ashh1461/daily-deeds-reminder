@@ -4,6 +4,8 @@ import com.dailydeeds.reminder.model.Deed
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.model.TasbeehStage
+import java.time.DayOfWeek
+import java.time.LocalDate
 
 object DeedsRepository {
 
@@ -226,15 +228,98 @@ object DeedsRepository {
             content = "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَعَجِّلْ فَرَجَهُمْ",
             instructions = "مائة صلوات محمدية مباركة يومياً، وهي مفتاح الخير والبركة واستجابة الدعوات.",
             referenceSource = "ثواب الأعمال للصدوق"
+        ),
+        Deed(
+            id = 12,
+            title = "الزيارة المختصرة لصاحب الزمان",
+            subtitle = "ضع يدك على قلبك وقل • لم يُذكر وقت محدد",
+            type = DeedType.READING,
+            targetCount = 1,
+            category = DeedCategory.ANYTIME,
+            content = """
+                السَّلَامُ عَلَيْكَ يَا صَاحِبَ الزَّمَانِ
+                السَّلَامُ عَلَيْكَ يَا خَلِيفَةَ الرَّحْمَنِ
+                السَّلَامُ عَلَيْكَ يَا شَرِيكَ الْقُرْآنِ
+                السَّلَامُ عَلَيْكَ يَا قَاطِعَ الْبُرْهَانِ
+                السَّلَامُ عَلَيْكَ يَا إِمَامَ الْإِنْسِ وَالْجَانِّ
+                السَّلَامُ عَلَيْكَ وَعَلَى آبَائِكَ الطَّيِّبِينَ
+                وَأَجْدَادِكَ الطَّاهِرِينَ الْمَعْصُومِينَ
+                وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
+            """.trimIndent(),
+            instructions = "ضع يدك على قلبك واقرأ الزيارة. لم يُحدَّد وقت أو عدد للتكرار في الصورة.",
+            referenceSource = "النص من الصورة المرفقة"
+        ),
+        Deed(
+            id = 13,
+            title = "دعاء استيداع المستقبل",
+            subtitle = "ثلاث مرات • لم يُذكر وقت محدد",
+            type = DeedType.COUNTER,
+            targetCount = 3,
+            category = DeedCategory.ANYTIME,
+            content = "اللهم إني استودعتك مستقبلاً لا أعلم خفاياه، ولكني أعلم أنك خير مدبر، فوفقني في أمور حياتي يا الله.",
+            instructions = "يُقرأ ثلاث مرات بحسب الصورة المرفقة، من دون تحديد وقت في اليوم.",
+            referenceSource = "الصورة المرفقة تنسبه إلى السيد علي القاضي (قدس الله سره)"
+        ),
+        Deed(
+            id = 14,
+            title = "ولكم فيها جمال",
+            subtitle = "ثلاث مرات قبل النوم • سورة النحل، الآية ٦",
+            type = DeedType.COUNTER,
+            targetCount = 3,
+            category = DeedCategory.BEDTIME,
+            content = "وَلَكُمْ فِيهَا جَمَالٌ حِينَ تُرِيحُونَ وَحِينَ تَسْرَحُونَ",
+            instructions = "اقرأ الآية ثلاث مرات قبل النوم. موعد التنبيه قابل للتعديل ليتوافق مع وقت نومك.",
+            referenceSource = "القرآن الكريم — النحل: ٦. التوقيت والتكرار بحسب الصورة المرفقة"
+        ),
+        Deed(
+            id = 15,
+            title = "دعاء تغيير الحال",
+            subtitle = "يُكرر في الليل • من دون عدد محدد",
+            type = DeedType.READING,
+            targetCount = 1,
+            category = DeedCategory.NIGHT,
+            content = """
+                اللهم يا مغير الأحوال غير حالي إلى أحسن حال،
+                وسخر لي من حظوظ الدنيا ما تعلم أنه خير لي،
+                واصرف عني كل ما هو شر لي،
+                إنك على كل شيء قدير.
+            """.trimIndent(),
+            instructions = "كرره في الليل بحسب الصورة المرفقة. لم يُذكر عدد محدد؛ زر الإنجاز يسجل القراءة فقط.",
+            referenceSource = "النص من الصورة المرفقة"
+        ),
+        Deed(
+            id = 16,
+            title = "قراءات صباح الخميس لطلب الحاجة",
+            subtitle = "صباح الخميس عند الخروج من المنزل لطلب الحاجة",
+            type = DeedType.READING,
+            targetCount = 1,
+            category = DeedCategory.THURSDAY,
+            content = """
+                ورد في الصورة، منسوباً إلى أمير المؤمنين علي (عليه السلام):
+
+                «إذا أراد أحدكم الحاجة فليبكر في طلبها يوم الخميس، وليقرأ إذا خرج من منزله آخر سورة آل عمران، وآية الكرسي، وإنا أنزلناه في ليلة القدر، وأم الكتاب، فإن فيها قضاء حوائج الدنيا والآخرة».
+
+                القراءات المذكورة:
+                ١. آخر سورة آل عمران.
+                ٢. آية الكرسي.
+                ٣. سورة القدر (إنا أنزلناه في ليلة القدر).
+                ٤. سورة الفاتحة (أم الكتاب).
+            """.trimIndent(),
+            instructions = "صباح الخميس عند الخروج لطلب الحاجة. لم تحدد الصورة أرقام آيات آخر سورة آل عمران أو عدد التكرار. التنبيه الأسبوعي قابل للتعديل.",
+            referenceSource = "المصدر المذكور في الصورة: بحار الأنوار، ج ٩٢، ص ١٣٥"
         )
     )
 
     fun getAllDeeds(): List<Deed> = deedsList
 
+    fun getDailyDeeds(date: LocalDate = LocalDate.now()): List<Deed> = deedsList.filter {
+        it.category != DeedCategory.THURSDAY || date.dayOfWeek == DayOfWeek.THURSDAY
+    }
+
     fun getDeedById(id: Int): Deed? = deedsList.find { it.id == id }
 
-    fun getDeedsByCategory(category: DeedCategory): List<Deed> {
-        if (category == DeedCategory.ALL) return deedsList
+    fun getDeedsByCategory(category: DeedCategory, date: LocalDate = LocalDate.now()): List<Deed> {
+        if (category == DeedCategory.ALL) return getDailyDeeds(date)
         return deedsList.filter { it.category == category }
     }
 }

@@ -5,10 +5,10 @@ Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Pub
 ## Completed
 
 - Checked Git status and Kotlin file integrity before editing. No modified or empty Kotlin files needed restoration.
-- Read the graph report and used the graphify skill to inspect the affected code.
-- Redesigned the Arabic RTL home screen, deed cards, filters, and daily progress summary. Replaced fixed UI colours with Material theme roles, improved dark-mode colour pairs, and added light/dark/large-text previews.
-- Added a theme contrast regression test. Full clean build, unit tests, and debug APK assembly passed: 22 tests, zero failures. No empty Kotlin files.
-- Updated the graph and pushed UI commit `6c3088c` to the release branch.
+- Verified test baseline: `:app:testDebugUnitTest` passed cleanly with 22 unit tests passing.
+- Initialized Linear tracking for the milestone: created issue `ALI-20` (*Add Full Quran (Tafsir Al-Mizan) and Mafatih Al-Jinan with Search and Indexing*) in "In Progress" status. Built reusable CLI utility `scripts/linear_tool.py`.
+- Formulated core binding operational directives in `AGENTS.md` and `SOUL.md` mandating constant synchronization across GitHub, Linear, and `progress.md`.
+- Executed `graphify update .` to index new operational directives and refresh the repository knowledge graph: 451 nodes, 916 edges, 43 communities in `graphify-out/`.
 - Split the reader into focused route, reading content, text card, counter content, counter widgets, and toolbar files. Preserved existing comments, displayed text, state ownership, and callbacks.
 - Reader refactor verification passed: full clean build, 22 unit tests, and debug APK assembly; no empty Kotlin files.
 - Updated the reader code graph: 437 nodes, 897 edges, 41 communities.
@@ -43,3 +43,4 @@ Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Pub
 - 2026-10-04: Merged [PR #1](https://github.com/ashh1461/daily-deeds-reminder/pull/1) into `master` as `749520c`. Confirmed the merged tree exactly matches the tested release commit `002bc58`.
 - 2026-10-04: Published [v1.1.1](https://github.com/ashh1461/daily-deeds-reminder/releases/tag/v1.1.1) from merged `master`, with `DailyDeeds-v1.1.1.apk` and its SHA-256 sidecar. GitHub confirms the release is public, not a draft or prerelease, and marked Latest. The uploaded APK digest matches the locally verified APK. Local `master` was fast-forwarded to the merge.
 - 2026-10-04: Final follow-up updates only this progress record and generated graph outputs; application source remains identical to the verified release.
+- 2026-10-05: Initiated major milestone: Full Quran with Tafsir Al-Mizan and Mafatih Al-Jinan with search and indexing. Baseline verified (22 unit tests passing). Configured Linear tracking (ALI-20), created AGENTS.md and SOUL.md core project directives, refreshed graphify knowledge graph (451 nodes, 916 edges, 43 communities).

@@ -6,3 +6,10 @@ build/
 app/build/
 *.apk
 *.ps1
+.android-local/
+analytics.settings
+DailyReminderGraph.html
+graphify-out/cache/
+graphify-out/reflections/
+graphify-out/202*
+graphify-out/.*

@@ -1,0 +1,15 @@
+{
+  "runs": [
+    {
+      "date": "2026-10-03T19:42:57.898380+00:00",
+      "input_tokens": null,
+      "output_tokens": null,
+      "token_usage_status": "Session agent usage not exposed; not measured",
+      "files": 22,
+      "commit": "058db4c4a4667469276e9823f28c2ce7859df4d6"
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "totals_complete": false
+}

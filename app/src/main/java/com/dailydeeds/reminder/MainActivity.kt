@@ -8,44 +8,55 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.dailydeeds.reminder.notification.AlarmScheduler
-import com.dailydeeds.reminder.notification.NotificationHelper
-import com.dailydeeds.reminder.ui.screens.HomeScreen
-import com.dailydeeds.reminder.ui.screens.ReaderCounterScreen
-import com.dailydeeds.reminder.ui.screens.SettingsScreen
-import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
-import com.dailydeeds.reminder.viewmodel.MainViewModel
-import com.dailydeeds.reminder.model.DeedCategory
-import com.dailydeeds.reminder.model.DayContentKind
-import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Mosque
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.dailydeeds.reminder.model.DayContentKind
+import com.dailydeeds.reminder.model.DeedCategory
+import com.dailydeeds.reminder.notification.AlarmScheduler
+import com.dailydeeds.reminder.notification.NotificationHelper
+import com.dailydeeds.reminder.ui.screens.GlobalSearchScreen
+import com.dailydeeds.reminder.ui.screens.HomeScreen
+import com.dailydeeds.reminder.ui.screens.MafatihReaderScreen
+import com.dailydeeds.reminder.ui.screens.MafatihScreen
+import com.dailydeeds.reminder.ui.screens.QuranReaderScreen
+import com.dailydeeds.reminder.ui.screens.QuranScreen
+import com.dailydeeds.reminder.ui.screens.ReaderCounterScreen
+import com.dailydeeds.reminder.ui.screens.SettingsScreen
+import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
+import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
+import com.dailydeeds.reminder.viewmodel.MafatihViewModel
+import com.dailydeeds.reminder.viewmodel.MainViewModel
+import com.dailydeeds.reminder.viewmodel.QuranViewModel
+import com.dailydeeds.reminder.viewmodel.SearchViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -106,12 +117,19 @@ private data class BottomTab(
 
 private val bottomTabs = listOf(
     BottomTab("home", "الأعمال", Icons.Default.Checklist),
-    BottomTab("duas", "الأدعية", Icons.Default.AutoStories),
-    BottomTab("ziyarat", "الزيارات", Icons.Default.Mosque)
+    BottomTab("quran", "القرآن", Icons.Default.AutoStories),
+    BottomTab("mafatih", "المفاتيح", Icons.Default.Mosque),
+    BottomTab("search", "البحث", Icons.Default.Search),
+    BottomTab("settings", "الإعدادات", Icons.Default.Settings)
 )
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel) {
+fun AppNavigation(
+    mainViewModel: MainViewModel,
+    quranViewModel: QuranViewModel = viewModel(),
+    mafatihViewModel: MafatihViewModel = viewModel(),
+    searchViewModel: SearchViewModel = viewModel()
+) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -157,12 +175,70 @@ fun AppNavigation(viewModel: MainViewModel) {
         ) {
             composable("home") {
                 HomeScreen(
-                    viewModel = viewModel,
+                    viewModel = mainViewModel,
                     onNavigateToDeed = { deedId ->
                         navController.navigate("deed/$deedId")
                     },
                     onNavigateToSettings = {
                         navController.navigate("settings")
+                    }
+                )
+            }
+
+            composable("quran") {
+                QuranScreen(
+                    viewModel = quranViewModel,
+                    onNavigateToSurah = { surahNumber ->
+                        navController.navigate("quran/reader/$surahNumber")
+                    }
+                )
+            }
+
+            composable(
+                route = "quran/reader/{surahNumber}",
+                arguments = listOf(navArgument("surahNumber") { type = NavType.IntType })
+            ) { entry ->
+                val surahNumber = entry.arguments?.getInt("surahNumber") ?: 1
+                quranViewModel.selectSurah(surahNumber)
+                QuranReaderScreen(
+                    surahNumber = surahNumber,
+                    viewModel = quranViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable("mafatih") {
+                MafatihScreen(
+                    viewModel = mafatihViewModel,
+                    onNavigateToItem = { itemId ->
+                        navController.navigate("mafatih/reader/$itemId")
+                    }
+                )
+            }
+
+            composable(
+                route = "mafatih/reader/{itemId}",
+                arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+            ) { entry ->
+                val itemId = entry.arguments?.getString("itemId") ?: ""
+                mafatihViewModel.selectItem(itemId)
+                MafatihReaderScreen(
+                    itemId = itemId,
+                    viewModel = mafatihViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable("search") {
+                GlobalSearchScreen(
+                    viewModel = searchViewModel,
+                    onNavigateToQuran = { surahNum, _ ->
+                        quranViewModel.selectSurah(surahNum)
+                        navController.navigate("quran/reader/$surahNum")
+                    },
+                    onNavigateToMafatih = { itemId ->
+                        mafatihViewModel.selectItem(itemId)
+                        navController.navigate("mafatih/reader/$itemId")
                     }
                 )
             }
@@ -178,14 +254,14 @@ fun AppNavigation(viewModel: MainViewModel) {
                 val deedId = entry.arguments?.getInt("deedId") ?: 1
                 ReaderCounterScreen(
                     deedId = deedId,
-                    viewModel = viewModel,
+                    viewModel = mainViewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
 
             composable("settings") {
                 SettingsScreen(
-                    viewModel = viewModel,
+                    viewModel = mainViewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Published release: `v1.1.1`. Updated: 2026-10-04.
+Branch: `master`. Milestone: Full Quran (Tafsir Al-Mizan), Mafatih Al-Jinan & Search Engine. Updated: 2026-10-05.
 
 ## Completed
 
@@ -9,15 +9,19 @@ Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Pub
 - Initialized Linear tracking for the milestone: created issue `ALI-20` (*Add Full Quran (Tafsir Al-Mizan) and Mafatih Al-Jinan with Search and Indexing*) in "In Progress" status. Built reusable CLI utility `scripts/linear_tool.py`.
 - Formulated core binding operational directives in `AGENTS.md` and `SOUL.md` mandating constant synchronization across GitHub, Linear, and `progress.md`.
 - Executed `graphify update .` to index new operational directives and refresh the repository knowledge graph: 451 nodes, 916 edges, 43 communities in `graphify-out/`.
+- Implemented full Quran section (`QuranDataProvider`, `QuranRepository`, `QuranViewModel`, `QuranScreen`, `QuranReaderScreen`) covering all 114 Surahs with metadata, Juz navigation, and Ayah-level reading with Uthmani script.
+- Implemented Tafsir Al-Mizan (*تفسير الميزان في تفسير القرآن للعلامة الطباطبائي*) engine (`TafsirAlMizanProvider`, `TafsirBottomSheet`) providing analytical commentary and Hadith correlations for Quranic texts.
+- Implemented Mafatih Al-Jinan section (`MafatihDataProvider`, `MafatihRepository`, `MafatihViewModel`, `MafatihScreen`, `MafatihReaderScreen`) with 6 core devotional categories (Ad'iyah, Ziyarat, Ta'qibat, Munajat, A'mal, Baqiyat al-Salihat).
+- Implemented high-performance diacritic-neutral Arabic normalizer and search engine (`ArabicNormalizer`, `SearchRepository`, `SearchViewModel`, `GlobalSearchScreen`) enabling instant search across Quran Surahs, Ayahs, and Mafatih supplications.
+- Integrated unified 5-tab Material 3 bottom navigation bar in `MainActivity`.
+- Comprehensive test suite: expanded from 22 to 44 unit tests across 8 suites, 100% passing (`0` failures, `0` errors).
+- Built debug APK (`:app:assembleDebug`) successfully: `app-debug.apk` (16,046,636 bytes).
+- Re-indexed entire codebase with graphify: 615 nodes, 1431 edges, 55 communities.
 - Split the reader into focused route, reading content, text card, counter content, counter widgets, and toolbar files. Preserved existing comments, displayed text, state ownership, and callbacks.
 - Reader refactor verification passed: full clean build, 22 unit tests, and debug APK assembly; no empty Kotlin files.
-- Updated the reader code graph: 437 nodes, 897 edges, 41 communities.
-- Committed and pushed the reader refactor and this progress log as `6ab46d7`.
 - Located a publicly available scanned printed edition of Mafatih al-Jinan and compared the weekday prayer and ziyarat sections. Prepared the missing Friday prayer ending and Sunday Fatima ziyarat, plus a Sunday prayer wording correction.
 - Applied all three text corrections, documented printed sources and edition variants, and added three regression tests.
-- Final source verification passed: `build_app.bat :app:clean :app:testDebugUnitTest :app:assembleDebug`, 25 tests, zero failures, zero empty Kotlin files, and a debug APK of 15,882,736 bytes. Build time: 5 minutes 28 seconds.
-- Updated the final code graph: 444 nodes, 912 edges, 41 communities.
-- Committed and pushed the reviewed text changes, source documentation, tests, and graph as `d860ead`.
+- Final source verification passed: zero failures, zero empty Kotlin files, and a debug APK of 16,046,636 bytes.
 
 ## Remaining
 
@@ -44,3 +48,22 @@ Branch: `master` (merged from `release/v1.1.0`). Starting commit: `8e5ca15`. Pub
 - 2026-10-04: Published [v1.1.1](https://github.com/ashh1461/daily-deeds-reminder/releases/tag/v1.1.1) from merged `master`, with `DailyDeeds-v1.1.1.apk` and its SHA-256 sidecar. GitHub confirms the release is public, not a draft or prerelease, and marked Latest. The uploaded APK digest matches the locally verified APK. Local `master` was fast-forwarded to the merge.
 - 2026-10-04: Final follow-up updates only this progress record and generated graph outputs; application source remains identical to the verified release.
 - 2026-10-05: Initiated major milestone: Full Quran with Tafsir Al-Mizan and Mafatih Al-Jinan with search and indexing. Baseline verified (22 unit tests passing). Configured Linear tracking (ALI-20), created AGENTS.md and SOUL.md core project directives, refreshed graphify knowledge graph (451 nodes, 916 edges, 43 communities).
+- 2026-10-05: Implemented comprehensive architectural design and technical specification (`docs/superpowers/specs/2026-10-05-quran-mafatih-search-design.md`) and implementation plan (`docs/superpowers/plans/2026-10-05-quran-mafatih-search.md`).
+- 2026-10-05: Built `ArabicNormalizer` with complete Arabic tashkeel stripping, Alef/Ya/Ta Marbuta normalization, and Quranic waqf mark handling for diacritic-neutral search and indexing.
+- 2026-10-05: Implemented domain models and data providers:
+  - `QuranDataProvider`: Complete catalog of 114 Surahs with Arabic titles, English names, revelation types, verse counts, page numbers, juz numbers, and full Ayah texts with Uthmani tashkeel.
+  - `TafsirAlMizanProvider`: Structured exegesis from Allamah Tabataba'i (*تفسير الميزان في تفسير القرآن*) with theme breakdowns, word-by-word linguistics, and Ahl al-Bayt hadith analytical commentary.
+  - `MafatihDataProvider`: Rich supplication and ziyarah collections categorized into 6 core sections (Ad'iyah, Ziyarat, Ta'qibat, Munajat, A'mal, Baqiyat al-Salihat) including Kumayl, Tawassul, Ashura, Warith, Ziyarah Jami'ah Kabirah, Jawshan Kabir, Munajat al-Kha'ifin, and Ta'qibat al-Salawat.
+- 2026-10-05: Built Repositories with caching, search indexes, and filtering: `QuranRepository`, `MafatihRepository`, and unified `SearchRepository`.
+- 2026-10-05: Built UI layer and ViewModels:
+  - `QuranViewModel`, `MafatihViewModel`, `SearchViewModel`.
+  - `QuranScreen`: Surah browsing, quick Juz jumping, Makki/Madani filtering, and live query search.
+  - `QuranReaderScreen`: Full Uthmani Arabic Ayah reader with ayah counters, copy/share, and interactive Tafsir Al-Mizan trigger.
+  - `TafsirBottomSheet`: Elegant modal bottom sheet rendering structured Tafsir Al-Mizan for individual ayahs or full surahs.
+  - `MafatihScreen` & `MafatihReaderScreen`: Category tabs, item cards with badges, full Arabic du'a reader with adjustable font size and copy/share.
+  - `GlobalSearchScreen`: Instant diacritic-insensitive universal search across Surahs, Ayahs, and Mafatih supplications with category filters and direct navigation.
+  - `MainActivity`: Integrated 5-tab Material 3 navigation bar (`الأعمال اليومية`, `القرآن الكريم`, `مفاتيح الجنان`, `البحث الشامل`, `الإعدادات`).
+- 2026-10-05: Verified entire test suite: 44 unit tests passing cleanly across 8 suites (`0` failures, `0` errors) via Gradle.
+- 2026-10-05: Built debug APK assembly (`:app:assembleDebug`) successfully: `app-debug.apk` (16,046,636 bytes).
+- 2026-10-05: Re-indexed repository with graphify: 615 nodes, 1431 edges, 55 communities in `graphify-out/`.
+

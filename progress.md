@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Milestone: Full Quran (Tafsir Al-Mizan), Mafatih Al-Jinan & Search Engine. Updated: 2026-10-05.
+Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -66,4 +66,13 @@ Branch: `master`. Milestone: Full Quran (Tafsir Al-Mizan), Mafatih Al-Jinan & Se
 - 2026-10-05: Verified entire test suite: 44 unit tests passing cleanly across 8 suites (`0` failures, `0` errors) via Gradle.
 - 2026-10-05: Built debug APK assembly (`:app:assembleDebug`) successfully: `app-debug.apk` (16,046,636 bytes).
 - 2026-10-05: Re-indexed repository with graphify: 615 nodes, 1431 edges, 55 communities in `graphify-out/`.
+- 2026-10-06: Prepared and validated v1.2.0 Release:
+  - Bumped version in `app/build.gradle.kts` to version code 4, version name `1.2.0`.
+  - Populated binding directives in `AGENTS.md` and core ethos in `SOUL.md`.
+  - Updated Arabic `README.md` with v1.2.0 highlights and features.
+  - Executed clean Gradle verification: `:app:clean :app:testDebugUnitTest :app:assembleDebug` in 6m 56s. All 44 unit tests passed (0 failures, 0 errors).
+  - Packaged distribution APK `build/distributions/DailyDeeds-v1.2.0.apk` (15,999,348 bytes) and computed SHA-256 digest (`ed20590a56db87d088d8b42fa23b6ba159b7ae544fb37b9a50a1c97208e4d3c5`).
+  - Authored release documentation in `docs/releases/v1.2.0.md`.
+  - Published GitHub release `v1.2.0` with tagged commit and attached APK artifacts.
+  - Updated Linear issue `ALI-20` with release notes, tag link, and SHA-256 digest.
 

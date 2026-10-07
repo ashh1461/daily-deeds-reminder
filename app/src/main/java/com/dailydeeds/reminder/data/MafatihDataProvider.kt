@@ -5,7 +5,7 @@ import com.dailydeeds.reminder.model.MafatihItem
 
 object MafatihDataProvider {
 
-    val items: List<MafatihItem> = listOf(
+    private val curatedItems: List<MafatihItem> = listOf(
         // === 1. الأدعية المشهورة (ADIYAH) ===
         MafatihItem(
             id = "dua_kumayl",
@@ -232,6 +232,32 @@ object MafatihDataProvider {
             virtueOrSource = "من أدعية تعقيب صلاة العشاء لسعة الرزق وقضاء الديون مروي في مصباح المتهجد ومفاتيح الجنان."
         )
     )
+
+    /** Resource bundled in the APK: `n|title|firstPage|lastPage|text` per line, newlines escaped as `\n`. */
+    const val FULLBOOK_RESOURCE = "mafatih/fullbook.txt"
+
+    const val FULLBOOK_SOURCE = "النص الكامل لكتاب مفاتيح الجنان للشيخ عباس القمي (ت 1359هـ)، من مدونة OpenITI المأخوذة عن المكتبة الشاملة، بلا تشكيل."
+
+    val fullBookItems: List<MafatihItem> by lazy { loadFullBook() }
+
+    val items: List<MafatihItem> by lazy { curatedItems + fullBookItems }
+
+    private fun loadFullBook(): List<MafatihItem> {
+        val stream = MafatihDataProvider::class.java.classLoader?.getResourceAsStream(FULLBOOK_RESOURCE)
+            ?: error("Missing bundled resource: $FULLBOOK_RESOURCE")
+        return stream.bufferedReader(Charsets.UTF_8).useLines { lines ->
+            lines.filter { it.isNotBlank() }.map { line ->
+                val f = line.split('|', limit = 5)
+                MafatihItem(
+                    id = "mj_${f[0]}",
+                    category = MafatihCategoryType.FULLBOOK,
+                    title = f[1],
+                    arabicText = f[4].replace("\\n", "\n"),
+                    virtueOrSource = FULLBOOK_SOURCE
+                )
+            }.toList()
+        }
+    }
 
     fun getItemsByCategory(category: MafatihCategoryType): List<MafatihItem> {
         return items.filter { it.category == category }

@@ -19,7 +19,7 @@ class MafatihRepositoryTest {
     @Test
     fun testGetCategoriesReturnsAll6MajorCategories() {
         val categories = repository.getCategories()
-        assertEquals(6, categories.size)
+        assertEquals(7, categories.size)
         assertTrue(categories.contains(MafatihCategoryType.ADIYAH))
         assertTrue(categories.contains(MafatihCategoryType.ZIYARAT))
         assertTrue(categories.contains(MafatihCategoryType.TAQIBAT))

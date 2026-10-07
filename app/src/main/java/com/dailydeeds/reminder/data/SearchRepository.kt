@@ -37,7 +37,8 @@ class SearchRepository(
         typeFilter: SearchResultType = SearchResultType.ALL,
         limit: Int = MAX_RESULTS // per result type
     ): List<SearchResultItem> {
-        val normalizedQuery = ArabicNormalizer.searchKey(query).lowercase()
+        // Bound attacker/pasted input: a multi-megabyte query could otherwise stall the search thread.
+        val normalizedQuery = ArabicNormalizer.searchKey(query.take(MAX_QUERY_LENGTH)).lowercase()
         if (normalizedQuery.isEmpty()) return emptyList()
 
         val types = if (typeFilter == SearchResultType.ALL) SEARCH_ORDER else listOf(typeFilter)
@@ -144,6 +145,7 @@ class SearchRepository(
 
     companion object {
         const val MAX_RESULTS = 50
+        const val MAX_QUERY_LENGTH = 200
         private val SEARCH_ORDER = listOf(
             SearchResultType.QURAN, SearchResultType.TAFSIR,
             SearchResultType.MAFATIH, SearchResultType.WEEKDAY

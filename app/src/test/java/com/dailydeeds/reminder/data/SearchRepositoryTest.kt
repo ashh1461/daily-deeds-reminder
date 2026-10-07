@@ -67,4 +67,13 @@ class SearchRepositoryTest {
         assertTrue(results.any { it.type == SearchResultType.TAFSIR })
         assertTrue(results.any { it.type == SearchResultType.MAFATIH })
     }
+
+    @Test
+    fun hugeHostileQueryIsBoundedAndFast() {
+        val start = System.nanoTime()
+        val results = searchRepository.search("ا".repeat(5_000_000) + "الله")
+        val ms = (System.nanoTime() - start) / 1_000_000
+        assertTrue("took $ms ms", ms < 5_000)
+        assertTrue(results.size <= 4 * SearchRepository.MAX_RESULTS)
+    }
 }

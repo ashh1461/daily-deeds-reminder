@@ -5,9 +5,6 @@ import android.content.SharedPreferences
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.model.ReminderType
 import java.time.LocalDate
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class PreferencesManager(context: Context) {
 
@@ -27,10 +24,11 @@ class PreferencesManager(context: Context) {
         const val KEY_SOUND_ENABLED = "pref_sound_enabled"
         const val KEY_COMPLETED_DAYS_STREAK = "pref_completed_days_streak"
 
-        fun getTodayDateString(): String {
-            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            return sdf.format(Date())
-        }
+        /** Days of per-day deed state kept before old keys are pruned. */
+        const val RETENTION_DAYS = 90L
+        private val DEED_DAY_KEY = Regex("""^deed_\d+_(?:completed|count|stage)_(\d{4}-\d{2}-\d{2})$""")
+
+        fun getTodayDateString(): String = LocalDate.now().toString()
     }
 
     fun isDeedCompleted(deedId: Int, date: String = getTodayDateString()): Boolean {
@@ -65,6 +63,19 @@ class PreferencesManager(context: Context) {
         prefs.edit().putString(KEY_LAST_ACTIVE_DATE, date).apply()
     }
 
+    /** Removes per-day deed keys older than [RETENTION_DAYS] so the preferences file stays bounded. */
+    fun pruneOldDeedState(today: String = getTodayDateString()) {
+        val cutoff = LocalDate.parse(today).minusDays(RETENTION_DAYS)
+        val stale = prefs.all.keys.filter { key ->
+            val date = DEED_DAY_KEY.matchEntire(key)?.groupValues?.get(1) ?: return@filter false
+            runCatching { LocalDate.parse(date).isBefore(cutoff) }.getOrDefault(false)
+        }
+        if (stale.isEmpty()) return
+        val editor = prefs.edit()
+        stale.forEach(editor::remove)
+        editor.apply()
+    }
+
     fun checkAndResetDaily(today: String = getTodayDateString()): Boolean {
         val lastDate = getLastActiveDate()
         if (lastDate.isEmpty()) {
@@ -73,6 +84,7 @@ class PreferencesManager(context: Context) {
         }
         if (lastDate != today) {
             setLastActiveDate(today)
+            pruneOldDeedState(today)
             return true
         }
         return false

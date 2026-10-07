@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.2.1`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -22,6 +22,16 @@ Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-
 - Located a publicly available scanned printed edition of Mafatih al-Jinan and compared the weekday prayer and ziyarat sections. Prepared the missing Friday prayer ending and Sunday Fatima ziyarat, plus a Sunday prayer wording correction.
 - Applied all three text corrections, documented printed sources and edition variants, and added three regression tests.
 - Final source verification passed: zero failures, zero empty Kotlin files, and a debug APK of 16,046,636 bytes.
+
+## v1.2.1 corrective release (2026-10-07)
+
+- Code review (Linear ALI-20) found v1.2.0 shipped placeholder Quran text for 96 surahs, model-written tafsir presented as quotes, abridged Mafatih texts, and dropped the daily Duas/Ziyarat from navigation.
+- Bundled the full 6,236-ayah Uthmani text as a checksummed resource; added `QuranDataIntegrityTest`.
+- Restored daily Duas/Ziyarat (Home card, Mafatih shortcuts, back button, search).
+- Relabelled Tafsir as summaries, removed generic fallbacks; flagged abridged Mafatih texts.
+- Rebuilt search (one-time index, debounce, background thread, alef-insensitive key).
+- Notifications, manifest, preferences pruning, R8 + signing-from-env, CI workflow.
+- Verification: 51 unit tests pass, lintDebug OK, assembleRelease (minified) OK.
 
 ## Remaining
 
@@ -76,3 +86,5 @@ Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-
   - Published GitHub release `v1.2.0` with tagged commit and attached APK artifacts.
   - Updated Linear issue `ALI-20` with release notes, tag link, and SHA-256 digest.
 
+
+- 2026-10-07: v1.2.1 corrective release prepared on `release/v1.2.1` (see section above); 51/51 tests pass.

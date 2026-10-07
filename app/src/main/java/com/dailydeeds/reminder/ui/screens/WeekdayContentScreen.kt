@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.TextDecrease
 import androidx.compose.material.icons.filled.TextIncrease
@@ -64,7 +65,7 @@ import java.time.LocalDate
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeekdayContentScreen(kind: DayContentKind) {
+fun WeekdayContentScreen(kind: DayContentKind, onNavigateBack: (() -> Unit)? = null) {
     val today = remember(kind) { LocalDate.now().dayOfWeek }
     var selectedName by rememberSaveable(kind.name) { mutableStateOf(today.name) }
     var fontSize by rememberSaveable(kind.name + "_font") { mutableIntStateOf(21) }
@@ -77,6 +78,13 @@ fun WeekdayContentScreen(kind: DayContentKind) {
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    if (onNavigateBack != null) {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
+                        }
+                    }
+                },
                 title = {
                     Column {
                         Text(

@@ -23,7 +23,7 @@ class QuranRepository(
     }
 
     fun getAyah(surahNumber: Int, ayahNumber: Int): Ayah? {
-        return dataProvider.getAyahs(surahNumber).find { it.ayahNumber == ayahNumber }
+        return dataProvider.getAyah(surahNumber, ayahNumber)
     }
 
     fun getTafsirForAyah(surahNumber: Int, ayahNumber: Int): TafsirAlMizan? {

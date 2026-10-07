@@ -17,4 +17,7 @@ data class MafatihItem(
     val virtueOrSource: String = "",
     val hasCounter: Boolean = false,
     val targetCount: Int = 1
-)
+) {
+    /** True when the bundled text is abridged (marked with an ellipsis) rather than the full printed text. */
+    val isExcerpt: Boolean get() = arabicText.contains("...")
+}

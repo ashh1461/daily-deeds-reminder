@@ -47,6 +47,20 @@ class SearchRepositoryTest {
     }
 
     @Test
+    fun testSearchFindsWeekdayDuasAndZiyarat() {
+        val results = searchRepository.search("دعاء يوم الجمعة", SearchResultType.WEEKDAY)
+        assertTrue(results.any { it.weekdayKind == com.dailydeeds.reminder.model.DayContentKind.DUA })
+    }
+
+    @Test
+    fun testSearchFindsAyahInSurahThatWasPreviouslyPlaceholder() {
+        val results = searchRepository.search("ذلك الكتاب لا ريب فيه", SearchResultType.QURAN)
+        assertTrue(results.any { it.surahNumber == 2 })
+        val kahf = searchRepository.search("الحمد لله الذي أنزل على عبده الكتاب", SearchResultType.QURAN)
+        assertTrue(kahf.any { it.surahNumber == 18 })
+    }
+
+    @Test
     fun testGlobalSearchWithAllFilterReturnsCrossDomainResults() {
         val results = searchRepository.search("الله", SearchResultType.ALL)
         assertTrue(results.any { it.type == SearchResultType.QURAN })

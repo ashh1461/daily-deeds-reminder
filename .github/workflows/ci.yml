@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [master, "release/**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Unit tests
+        run: ./gradlew.bat --no-daemon :app:testDebugUnitTest
+      - name: Lint and debug APK
+        run: ./gradlew.bat --no-daemon :app:lintDebug :app:assembleDebug
+      - name: Guard against placeholder Quran text and leaked keys
+        shell: bash
+        run: |
+          ! grep -rn "آية رقم" app/src/main
+          ! git grep -nE "lin_api_[A-Za-z0-9]{20,}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk

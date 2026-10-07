@@ -1,112 +1,152 @@
 package com.dailydeeds.reminder.data
 
+import com.dailydeeds.reminder.model.DayContent
+import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.model.SearchResultItem
 import com.dailydeeds.reminder.model.SearchResultType
 import com.dailydeeds.reminder.util.ArabicNormalizer
 
+/**
+ * Diacritic-neutral search over the Quran, Tafsir summaries, Mafatih and weekday duas/ziyarat.
+ *
+ * Every searchable string is normalized exactly once, when the index is first built, so a query only
+ * pays for normalizing the query itself. Build the index off the main thread (see [warmUp]).
+ */
 class SearchRepository(
     private val quranRepo: QuranRepository = QuranRepository(),
     private val mafatihRepo: MafatihRepository = MafatihRepository(),
     private val tafsirProvider: TafsirAlMizanProvider = TafsirAlMizanProvider
 ) {
 
-    fun search(query: String, typeFilter: SearchResultType = SearchResultType.ALL): List<SearchResultItem> {
-        if (query.isBlank()) return emptyList()
+    private class Entry(
+        val searchable: List<String>,
+        val build: (normalizedQuery: String) -> SearchResultItem
+    ) {
+        fun matches(query: String) = searchable.any { it.contains(query) }
+    }
 
-        val results = mutableListOf<SearchResultItem>()
-        val normalizedQuery = ArabicNormalizer.normalize(query)
+    private val index: Map<SearchResultType, List<Entry>> by lazy { buildIndex() }
 
-        // 1. Search in Quran
-        if (typeFilter == SearchResultType.ALL || typeFilter == SearchResultType.QURAN) {
-            val surahs = quranRepo.getAllSurahs()
-            for (surah in surahs) {
-                if (ArabicNormalizer.contains(surah.nameArabic, query) ||
-                    surah.nameEnglish.contains(query, ignoreCase = true)
-                ) {
-                    results.add(
-                        SearchResultItem(
-                            id = "surah_${surah.number}",
-                            type = SearchResultType.QURAN,
-                            title = "سورة ${surah.nameArabic} (${surah.nameEnglish})",
-                            snippet = "سورة ${surah.revelationType.arabicName}، عدد آياتها ${surah.ayahCount}، في الجزء ${surah.juzStart}",
-                            surahNumber = surah.number,
-                            ayahNumber = 1
-                        )
-                    )
-                }
+    /** Forces the lazy index to be built; call from a background dispatcher. */
+    fun warmUp() {
+        index
+    }
 
-                val ayahs = quranRepo.getAyahsForSurah(surah.number)
-                for (ayah in ayahs) {
-                    if (ArabicNormalizer.contains(ayah.textArabic, query)) {
-                        results.add(
-                            SearchResultItem(
-                                id = "ayah_${surah.number}_${ayah.ayahNumber}",
-                                type = SearchResultType.QURAN,
-                                title = "سورة ${surah.nameArabic} - الآية ${ayah.ayahNumber}",
-                                snippet = createSnippet(ayah.textArabic, normalizedQuery),
-                                surahNumber = surah.number,
-                                ayahNumber = ayah.ayahNumber
-                            )
-                        )
-                    }
+    fun search(
+        query: String,
+        typeFilter: SearchResultType = SearchResultType.ALL,
+        limit: Int = MAX_RESULTS // per result type
+    ): List<SearchResultItem> {
+        val normalizedQuery = ArabicNormalizer.searchKey(query).lowercase()
+        if (normalizedQuery.isEmpty()) return emptyList()
+
+        val types = if (typeFilter == SearchResultType.ALL) SEARCH_ORDER else listOf(typeFilter)
+        val results = ArrayList<SearchResultItem>()
+        for (type in types) {
+            var found = 0
+            for (entry in index[type].orEmpty()) {
+                if (entry.matches(normalizedQuery)) {
+                    results.add(entry.build(normalizedQuery))
+                    if (++found >= limit) break
                 }
             }
         }
-
-        // 2. Search in Tafsir Al-Mizan
-        if (typeFilter == SearchResultType.ALL || typeFilter == SearchResultType.TAFSIR) {
-            val tafsirList = tafsirProvider.getAllEntries()
-            for (tafsir in tafsirList) {
-                if (ArabicNormalizer.contains(tafsir.title, query) ||
-                    ArabicNormalizer.contains(tafsir.commentaryArabic, query) ||
-                    (tafsir.intellectualTheme != null && ArabicNormalizer.contains(tafsir.intellectualTheme, query))
-                ) {
-                    results.add(
-                        SearchResultItem(
-                            id = "tafsir_${tafsir.id}",
-                            type = SearchResultType.TAFSIR,
-                            title = tafsir.title,
-                            snippet = createSnippet(tafsir.commentaryArabic, normalizedQuery),
-                            surahNumber = tafsir.surahNumber,
-                            ayahNumber = tafsir.ayahStart
-                        )
-                    )
-                }
-            }
-        }
-
-        // 3. Search in Mafatih Al-Jinan
-        if (typeFilter == SearchResultType.ALL || typeFilter == SearchResultType.MAFATIH) {
-            val mafatihItems = mafatihRepo.getAllItems()
-            for (item in mafatihItems) {
-                if (ArabicNormalizer.contains(item.title, query) ||
-                    ArabicNormalizer.contains(item.arabicText, query) ||
-                    ArabicNormalizer.contains(item.virtueOrSource, query)
-                ) {
-                    results.add(
-                        SearchResultItem(
-                            id = "mafatih_${item.id}",
-                            type = SearchResultType.MAFATIH,
-                            title = "${item.title} (${item.category.titleArabic})",
-                            snippet = createSnippet(item.arabicText, normalizedQuery),
-                            mafatihItemId = item.id
-                        )
-                    )
-                }
-            }
-        }
-
         return results
+    }
+
+    private fun buildIndex(): Map<SearchResultType, List<Entry>> {
+        val quran = ArrayList<Entry>()
+        for (surah in quranRepo.getAllSurahs()) {
+            quran += Entry(
+                listOf(ArabicNormalizer.searchKey(surah.nameArabic), surah.nameEnglish.lowercase())
+            ) {
+                SearchResultItem(
+                    id = "surah_${surah.number}",
+                    type = SearchResultType.QURAN,
+                    title = "سورة ${surah.nameArabic} (${surah.nameEnglish})",
+                    snippet = "سورة ${surah.revelationType.arabicName}، عدد آياتها ${surah.ayahCount}، في الجزء ${surah.juzStart}",
+                    surahNumber = surah.number,
+                    ayahNumber = 1
+                )
+            }
+            for (ayah in quranRepo.getAyahsForSurah(surah.number)) {
+                quran += Entry(listOf(ArabicNormalizer.searchKey(ayah.textArabic))) { q ->
+                    SearchResultItem(
+                        id = "ayah_${surah.number}_${ayah.ayahNumber}",
+                        type = SearchResultType.QURAN,
+                        title = "سورة ${surah.nameArabic} - الآية ${ayah.ayahNumber}",
+                        snippet = createSnippet(ayah.textArabic, q),
+                        surahNumber = surah.number,
+                        ayahNumber = ayah.ayahNumber
+                    )
+                }
+            }
+        }
+
+        val tafsir = tafsirProvider.getAllEntries().map { t ->
+            Entry(
+                listOfNotNull(t.title, t.commentaryArabic, t.intellectualTheme).map(ArabicNormalizer::searchKey)
+            ) { q ->
+                SearchResultItem(
+                    id = "tafsir_${t.id}",
+                    type = SearchResultType.TAFSIR,
+                    title = t.title,
+                    snippet = createSnippet(t.commentaryArabic, q),
+                    surahNumber = t.surahNumber,
+                    ayahNumber = t.ayahStart
+                )
+            }
+        }
+
+        val mafatih = mafatihRepo.getAllItems().map { item ->
+            Entry(listOf(item.title, item.arabicText, item.virtueOrSource).map(ArabicNormalizer::searchKey)) { q ->
+                SearchResultItem(
+                    id = "mafatih_${item.id}",
+                    type = SearchResultType.MAFATIH,
+                    title = "${item.title} (${item.category.titleArabic})",
+                    snippet = createSnippet(item.arabicText, q),
+                    mafatihItemId = item.id
+                )
+            }
+        }
+
+        val weekday = DayContentKind.values().flatMap { kind ->
+            WeekdayRepository.all(kind).map { content -> weekdayEntry(content) }
+        }
+
+        return mapOf(
+            SearchResultType.QURAN to quran,
+            SearchResultType.TAFSIR to tafsir,
+            SearchResultType.MAFATIH to mafatih,
+            SearchResultType.WEEKDAY to weekday
+        )
+    }
+
+    private fun weekdayEntry(content: DayContent) = Entry(
+        listOf(content.title, content.text, content.honoree).map(ArabicNormalizer::searchKey)
+    ) { q ->
+        SearchResultItem(
+            id = "weekday_${content.kind.name}_${content.day.name}",
+            type = SearchResultType.WEEKDAY,
+            title = content.title,
+            snippet = createSnippet(content.text, q),
+            weekdayKind = content.kind
+        )
     }
 
     private fun createSnippet(text: String, normalizedQuery: String, maxLength: Int = 120): String {
         val lines = text.lines().map { it.trim() }.filter { it.isNotEmpty() }
-        for (line in lines) {
-            if (ArabicNormalizer.contains(line, normalizedQuery)) {
-                return if (line.length <= maxLength) line else line.take(maxLength) + "..."
-            }
-        }
-        val firstLine = lines.firstOrNull() ?: text
-        return if (firstLine.length <= maxLength) firstLine else firstLine.take(maxLength) + "..."
+        val line = lines.firstOrNull { ArabicNormalizer.searchKey(it).contains(normalizedQuery) }
+            ?: lines.firstOrNull()
+            ?: text
+        return if (line.length <= maxLength) line else line.take(maxLength) + "..."
+    }
+
+    companion object {
+        const val MAX_RESULTS = 50
+        private val SEARCH_ORDER = listOf(
+            SearchResultType.QURAN, SearchResultType.TAFSIR,
+            SearchResultType.MAFATIH, SearchResultType.WEEKDAY
+        )
     }
 }

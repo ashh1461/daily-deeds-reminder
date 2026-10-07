@@ -47,8 +47,11 @@ class QuranViewModel(
         }
     }
 
+    fun hasTafsir(surahNumber: Int, ayahNumber: Int): Boolean =
+        repository.getTafsirForAyah(surahNumber, ayahNumber) != null
+
     fun openTafsir(surahNumber: Int, ayahNumber: Int) {
-        val tafsir = repository.getTafsirForAyah(surahNumber, ayahNumber)
+        val tafsir = repository.getTafsirForAyah(surahNumber, ayahNumber) ?: return
         _selectedTafsir.value = tafsir
         _isTafsirVisible.value = true
     }

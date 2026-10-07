@@ -88,3 +88,4 @@ Branch: `master`. Published release: `v1.2.1`. Milestone: Full Quran, Tafsir Al-
 
 
 - 2026-10-07: v1.2.1 corrective release prepared on `release/v1.2.1` (see section above); 51/51 tests pass.
+- 2026-10-07: Published GitHub release `v1.2.1` (target `release/v1.2.1`, commit 219e2e9): `DailyDeeds-v1.2.1.apk` (16,321,346 bytes, SHA-256 `a43177f04fc42420ec474dd838cff637d8e0a1011c6f99309eb3e6be41d7a8e8`). An initial upload accidentally attached the stale v1.2.0 APK; it was detected by the identical hash and replaced with the freshly built one. Added correction notice to the v1.2.0 GitHub release. Graph refreshed: 670 nodes, 1576 edges, 57 communities. Linear ALI-20 updated.

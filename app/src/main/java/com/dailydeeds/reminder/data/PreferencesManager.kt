@@ -2,6 +2,10 @@ package com.dailydeeds.reminder.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
+import com.dailydeeds.reminder.adhan.AdhanMode
+import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
+import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.model.PlacePresets
@@ -31,6 +35,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
         private const val KEY_LAST_SAHIFA = "pref_last_sahifa"
         private const val KEY_THEME_MODE = "pref_theme_mode"
+        private const val KEY_ADHAN_GLOBAL = "pref_adhan_global"
+        private const val KEY_PRAYER_SETTINGS = "pref_prayer_settings"
         private const val KEY_ASKED_NOTIFICATIONS = "pref_asked_notifications"
         private const val KEY_PLACE_NAME = "pref_place_name"
         private const val KEY_PLACE_LAT = "pref_place_lat"
@@ -223,9 +229,24 @@ class PreferencesManager(context: Context) {
     fun setHijriOffset(days: Int) =
         prefs.edit().putInt(KEY_HIJRI_OFFSET, days.coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)).apply()
 
-    fun isPrayerAlarmEnabled(prayer: Prayer): Boolean = prefs.getBoolean("pref_prayer_alarm_${prayer.id}", false)
-    fun setPrayerAlarmEnabled(prayer: Prayer, enabled: Boolean) =
-        prefs.edit().putBoolean("pref_prayer_alarm_${prayer.id}", enabled).apply()
+    /**
+     * Alarm configuration of one prayer. Installs from before the adhan feature stored a single on/off
+     * switch; "on" becomes the notification mode so nobody is silently switched to audio.
+     */
+    fun getAlarmConfig(prayer: Prayer): PrayerAlarmConfig {
+        PrayerAlarmConfig.decode(prefs.getString("pref_alarm_cfg_${prayer.id}", null))?.let { return it }
+        val legacyOn = prefs.getBoolean("pref_prayer_alarm_${prayer.id}", false)
+        return PrayerAlarmConfig(mode = if (legacyOn) AdhanMode.NOTIFICATION else AdhanMode.OFF)
+    }
+
+    fun setAlarmConfig(prayer: Prayer, config: PrayerAlarmConfig) =
+        prefs.edit().putString("pref_alarm_cfg_${prayer.id}", config.encode()).apply()
+
+    fun getAdhanGlobal(): AdhanGlobalSettings = AdhanGlobalSettings.decode(prefs.getString(KEY_ADHAN_GLOBAL, null)) ?: AdhanGlobalSettings()
+    fun setAdhanGlobal(settings: AdhanGlobalSettings) = prefs.edit().putString(KEY_ADHAN_GLOBAL, settings.encode()).apply()
+
+    fun getPrayerSettings(): PrayerSettings = PrayerSettings.decode(prefs.getString(KEY_PRAYER_SETTINGS, null)) ?: PrayerSettings()
+    fun setPrayerSettings(settings: PrayerSettings) = prefs.edit().putString(KEY_PRAYER_SETTINGS, settings.encode()).apply()
 
     fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
     fun setOccasionReminderEnabled(enabled: Boolean) =

@@ -1,7 +1,5 @@
 package com.dailydeeds.reminder.ui.screens
 
-import com.dailydeeds.reminder.ui.components.PermissionHealthCard
-import com.dailydeeds.reminder.ui.components.rememberNow
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,7 +25,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,15 +38,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.dailydeeds.reminder.adhan.AdhanMode
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.model.PlacePresets
+import com.dailydeeds.reminder.ui.components.PermissionHealthCard
+import com.dailydeeds.reminder.ui.components.cardBorder
+import com.dailydeeds.reminder.ui.components.rememberNow
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.util.PrayerSchedule
+import com.dailydeeds.reminder.util.TimeFormat
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 private val TIME_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -66,16 +67,24 @@ internal fun lastKnownPlace(context: Context): Place? {
 }
 
 @Composable
-fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onOpenQibla: () -> Unit) {
+fun PrayerTimesScreen(
+    viewModel: ToolsViewModel,
+    onNavigateBack: () -> Unit,
+    onOpenQibla: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
     val place by viewModel.place.collectAsState()
-    val alarms by viewModel.prayerAlarms.collectAsState()
+    val calc by viewModel.prayerContext.collectAsState()
+    val configs by viewModel.alarmConfigs.collectAsState()
     val context = LocalContext.current
     var menuOpen by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
+    var showCoordinates by remember { mutableStateOf(false) }
 
     fun useDeviceLocation() {
         val p = lastKnownPlace(context)
         if (p == null) {
-            Toast.makeText(context, "تعذّر تحديد الموقع؛ اختر مدينتك من القائمة.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "تعذّر تحديد الموقع؛ ابحث عن مدينتك أو اخترها من القائمة.", Toast.LENGTH_LONG).show()
         } else viewModel.setPlace(p)
     }
 
@@ -86,10 +95,11 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
     // Refreshes every 30 s, so the highlighted "next prayer" and the date roll over without reopening the screen.
     val now by rememberNow()
     val today = now.toLocalDate()
-    val times = remember(place, today) { PrayerSchedule.timesFor(today, place) }
-    val next = remember(place, now) { PrayerSchedule.next(now, place) }
+    val times = remember(place, today, calc) { PrayerSchedule.timesFor(today, place, calc) }
+    val next = remember(place, now, calc) { PrayerSchedule.next(now, place, calc) }
 
     val rows: List<Triple<String, LocalTime?, Prayer?>> = listOf(
+        Triple("الإمساك", times.imsak, null),
         Triple("الفجر", times.fajr, Prayer.FAJR),
         Triple("الشروق", times.sunrise, null),
         Triple("الظهر", times.dhuhr, Prayer.DHUHR),
@@ -99,7 +109,7 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
         Triple("منتصف الليل الشرعي", times.midnight, null)
     )
 
-    ToolScaffold("أوقات الصلاة (الفقه الجعفري)", onNavigateBack) {
+    ToolScaffold("أوقات الصلاة والأذان", onNavigateBack) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -111,11 +121,11 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("المكان: ${place.name}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                         next?.let {
-                            Text("الصلاة القادمة: ${it.prayer.nameArabic} عند ${it.time.format(TIME_FORMAT)}")
+                            Text("الصلاة القادمة: ${it.prayer.nameArabic} عند ${it.time.format(TIME_FORMAT)} • ${TimeFormat.countdown(now, it.time)}")
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Box {
-                                OutlinedButton(onClick = { menuOpen = true }) { Text("اختيار مدينة") }
+                                OutlinedButton(onClick = { menuOpen = true }) { Text("مدن مقترحة") }
                                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                                     PlacePresets.all.forEach { p ->
                                         DropdownMenuItem(text = { Text(p.name) }, onClick = {
@@ -124,6 +134,7 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
                                     }
                                 }
                             }
+                            OutlinedButton(onClick = { showSearch = true }) { Text("بحث") }
                             OutlinedButton(onClick = {
                                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                                     == PackageManager.PERMISSION_GRANTED
@@ -131,39 +142,56 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
                                 else permission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
                             }) { Text("موقعي") }
                         }
+                        OutlinedButton(onClick = { showCoordinates = true }) { Text("إدخال الإحداثيات") }
                     }
                 }
             }
-            items(rows.size) { i ->
-                val (label, time, prayer) = rows[i]
-                Card(Modifier.fillMaxWidth()) {
+            items(rows) { (label, time, prayer) ->
+                Card(
+                    Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    border = cardBorder(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
                     Row(
                         Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(label, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-                        Text(time?.format(TIME_FORMAT) ?: "—", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                        if (prayer != null) {
-                            Switch(
-                                checked = alarms[prayer] == true,
-                                onCheckedChange = { viewModel.setPrayerAlarm(prayer, it) },
-                                modifier = Modifier.padding(start = 12.dp)
-                            )
+                        Column(Modifier.weight(1f)) {
+                            Text(label, style = MaterialTheme.typography.titleSmall)
+                            if (prayer != null) {
+                                val mode = configs[prayer]?.mode ?: AdhanMode.OFF
+                                Text(
+                                    "التنبيه: ${mode.labelArabic}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
+                        Text(time?.format(TIME_FORMAT) ?: "—", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     }
                 }
             }
             item {
-                Button(onClick = onOpenQibla, modifier = Modifier.fillMaxWidth()) { Text("اتجاه القبلة") }
+                Button(onClick = onOpenSettings, modifier = Modifier.fillMaxWidth()) { Text("إعدادات الأذان وطريقة الحساب") }
+            }
+            item {
+                OutlinedButton(onClick = onOpenQibla, modifier = Modifier.fillMaxWidth()) { Text("اتجاه القبلة") }
             }
             item {
                 Text(
-                    "الحساب بالزوايا الجعفرية: الفجر 16°، المغرب 4° بعد الغروب، العشاء 14°. المفتاح بجانب كل صلاة يفعّل تنبيه الأذان. " +
-                        "قارن بجدول مرجعك المحلي واحتط عند الحاجة.",
+                    "الحساب بالفقه الجعفري، وطريقته قابلة للتغيير من الإعدادات. قارن بجدول مرجعك المحلي واحتط عند الحاجة.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
+    }
+
+    if (showSearch) {
+        CitySearchDialog(onDismiss = { showSearch = false }, onPick = { viewModel.setPlace(it); showSearch = false })
+    }
+    if (showCoordinates) {
+        CoordinatesDialog(onDismiss = { showCoordinates = false }, onPick = { viewModel.setPlace(it); showCoordinates = false })
     }
 }

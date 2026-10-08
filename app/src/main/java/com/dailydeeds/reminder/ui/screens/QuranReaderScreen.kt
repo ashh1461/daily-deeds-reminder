@@ -153,15 +153,19 @@ fun QuranReaderScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                OutlinedButton(
-                                    onClick = { viewModel.openTafsir(ayah.surahNumber, ayah.ayahNumber) }
-                                ) {
-                                    Icon(
-                                        Icons.Default.MenuBook,
-                                        contentDescription = "تفسير الميزان",
-                                        modifier = Modifier.padding(end = 4.dp)
-                                    )
-                                    Text("تفسير الميزان", style = MaterialTheme.typography.labelMedium)
+                                if (viewModel.hasTafsir(ayah.surahNumber, ayah.ayahNumber)) {
+                                    OutlinedButton(
+                                        onClick = { viewModel.openTafsir(ayah.surahNumber, ayah.ayahNumber) }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.MenuBook,
+                                            contentDescription = "ملخص موضوعي من الميزان",
+                                            modifier = Modifier.padding(end = 4.dp)
+                                        )
+                                        Text("ملخص الميزان", style = MaterialTheme.typography.labelMedium)
+                                    }
+                                } else {
+                                    Spacer(modifier = Modifier.width(1.dp))
                                 }
 
                                 Box(

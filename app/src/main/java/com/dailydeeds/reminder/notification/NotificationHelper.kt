@@ -6,12 +6,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dailydeeds.reminder.MainActivity
 import com.dailydeeds.reminder.model.DeedCategory
 
 object NotificationHelper {
+    private const val TAG = "NotificationHelper"
     const val EXTRA_CATEGORY = "reminder_category"
 
     const val CHANNEL_ID = "daily_deeds_channel"
@@ -45,7 +47,7 @@ object NotificationHelper {
         createNotificationChannel(context)
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             category?.let { putExtra(EXTRA_CATEGORY, it.name) }
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
@@ -56,7 +58,7 @@ object NotificationHelper {
         )
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setSmallIcon(com.dailydeeds.reminder.R.drawable.ic_stat_reminder)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
@@ -69,7 +71,7 @@ object NotificationHelper {
                 notify(notificationId, builder.build())
             }
         } catch (e: SecurityException) {
-            e.printStackTrace()
+            Log.w(TAG, "Notification permission revoked; skipping reminder", e)
         }
     }
 }

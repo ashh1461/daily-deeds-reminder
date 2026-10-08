@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.2.2`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -22,6 +22,16 @@ Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-
 - Located a publicly available scanned printed edition of Mafatih al-Jinan and compared the weekday prayer and ziyarat sections. Prepared the missing Friday prayer ending and Sunday Fatima ziyarat, plus a Sunday prayer wording correction.
 - Applied all three text corrections, documented printed sources and edition variants, and added three regression tests.
 - Final source verification passed: zero failures, zero empty Kotlin files, and a debug APK of 16,046,636 bytes.
+
+## v1.2.1 corrective release (2026-10-07)
+
+- Code review (Linear ALI-20) found v1.2.0 shipped placeholder Quran text for 96 surahs, model-written tafsir presented as quotes, abridged Mafatih texts, and dropped the daily Duas/Ziyarat from navigation.
+- Bundled the full 6,236-ayah Uthmani text as a checksummed resource; added `QuranDataIntegrityTest`.
+- Restored daily Duas/Ziyarat (Home card, Mafatih shortcuts, back button, search).
+- Relabelled Tafsir as summaries, removed generic fallbacks; flagged abridged Mafatih texts.
+- Rebuilt search (one-time index, debounce, background thread, alef-insensitive key).
+- Notifications, manifest, preferences pruning, R8 + signing-from-env, CI workflow.
+- Verification: 51 unit tests pass, lintDebug OK, assembleRelease (minified) OK.
 
 ## Remaining
 
@@ -76,3 +86,9 @@ Branch: `master`. Published release: `v1.2.0`. Milestone: Full Quran, Tafsir Al-
   - Published GitHub release `v1.2.0` with tagged commit and attached APK artifacts.
   - Updated Linear issue `ALI-20` with release notes, tag link, and SHA-256 digest.
 
+
+- 2026-10-07: v1.2.1 corrective release prepared on `release/v1.2.1` (see section above); 51/51 tests pass.
+- 2026-10-07: Published GitHub release `v1.2.1` (target `release/v1.2.1`, commit 219e2e9): `DailyDeeds-v1.2.1.apk` (16,321,346 bytes, SHA-256 `a43177f04fc42420ec474dd838cff637d8e0a1011c6f99309eb3e6be41d7a8e8`). An initial upload accidentally attached the stale v1.2.0 APK; it was detected by the identical hash and replaced with the freshly built one. Added correction notice to the v1.2.0 GitHub release. Graph refreshed: 670 nodes, 1576 edges, 57 communities. Linear ALI-20 updated.
+- 2026-10-07: v1.2.2 prepared on `release/v1.2.2`: full Mafatih al-Jinan text (103 sections, OpenITI/Shamela, undiacritized) bundled as `mafatih/fullbook.txt`, new FULLBOOK category, searchable; 56/56 tests pass.
+- 2026-10-07: Published GitHub release `v1.2.2`: `DailyDeeds-v1.2.2.apk` (16,708,256 bytes, SHA-256 `6430b47c32a11540d41ad64a1d2b410f73acbc85e2c0a8f47f1c740ea098bf6b`, verified to contain `mafatih/fullbook.txt` and versionName 1.2.2). Graph refreshed: 686 nodes, 1605 edges, 53 communities. Linear ALI-20 updated.
+- 2026-10-07: Security hardening pass (branch `security/hardening`): OSV scan of 84 resolved libraries = 0 advisories; pinned Gradle distribution SHA-256, SHA-pinned CI actions with read-only token, Dependabot config, bounded search query length (+ hostile-input test). 57/57 tests pass, lint OK.

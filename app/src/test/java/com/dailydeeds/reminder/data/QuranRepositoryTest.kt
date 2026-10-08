@@ -1,6 +1,7 @@
 package com.dailydeeds.reminder.data
 
 import com.dailydeeds.reminder.model.RevelationType
+import com.dailydeeds.reminder.util.ArabicNormalizer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -45,9 +46,9 @@ class QuranRepositoryTest {
         val fatihahAyahs = repository.getAyahsForSurah(1)
         assertEquals(7, fatihahAyahs.size)
         assertEquals(1, fatihahAyahs[0].ayahNumber)
-        assertTrue(fatihahAyahs[0].textArabic.contains("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"))
+        assertTrue(ArabicNormalizer.contains(fatihahAyahs[0].textArabic, "بسم الله الرحمن الرحيم"))
         assertEquals(7, fatihahAyahs[6].ayahNumber)
-        assertTrue(fatihahAyahs[6].textArabic.contains("صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ"))
+        assertTrue(ArabicNormalizer.contains(fatihahAyahs[6].textArabic, "صراط الذين أنعمت عليهم"))
     }
 
     @Test

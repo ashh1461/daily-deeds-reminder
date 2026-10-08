@@ -2,6 +2,7 @@ package com.dailydeeds.reminder.util
 
 object ArabicNormalizer {
 
+    private val WHITESPACE_REGEX = Regex("\\s+")
     private val TASHKEEL_REGEX = Regex("[\\u064B-\\u0655\\u0670\\u06D6-\\u06ED۝ۚۖۗۘۙۛۜ]")
 
     fun normalize(text: String): String {
@@ -18,13 +19,18 @@ object ArabicNormalizer {
         cleaned = cleaned.replace('ة', 'ه')
         cleaned = cleaned.replace('ى', 'ي')
 
-        return cleaned.trim().replace(Regex("\\s+"), " ")
+        return cleaned.trim().replace(WHITESPACE_REGEX, " ")
     }
+
+    /**
+     * Matching key: [normalize] plus removal of every plain alef. Uthmani script writes many long
+     * alefs as a dagger mark (صِرَٰطَ) while everyday spelling keeps them (صراط), so dropping alefs
+     * from both sides lets either spelling find the other.
+     */
+    fun searchKey(text: String): String = normalize(text).replace("ا", "")
 
     fun contains(source: String, query: String): Boolean {
         if (query.isBlank()) return true
-        val normalizedSource = normalize(source)
-        val normalizedQuery = normalize(query)
-        return normalizedSource.contains(normalizedQuery, ignoreCase = true)
+        return searchKey(source).contains(searchKey(query), ignoreCase = true)
     }
 }

@@ -181,7 +181,9 @@ fun AppNavigation(
                     },
                     onNavigateToSettings = {
                         navController.navigate("settings")
-                    }
+                    },
+                    onNavigateToDuas = { navController.navigate("duas") },
+                    onNavigateToZiyarat = { navController.navigate("ziyarat") }
                 )
             }
 
@@ -212,7 +214,9 @@ fun AppNavigation(
                     viewModel = mafatihViewModel,
                     onNavigateToItem = { itemId ->
                         navController.navigate("mafatih/reader/$itemId")
-                    }
+                    },
+                    onNavigateToDuas = { navController.navigate("duas") },
+                    onNavigateToZiyarat = { navController.navigate("ziyarat") }
                 )
             }
 
@@ -239,13 +243,20 @@ fun AppNavigation(
                     onNavigateToMafatih = { itemId ->
                         mafatihViewModel.selectItem(itemId)
                         navController.navigate("mafatih/reader/$itemId")
+                    },
+                    onNavigateToWeekday = { kind ->
+                        navController.navigate(if (kind == DayContentKind.DUA) "duas" else "ziyarat")
                     }
                 )
             }
 
-            composable("duas") { WeekdayContentScreen(DayContentKind.DUA) }
+            composable("duas") {
+                WeekdayContentScreen(DayContentKind.DUA, onNavigateBack = { navController.popBackStack() })
+            }
 
-            composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT) }
+            composable("ziyarat") {
+                WeekdayContentScreen(DayContentKind.ZIYARAT, onNavigateBack = { navController.popBackStack() })
+            }
 
             composable(
                 route = "deed/{deedId}",

@@ -150,6 +150,17 @@ fun MafatihReaderScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
+            if (currentItem.isExcerpt) {
+                Text(
+                    text = "تنبيه: النص المعروض هنا مختصر، وليس النص الكامل. يُرجى الرجوع إلى مفاتيح الجنان المطبوع للنص الكامل.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             if (currentItem.virtueOrSource.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),

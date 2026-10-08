@@ -44,7 +44,8 @@ import com.dailydeeds.reminder.viewmodel.SearchViewModel
 fun GlobalSearchScreen(
     viewModel: SearchViewModel,
     onNavigateToQuran: (surahNumber: Int, ayahNumber: Int?) -> Unit,
-    onNavigateToMafatih: (itemId: String) -> Unit
+    onNavigateToMafatih: (itemId: String) -> Unit,
+    onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind) -> Unit
 ) {
     val query by viewModel.query.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
@@ -150,6 +151,7 @@ fun GlobalSearchScreen(
                                         onNavigateToMafatih(item.mafatihItemId)
                                     }
                                 }
+                                SearchResultType.WEEKDAY -> item.weekdayKind?.let(onNavigateToWeekday)
                                 SearchResultType.ALL -> {}
                             }
                         }
@@ -195,7 +197,7 @@ private fun SearchResultCard(
                             color = when (item.type) {
                                 SearchResultType.QURAN -> MaterialTheme.colorScheme.primaryContainer
                                 SearchResultType.TAFSIR -> MaterialTheme.colorScheme.tertiaryContainer
-                                SearchResultType.MAFATIH -> MaterialTheme.colorScheme.secondaryContainer
+                                SearchResultType.MAFATIH, SearchResultType.WEEKDAY -> MaterialTheme.colorScheme.secondaryContainer
                                 else -> MaterialTheme.colorScheme.surfaceVariant
                             },
                             shape = RoundedCornerShape(8.dp)

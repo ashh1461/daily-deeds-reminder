@@ -1,5 +1,6 @@
 package com.dailydeeds.reminder.viewmodel
 
+import com.dailydeeds.reminder.worship.ZahraStages
 import android.app.Application
 import android.content.Context
 import android.os.Build
@@ -148,11 +149,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _countsMap.value = _countsMap.value.toMutableMap().apply { put(deedId, newCount) }
 
         if (deed.type == DeedType.MULTI_STAGE_COUNTER && deed.stages != null) {
-            val newStage = when {
-                newCount <= 34 -> 0
-                newCount <= 67 -> 1
-                else -> 2
-            }
+            val newStage = ZahraStages.stageIndex(newCount)
             prefs.setDeedStage(deedId, newStage)
             _stagesMap.value = _stagesMap.value.toMutableMap().apply { put(deedId, newStage) }
         }

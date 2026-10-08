@@ -27,10 +27,17 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     }
 
     private fun handle(context: Context, prayer: Prayer, kind: AlarmKind, scheduledAt: Long, snooze: Boolean) {
-        val config = PreferencesManager(context).getAlarmConfig(prayer)
-        if (config.mode == AdhanMode.OFF && !snooze) return
         // An alarm delivered long after its time (Doze, or inexact alarms) must not announce "now".
         val late = scheduledAt > 0 && System.currentTimeMillis() - scheduledAt > STALE_AFTER_MS
+        if (kind == AlarmKind.IMSAK) {
+            if (!late) NotificationHelper.showNotification(
+                context, 5200, "حان وقت الإمساك", "بدأ وقت الإمساك. تقبّل الله صيامكم.",
+                channelId = NotificationHelper.CHANNEL_PRAYER_REMINDER
+            )
+            return
+        }
+        val config = PreferencesManager(context).getAlarmConfig(prayer)
+        if (config.mode == AdhanMode.OFF && !snooze) return
         val id = 5000 + prayer.id
 
         when {

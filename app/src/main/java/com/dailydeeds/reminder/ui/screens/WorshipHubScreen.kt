@@ -10,9 +10,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Mosque
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -36,6 +41,11 @@ private val hubEntries = listOf(
     HubEntry("إعدادات الأذان", "الصوت، التنبيه قبل الصلاة، طريقة الحساب", Icons.Default.AccessTime, "prayer/settings"),
     HubEntry("اتجاه القبلة", "بوصلة القبلة من مدينتك", Icons.Default.Explore, "qibla"),
     HubEntry("التقويم والمناسبات", "التاريخ الهجري ومناسبات أهل البيت (ع)", Icons.Default.CalendarMonth, "calendar"),
+    HubEntry("المسبحة", "تسبيح الزهراء (ع) وعدّاد حر", Icons.Default.TouchApp, "tasbih"),
+    HubEntry("القضاء", "تتبّع الصلوات والصيام الفائت", Icons.Default.Checklist, "qada"),
+    HubEntry("رمضان والإمساك", "جدول الإمساك والإفطار وليالي القدر مع PDF", Icons.Default.NightsStay, "ramadan"),
+    HubEntry("صلاة الآيات", "الكيفية والخسوف والكسوف القادم", Icons.Default.DarkMode, "ayat"),
+    HubEntry("حاسبة الخمس", "حساب الخمس ورأس السنة الخمسية", Icons.Default.Calculate, "khums"),
     HubEntry("أدعية الأيام", "دعاء لكل يوم من أيام الأسبوع", Icons.Default.AutoStories, "duas"),
     HubEntry("زيارات الأيام", "زيارة لكل يوم من أيام الأسبوع", Icons.Default.Mosque, "ziyarat")
 )

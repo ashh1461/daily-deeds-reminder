@@ -33,6 +33,7 @@ object PrayerSchedule {
         fun shift(time: java.time.LocalTime?, prayer: Prayer) = time?.plusMinutes((o[prayer] ?: 0).toLong())
         return t.copy(
             fajr = shift(t.fajr, Prayer.FAJR),
+            imsak = shift(t.imsak, Prayer.FAJR),
             dhuhr = shift(t.dhuhr, Prayer.DHUHR),
             maghrib = shift(t.maghrib, Prayer.MAGHRIB),
             isha = shift(t.isha, Prayer.ISHA)

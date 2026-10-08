@@ -12,7 +12,11 @@ import com.dailydeeds.reminder.model.PlacePresets
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.model.ReminderType
+import com.dailydeeds.reminder.worship.KhumsYear
+import com.dailydeeds.reminder.worship.QadaState
+import com.dailydeeds.reminder.worship.TasbihState
 import java.time.LocalDate
+import java.time.ZoneId
 
 class PreferencesManager(context: Context) {
 
@@ -44,6 +48,12 @@ class PreferencesManager(context: Context) {
         private const val KEY_PLACE_ZONE = "pref_place_zone"
         private const val KEY_HIJRI_OFFSET = "pref_hijri_offset"
         private const val KEY_OCCASION_REMINDER = "pref_occasion_reminder"
+        private const val KEY_TASBIH = "worship_tasbih"
+        private const val KEY_QADA = "worship_qada"
+        private const val KEY_KHUMS_YEAR = "worship_khums_year"
+        private const val KEY_IMSAK_ALARM = "worship_imsak_enabled"
+        private const val KEY_KHUMS_REMINDER = "worship_khums_enabled"
+        private const val KEY_ECLIPSE_REMINDER = "worship_eclipse_enabled"
 
         /** Days of per-day deed state kept before old keys are pruned. */
         const val RETENTION_DAYS = 90L
@@ -207,12 +217,12 @@ class PreferencesManager(context: Context) {
     fun getPlace(): Place {
         val name = prefs.getString(KEY_PLACE_NAME, null) ?: return PlacePresets.default
         return runCatching {
-            Place(
-                name,
-                Double.fromBits(prefs.getLong(KEY_PLACE_LAT, 0L)),
-                Double.fromBits(prefs.getLong(KEY_PLACE_LNG, 0L)),
-                prefs.getString(KEY_PLACE_ZONE, "UTC") ?: "UTC"
-            )
+            val lat = Double.fromBits(prefs.getLong(KEY_PLACE_LAT, 0L))
+            val lng = Double.fromBits(prefs.getLong(KEY_PLACE_LNG, 0L))
+            val zone = prefs.getString(KEY_PLACE_ZONE, "UTC") ?: "UTC"
+            require(lat.isFinite() && lng.isFinite() && lat in -90.0..90.0 && lng in -180.0..180.0)
+            ZoneId.of(zone)
+            Place(name, lat, lng, zone)
         }.getOrDefault(PlacePresets.default)
     }
 
@@ -251,6 +261,49 @@ class PreferencesManager(context: Context) {
     fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
     fun setOccasionReminderEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
+
+    // --- Worship tools --------------------------------------------------------------------
+
+    fun getTasbih(): TasbihState = TasbihState.decode(prefs.getString(KEY_TASBIH, null))
+    fun setTasbih(state: TasbihState) = prefs.edit().putString(KEY_TASBIH, state.encode()).apply()
+
+    fun getQada(): QadaState = QadaState.decode(prefs.getString(KEY_QADA, null))
+    fun setQada(state: QadaState) = prefs.edit().putString(KEY_QADA, state.encode()).apply()
+
+    fun getKhumsYear(): KhumsYear? = KhumsYear.decode(prefs.getString(KEY_KHUMS_YEAR, null))
+    fun setKhumsYear(year: KhumsYear?) {
+        if (year == null) prefs.edit().remove(KEY_KHUMS_YEAR).apply()
+        else prefs.edit().putString(KEY_KHUMS_YEAR, year.encode()).apply()
+    }
+
+    fun isImsakAlarmEnabled(): Boolean = prefs.getBoolean(KEY_IMSAK_ALARM, false)
+    fun setImsakAlarmEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_IMSAK_ALARM, enabled).apply()
+
+    fun isKhumsReminderEnabled(): Boolean = prefs.getBoolean(KEY_KHUMS_REMINDER, false)
+    fun setKhumsReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_KHUMS_REMINDER, enabled).apply()
+
+    fun isEclipseReminderEnabled(): Boolean = prefs.getBoolean(KEY_ECLIPSE_REMINDER, false)
+    fun setEclipseReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_ECLIPSE_REMINDER, enabled).apply()
+
+    // --- Backup ---------------------------------------------------------------------------
+
+    /** Everything that belongs in a backup file (see [BackupCodec]). */
+    fun exportForBackup(): String = BackupCodec.export(prefs.all, java.time.Instant.now().toString())
+
+    /** Replaces the backed-up settings with [entries], which [BackupCodec.parse] has already validated. */
+    fun importFromBackup(entries: Map<String, Any>) {
+        val editor = prefs.edit()
+        prefs.all.keys.filter { BackupCodec.isAllowedKey(it) }.forEach(editor::remove)
+        entries.forEach { (key, value) ->
+            when (value) {
+                is Boolean -> editor.putBoolean(key, value)
+                is Int -> editor.putInt(key, value)
+                is Long -> editor.putLong(key, value)
+                is String -> editor.putString(key, value)
+            }
+        }
+        editor.commit()
+    }
 
     fun getLastSahifaId(): String? = prefs.getString(KEY_LAST_SAHIFA, null)
     fun setLastSahifaId(id: String) = prefs.edit().putString(KEY_LAST_SAHIFA, id).apply()

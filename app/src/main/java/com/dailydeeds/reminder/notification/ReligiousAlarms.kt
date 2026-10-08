@@ -7,11 +7,14 @@ import android.content.Intent
 import android.os.Build
 import com.dailydeeds.reminder.adhan.AdhanPlanner
 import com.dailydeeds.reminder.adhan.AlarmKind
+import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.receiver.OccasionAlarmReceiver
 import com.dailydeeds.reminder.receiver.PrayerAlarmReceiver
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.util.PrayerContext
+import com.dailydeeds.reminder.widget.WidgetUpdater
+import com.dailydeeds.reminder.worship.DailyNotesConfig
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -29,6 +32,7 @@ object ReligiousAlarms {
     private const val OCCASION_REQUEST_CODE = 3001
     private const val SNOOZE_REQUEST_CODE = 3002
     const val OCCASION_HOUR = 8
+    private const val RAMADAN = 9
 
     fun scheduleAll(context: Context) {
         schedulePrayer(context)
@@ -40,7 +44,12 @@ object ReligiousAlarms {
         val prefs = PreferencesManager(context)
         val configs = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
         val calc = PrayerContext(prefs.getPrayerSettings().params(), configs.mapValues { it.value.offsetMinutes })
-        val planned = AdhanPlanner.next(ZonedDateTime.now(), prefs.getPlace(), calc, configs)
+        val offset = prefs.getHijriOffset()
+        val imsakOn = prefs.isImsakAlarmEnabled()
+        val planned = AdhanPlanner.next(ZonedDateTime.now(), prefs.getPlace(), calc, configs) { date ->
+            imsakOn && ShiaCalendar.toHijri(date, offset).month == RAMADAN
+        }
+        WidgetUpdater.refresh(context)
         if (planned == null) {
             cancel(context, PRAYER_REQUEST_CODE, PrayerAlarmReceiver::class.java)
             return
@@ -65,7 +74,7 @@ object ReligiousAlarms {
 
     fun scheduleOccasion(context: Context) {
         val prefs = PreferencesManager(context)
-        if (!prefs.isOccasionReminderEnabled()) {
+        if (!notesConfig(prefs).any) {
             cancel(context, OCCASION_REQUEST_CODE, OccasionAlarmReceiver::class.java)
             return
         }
@@ -77,6 +86,13 @@ object ReligiousAlarms {
     }
 
     fun today(): LocalDate = LocalDate.now()
+
+    /** Which of the morning notes (occasion, khums year, lunar eclipse) the user has switched on. */
+    fun notesConfig(prefs: PreferencesManager) = DailyNotesConfig(
+        occasions = prefs.isOccasionReminderEnabled(),
+        khumsYear = if (prefs.isKhumsReminderEnabled()) prefs.getKhumsYear() else null,
+        lunarEclipse = prefs.isEclipseReminderEnabled()
+    )
 
     private fun set(context: Context, requestCode: Int, triggerAt: Long, intent: Intent) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return

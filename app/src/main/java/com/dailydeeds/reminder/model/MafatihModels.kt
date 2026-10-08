@@ -6,7 +6,8 @@ enum class MafatihCategoryType(val id: String, val titleArabic: String, val icon
     TAQIBAT("taqibat", "تعقيبات الصلوات", "التعقيبات العامة والخاصة للصلوات اليومية"),
     MUNAJAT("munajat", "المناجاة الخمس عشرة", "مناجاة التائبين، الشاكين، الخائفين..."),
     AMAL("amal", "أعمال الأيام والشهور", "أعمال رجب، شعبان، رمضان، والجمعة..."),
-    BAQIYAT("baqiyat", "باقيات الصالحات", "حروز وأدعية الحفظ والرزق وقضاء الحوائج")
+    BAQIYAT("baqiyat", "باقيات الصالحات", "حروز وأدعية الحفظ والرزق وقضاء الحوائج"),
+    FULLBOOK("fullbook", "الكتاب كاملاً", "النص الكامل لمفاتيح الجنان بأبوابه وفصوله (بلا تشكيل)")
 }
 
 data class MafatihItem(
@@ -19,5 +20,5 @@ data class MafatihItem(
     val targetCount: Int = 1
 ) {
     /** True when the bundled text is abridged (marked with an ellipsis) rather than the full printed text. */
-    val isExcerpt: Boolean get() = arabicText.contains("...")
+    val isExcerpt: Boolean get() = category != MafatihCategoryType.FULLBOOK && arabicText.contains("...")
 }

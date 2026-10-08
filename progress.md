@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.2.1`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.2.2`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -89,3 +89,6 @@ Branch: `master`. Published release: `v1.2.1`. Milestone: Full Quran, Tafsir Al-
 
 - 2026-10-07: v1.2.1 corrective release prepared on `release/v1.2.1` (see section above); 51/51 tests pass.
 - 2026-10-07: Published GitHub release `v1.2.1` (target `release/v1.2.1`, commit 219e2e9): `DailyDeeds-v1.2.1.apk` (16,321,346 bytes, SHA-256 `a43177f04fc42420ec474dd838cff637d8e0a1011c6f99309eb3e6be41d7a8e8`). An initial upload accidentally attached the stale v1.2.0 APK; it was detected by the identical hash and replaced with the freshly built one. Added correction notice to the v1.2.0 GitHub release. Graph refreshed: 670 nodes, 1576 edges, 57 communities. Linear ALI-20 updated.
+- 2026-10-07: v1.2.2 prepared on `release/v1.2.2`: full Mafatih al-Jinan text (103 sections, OpenITI/Shamela, undiacritized) bundled as `mafatih/fullbook.txt`, new FULLBOOK category, searchable; 56/56 tests pass.
+- 2026-10-07: Published GitHub release `v1.2.2`: `DailyDeeds-v1.2.2.apk` (16,708,256 bytes, SHA-256 `6430b47c32a11540d41ad64a1d2b410f73acbc85e2c0a8f47f1c740ea098bf6b`, verified to contain `mafatih/fullbook.txt` and versionName 1.2.2). Graph refreshed: 686 nodes, 1605 edges, 53 communities. Linear ALI-20 updated.
+- 2026-10-07: Security hardening pass (branch `security/hardening`): OSV scan of 84 resolved libraries = 0 advisories; pinned Gradle distribution SHA-256, SHA-pinned CI actions with read-only token, Dependabot config, bounded search query length (+ hostile-input test). 57/57 tests pass, lint OK.

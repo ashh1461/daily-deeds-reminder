@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1791395785.4904442,
-    "seen": 1791396722.7201102,
-    "ast_hash": "d061e202c885de6400dea687fa8a7986",
+    "mtime": 1791397948.888176,
+    "seen": 1791398089.2378645,
+    "ast_hash": "8aa60634a91c8fa53b76652e9a86d91e",
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/MainActivity.kt": {
@@ -156,9 +156,9 @@
     "semantic_hash": "7ea3c94a2151ad7669b274060f899387"
   },
   "README.md": {
-    "mtime": 1791396689.2730474,
-    "seen": 1791396722.7211192,
-    "ast_hash": "c44017c753737cabe883aaf43ca7c32e",
+    "mtime": 1791397950.047061,
+    "seen": 1791398089.2378645,
+    "ast_hash": "3a949ad361e51cb28fba7bf30a9179ce",
     "semantic_hash": ""
   },
   "docs/releases/v1.1.0.md": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "progress.md": {
-    "mtime": 1791396678.3022492,
-    "seen": 1791396722.7211192,
-    "ast_hash": "652f7d3580380b0e4fbac3d15d433f3e",
+    "mtime": 1791397950.0480957,
+    "seen": 1791398089.2378645,
+    "ast_hash": "c2c7a50be0b8bf4b1e0342d1e65cc17b",
     "semantic_hash": ""
   },
   "docs/content/weekday-text-review.md": {
@@ -276,9 +276,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/data/MafatihDataProvider.kt": {
-    "mtime": 1791228501.988442,
-    "seen": 1791228901.5833511,
-    "ast_hash": "207e91bc14ea545b65c2a0b8dd15c631",
+    "mtime": 1791397271.4441304,
+    "seen": 1791398089.2378645,
+    "ast_hash": "ff45f0af9ceda2382b1d1bbdae728b23",
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/data/MafatihRepository.kt": {
@@ -312,9 +312,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/model/MafatihModels.kt": {
-    "mtime": 1791395840.1828952,
-    "seen": 1791396722.7211192,
-    "ast_hash": "1e4558442ce5acee8b37dc8a608e3a59",
+    "mtime": 1791397244.7705622,
+    "seen": 1791398089.2378645,
+    "ast_hash": "2f51b95e0b3c4a93284a52afa836bfe8",
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/model/QuranModels.kt": {
@@ -396,9 +396,9 @@
     "semantic_hash": ""
   },
   "app/src/test/java/com/dailydeeds/reminder/data/MafatihRepositoryTest.kt": {
-    "mtime": 1791228563.9280424,
-    "seen": 1791228901.5833511,
-    "ast_hash": "617c99a933fd3a7bd0fe160c8a62d2f1",
+    "mtime": 1791397283.5499375,
+    "seen": 1791398089.2378645,
+    "ast_hash": "c771e9c5595d63e0417e972493eda4a8",
     "semantic_hash": ""
   },
   "app/src/test/java/com/dailydeeds/reminder/data/QuranRepositoryTest.kt": {
@@ -459,6 +459,24 @@
     "mtime": 1791396678.2794056,
     "seen": 1791396722.7211192,
     "ast_hash": "1f0b1d4fdbe2a8e9ba97558193d4b085",
+    "semantic_hash": ""
+  },
+  "app/src/test/java/com/dailydeeds/reminder/data/MafatihFullBookTest.kt": {
+    "mtime": 1791397665.7791486,
+    "seen": 1791398089.2378645,
+    "ast_hash": "91008459d9d770fdef50c62b57102612",
+    "semantic_hash": ""
+  },
+  "app/src/main/resources/mafatih/fullbook.txt": {
+    "mtime": 1791397231.321501,
+    "seen": 1791398089.2378645,
+    "ast_hash": "56f28cbb1d544705fc0348971715a834",
+    "semantic_hash": ""
+  },
+  "docs/releases/v1.2.2.md": {
+    "mtime": 1791397949.36182,
+    "seen": 1791398089.2378645,
+    "ast_hash": "e122740e88682fe5f8ac68b763a7b7a0",
     "semantic_hash": ""
   }
 }

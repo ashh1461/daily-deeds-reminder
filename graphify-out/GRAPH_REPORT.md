@@ -1,17 +1,17 @@
-# Graph Report - Daily Reminder  (2026-10-07)
+# Graph Report - Daily Reminder  (2026-10-08)
 
 ## Corpus Check
-- 77 files · ~271,361 words
+- 77 files · ~271,512 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .xml 7, (none) 2, .bat 2)
 
 ## Summary
-- 686 nodes · 1605 edges · 53 communities (15 shown, 38 thin omitted)
+- 687 nodes · 1607 edges · 60 communities (16 shown, 44 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.92)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5ea5a41f`
+- Built from commit: `994a6578`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,7 +23,7 @@
 - PreferencesManager
 - ReminderType
 - Deed
-- .nextOccurrence
+- NotificationHelper.kt
 - MainViewModel
 - QuranViewModel
 - Daily Deeds Reminder 1.2.2
@@ -33,10 +33,17 @@
 - linear_tool.py
 - Repository Soul & Core Identity
 - SearchRepositoryTest
-- DailyReminderReceiver.kt
+- MafatihRepositoryTest
+- QuranRepositoryTest
+- SettingsScreen.kt
+- ArabicNormalizerTest
 - Daily Deeds Reminder 1.2.1
 - SearchRepository
+- MafatihFullBookTest
+- QuranDataIntegrityTest
 - .scheduleReminder
+- ColorSchemeContrastTest.kt
+- Validation
 
 ## God Nodes (most connected - your core abstractions)
 1. `PreferencesManager` - 37 edges
@@ -65,11 +72,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (53 total, 38 thin omitted)
+## Communities (60 total, 44 thin omitted)
 
 ### Community 0 - "MafatihViewModel"
-Cohesion: 0.08
-Nodes (14): MafatihDataProvider, MafatihRepository, MafatihCategoryType, ADIYAH, AMAL, BAQIYAT, FULLBOOK, MUNAJAT (+6 more)
+Cohesion: 0.09
+Nodes (13): MafatihDataProvider, MafatihRepository, MafatihCategoryType, ADIYAH, AMAL, BAQIYAT, FULLBOOK, MUNAJAT (+5 more)
 
 ### Community 1 - "MainActivity.kt"
 Cohesion: 0.05
@@ -84,12 +91,16 @@ Cohesion: 0.50
 Nodes (3): Daily Deeds Reminder 1.1.1, Distribution, Validation
 
 ### Community 5 - "ReminderType"
-Cohesion: 0.14
-Nodes (9): ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY, ReminderSettingCard() (+1 more)
+Cohesion: 0.24
+Nodes (7): ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY
 
 ### Community 6 - "Deed"
 Cohesion: 0.06
 Nodes (31): DeedsRepository, Deed, DeedCategory, AFTER_PRAYER, ALL, ANYTIME, BEDTIME, MORNING_EVENING (+23 more)
+
+### Community 7 - "NotificationHelper.kt"
+Cohesion: 0.09
+Nodes (4): NotificationHelper, ReminderTimeCalculator, DailyReminderReceiver, ReminderTimeCalculatorTest
 
 ### Community 9 - "QuranViewModel"
 Cohesion: 0.06
@@ -115,10 +126,6 @@ Nodes (5): comment(), create_issue(), query_linear(), teams(), update_issue()
 Cohesion: 0.40
 Nodes (4): Non-Negotiable Directives, Purpose & Ethos, Repository Soul & Core Identity, Triad of Accountability
 
-### Community 32 - "SearchRepositoryTest"
-Cohesion: 0.05
-Nodes (10): MafatihFullBookTest, MafatihRepositoryTest, QuranDataIntegrityTest, QuranRepositoryTest, SearchRepositoryTest, ColorSchemeContrastTest, Daily Deeds Reminder 1.2.0, Distribution (+2 more)
-
 ### Community 47 - "Daily Deeds Reminder 1.2.1"
 Cohesion: 0.33
 Nodes (5): Daily Deeds Reminder 1.2.1, Fixed, Improved, Known limits, Verification
@@ -127,25 +134,29 @@ Nodes (5): Daily Deeds Reminder 1.2.1, Fixed, Improved, Known limits, Verificati
 Cohesion: 0.12
 Nodes (10): Entry, SearchRepository, SearchResultItem, SearchResultType, ALL, MAFATIH, QURAN, TAFSIR (+2 more)
 
+### Community 59 - "Validation"
+Cohesion: 0.40
+Nodes (4): Daily Deeds Reminder 1.2.0, Distribution, Key Features, Validation
+
 ## Knowledge Gaps
 - **62 isolated node(s):** `DUA`, `ZIYARAT`, `READING`, `COUNTER`, `MULTI_STAGE_COUNTER` (+57 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 240 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **38 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **44 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `MainViewModel` connect `MainViewModel` to `MainActivity.kt`, `PreferencesManager`, `ReminderType`, `Deed`, `QuranViewModel`, `WeekdayContentScreen.kt`, `MainViewModel.kt`?**
+- **Why does `MainViewModel` connect `MainViewModel` to `MainActivity.kt`, `PreferencesManager`, `ReminderType`, `Deed`, `QuranViewModel`, `SettingsScreen.kt`, `WeekdayContentScreen.kt`, `MainViewModel.kt`, `.scheduleReminder`?**
   _High betweenness centrality (0.087) - this node is a cross-community bridge._
-- **Why does `PreferencesManager` connect `PreferencesManager` to `ReminderType`, `Deed`, `MainViewModel`, `DailyReminderReceiver.kt`, `NotificationHelper.kt`, `MainViewModel.kt`, `.scheduleReminder`?**
+- **Why does `PreferencesManager` connect `PreferencesManager` to `ReminderType`, `Deed`, `NotificationHelper.kt`, `MainViewModel`, `MainViewModel.kt`, `.scheduleReminder`?**
   _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `DeedCategory` connect `Deed` to `MainActivity.kt`, `ReminderType`, `MainViewModel`, `DailyReminderReceiver.kt`, `NotificationHelper.kt`, `WeekdayContentScreen.kt`, `MainViewModel.kt`?**
+- **Why does `DeedCategory` connect `Deed` to `MainActivity.kt`, `ReminderType`, `NotificationHelper.kt`, `MainViewModel`, `WeekdayContentScreen.kt`, `MainViewModel.kt`?**
   _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `QuranViewModel` (e.g. with `Completed` and `Ongoing log`) actually correct?**
   _`QuranViewModel` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `DUA`, `ZIYARAT`, `READING` to the rest of the system?**
   _62 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `MafatihViewModel` be split into smaller, more focused modules?**
-  _Cohesion score 0.07632850241545894 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0915915915915916 - nodes in this community are weakly interconnected._
 - **Should `MainActivity.kt` be split into smaller, more focused modules?**
   _Cohesion score 0.05204872646733112 - nodes in this community are weakly interconnected._

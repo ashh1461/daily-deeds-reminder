@@ -220,18 +220,6 @@ fun WeekdayContentScreen(kind: DayContentKind, tools: ToolsViewModel, onNavigate
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(Modifier.height(16.dp))
-
-                        Text(
-                            text = if (content.isExcerpt) "${content.source} (مقتطف)" else content.source,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            color = MaterialTheme.colorScheme.secondary,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
                 Spacer(Modifier.height(24.dp))

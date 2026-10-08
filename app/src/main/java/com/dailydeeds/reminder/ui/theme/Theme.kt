@@ -2,27 +2,31 @@ package com.dailydeeds.reminder.ui.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 internal val DarkColorScheme = darkColorScheme(
-    primary = NavyLight,
-    onPrimary = BackgroundDark,
-    primaryContainer = NavySecondary,
-    onPrimaryContainer = NavyLight,
-    secondary = GoldLight,
-    onSecondary = BackgroundDark,
-    tertiary = SuccessGreenContainer,
-    onTertiary = BackgroundDark,
+    primary = EmeraldSoftDark,
+    onPrimary = EmeraldInk,
+    primaryContainer = EmeraldContainerDark,
+    onPrimaryContainer = EmeraldOnContainerDark,
+    secondary = GoldBright,
+    onSecondary = Color(0xFF261B00),
+    tertiary = SuccessGreenDark,
+    onTertiary = Color(0xFF052512),
     outlineVariant = CardBorderColorDark,
     background = BackgroundDark,
     onBackground = TextPrimaryDark,
@@ -33,10 +37,10 @@ internal val DarkColorScheme = darkColorScheme(
 )
 
 internal val LightColorScheme = lightColorScheme(
-    primary = NavyPrimary,
+    primary = EmeraldPrimary,
     onPrimary = SurfaceLight,
-    primaryContainer = NavyLight,
-    onPrimaryContainer = NavyDark,
+    primaryContainer = EmeraldMint,
+    onPrimaryContainer = EmeraldInk,
     secondary = GoldText,
     onSecondary = SurfaceLight,
     tertiary = SuccessGreen,
@@ -50,6 +54,14 @@ internal val LightColorScheme = lightColorScheme(
     onSurfaceVariant = TextSecondaryLight
 )
 
+private val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(30.dp)
+)
+
 @Composable
 fun DailyReminderTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -61,7 +73,7 @@ fun DailyReminderTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.statusBarColor = colorScheme.surface.toArgb()
+                window.statusBarColor = colorScheme.background.toArgb()
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             }
         }
@@ -71,6 +83,7 @@ fun DailyReminderTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = AppShapes,
             content = content
         )
     }

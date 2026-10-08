@@ -53,7 +53,7 @@ fun SettingsScreen(viewModel: MainViewModel, onNavigateBack: () -> Unit) {
                 ReminderSettingCard(type, settings) { viewModel.setReminder(type, it) }
             }
             Text(
-                "الزيارة المختصرة ودعاء استيداع المستقبل متاحان في قسم «في أي وقت»؛ لم يُذكر لهما موعد محدد.",
+                "الزيارة المختصرة ودعاء استيداع المستقبل متاحان في قسم «في أي وقت»، وليس لهما موعد محدد.",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text("التفاعل", style = MaterialTheme.typography.titleLarge)
@@ -71,8 +71,14 @@ fun SettingsScreen(viewModel: MainViewModel, onNavigateBack: () -> Unit) {
             }
             Card {
                 Text(
-                    "يضم التطبيق الأعمال الإحدى عشرة الأصلية، وخمس إضافات من الصور المرفقة. تظهر قراءات الخميس ضمن أعمال اليوم يوم الخميس فقط، ويمكن فتحها دائماً من قسم «صباح الخميس».",
+                    "يضم التطبيق الأعمال الإحدى عشرة الأصلية، وخمس إضافات. تظهر قراءات الخميس ضمن أعمال اليوم يوم الخميس فقط، ويمكن فتحها دائماً من قسم «صباح الخميس».",
                     Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Card {
+                Text(
+                    "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني. نص مفاتيح الجنان والصحيفة السجادية: مدونة OpenITI (رخصة MIT) المأخوذة عن المكتبة الشاملة. الخطوط: أميري وتجوال (رخصة SIL OFL).",
+                    Modifier.padding(16.dp), style = MaterialTheme.typography.bodySmall
                 )
             }
             OutlinedButton(onClick = { showResetDialog = true }, modifier = Modifier.fillMaxWidth()) {

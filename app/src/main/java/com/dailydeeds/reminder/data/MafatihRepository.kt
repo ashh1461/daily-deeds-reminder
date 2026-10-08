@@ -8,28 +8,32 @@ class MafatihRepository(
     private val provider: MafatihDataProvider = MafatihDataProvider
 ) {
 
-    fun getCategories(): List<MafatihCategoryType> {
-        return MafatihCategoryType.values().toList()
+    /** Normalized title + text of every item, computed once; searching only normalizes the query. */
+    private val searchKeys: Map<String, String> by lazy {
+        provider.items.associate { it.id to ArabicNormalizer.searchKey(it.title + " " + it.arabicText) }
     }
 
-    fun getItemsByCategory(category: MafatihCategoryType): List<MafatihItem> {
-        return provider.getItemsByCategory(category)
+    fun getCategories(): List<MafatihCategoryType> = MafatihCategoryType.values().toList()
+
+    fun getItemsByCategory(category: MafatihCategoryType): List<MafatihItem> = provider.getItemsByCategory(category)
+
+    fun getItemById(id: String): MafatihItem? = provider.getItemById(id)
+
+    fun getAllItems(): List<MafatihItem> = provider.items
+
+    /** Builds the search index; call from a background thread before the first query. */
+    fun warmUp() {
+        searchKeys
     }
 
-    fun getItemById(id: String): MafatihItem? {
-        return provider.getItemById(id)
+    fun searchMafatih(query: String, category: MafatihCategoryType? = null): List<MafatihItem> {
+        val pool = if (category == null) provider.items else getItemsByCategory(category)
+        val key = ArabicNormalizer.searchKey(query.take(MAX_QUERY_LENGTH))
+        if (key.isEmpty()) return pool
+        return pool.filter { searchKeys[it.id]?.contains(key) == true }
     }
 
-    fun getAllItems(): List<MafatihItem> {
-        return provider.items
-    }
-
-    fun searchMafatih(query: String): List<MafatihItem> {
-        if (query.isBlank()) return getAllItems()
-        return provider.items.filter { item ->
-            ArabicNormalizer.contains(item.title, query) ||
-                    ArabicNormalizer.contains(item.arabicText, query) ||
-                    ArabicNormalizer.contains(item.virtueOrSource, query)
-        }
+    private companion object {
+        const val MAX_QUERY_LENGTH = 200
     }
 }

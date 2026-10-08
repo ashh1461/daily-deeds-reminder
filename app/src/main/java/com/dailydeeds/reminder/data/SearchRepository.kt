@@ -100,7 +100,7 @@ class SearchRepository(
         }
 
         val mafatih = mafatihRepo.getAllItems().map { item ->
-            Entry(listOf(item.title, item.arabicText, item.virtueOrSource).map(ArabicNormalizer::searchKey)) { q ->
+            Entry(listOf(item.title, item.arabicText).map(ArabicNormalizer::searchKey)) { q ->
                 SearchResultItem(
                     id = "mafatih_${item.id}",
                     type = SearchResultType.MAFATIH,

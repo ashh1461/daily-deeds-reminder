@@ -1,5 +1,7 @@
 package com.dailydeeds.reminder.ui.screens
 
+import com.dailydeeds.reminder.ui.components.OrnateTitle
+import com.dailydeeds.reminder.ui.components.cardBorder
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.foundation.clickable
@@ -58,27 +60,12 @@ fun MafatihScreen(
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "مفاتيح الجنان",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        OrnateTitle("مفاتيح الجنان والصحيفة السجادية")
 
         Spacer(modifier = Modifier.height(12.dp))
 
         WeekdayShortcuts(onNavigateToDuas, onNavigateToZiyarat)
 
-        val uriHandler = LocalUriHandler.current
-        TextButton(onClick = { uriHandler.openUri(SAHIFA_URL) }) {
-            Text("الصحيفة السجادية (نسخة مكتبة المعارف على الإنترنت)")
-        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -138,10 +125,9 @@ fun MafatihScreen(
                             viewModel.selectItem(item.id)
                             onNavigateToItem(item.id)
                         },
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                    )
+                    shape = MaterialTheme.shapes.medium,
+                    border = cardBorder(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Row(
                         modifier = Modifier
@@ -167,16 +153,6 @@ fun MafatihScreen(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Right
                             )
-                            if (item.virtueOrSource.isNotBlank()) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = item.virtueOrSource,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1,
-                                    textAlign = TextAlign.Right
-                                )
-                            }
                         }
                     }
                 }
@@ -198,5 +174,3 @@ internal fun WeekdayShortcuts(onDuas: () -> Unit, onZiyarat: () -> Unit, modifie
     }
 }
 
-/** Official online edition of al-Sahifa al-Sajjadiyya; opened in the browser, not bundled. */
-private const val SAHIFA_URL = "https://books.almaaref.org/static/documents/uploads/pdf/sahifa.pdf"

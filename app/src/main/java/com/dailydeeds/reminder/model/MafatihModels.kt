@@ -1,13 +1,17 @@
 package com.dailydeeds.reminder.model
 
+/**
+ * Sections of the Mafatih tab. The first five are thematic views over the complete book; [FULLBOOK]
+ * lists every section of the book in order; [SAHIFA] is al-Sahifa al-Sajjadiyya al-Kamila.
+ */
 enum class MafatihCategoryType(val id: String, val titleArabic: String, val iconDescription: String) {
-    ADIYAH("adiyah", "الأدعية المشهورة", "دعاء كميل، التوسل، الصباح، السمات..."),
-    ZIYARAT("ziyarat", "الزيارات المباركة", "عاشوراء، وارث، الجامعة الكبيرة، أمين الله..."),
-    TAQIBAT("taqibat", "تعقيبات الصلوات", "التعقيبات العامة والخاصة للصلوات اليومية"),
-    MUNAJAT("munajat", "المناجاة الخمس عشرة", "مناجاة التائبين، الشاكين، الخائفين..."),
-    AMAL("amal", "أعمال الأيام والشهور", "أعمال رجب، شعبان، رمضان، والجمعة..."),
-    BAQIYAT("baqiyat", "باقيات الصالحات", "حروز وأدعية الحفظ والرزق وقضاء الحوائج"),
-    FULLBOOK("fullbook", "الكتاب كاملاً", "النص الكامل لمفاتيح الجنان بأبوابه وفصوله (بلا تشكيل)")
+    ADIYAH("adiyah", "الأدعية", "كميل، السمات، الصباح، التوسل، الافتتاح، أبو حمزة..."),
+    ZIYARAT("ziyarat", "الزيارات", "عاشوراء، الأربعين، الجامعة، أمين الله، زيارات الأئمة..."),
+    MUNAJAT("munajat", "المناجاة", "المناجاة الخمس عشرة للإمام زين العابدين (ع)"),
+    TAQIBAT("taqibat", "التعقيبات", "تعقيبات الصلوات العامة والخاصة"),
+    AMAL("amal", "أعمال الشهور", "أعمال الجمعة ورجب وشعبان ورمضان وسائر الشهور"),
+    SAHIFA("sahifa", "الصحيفة السجادية", "الصحيفة السجادية الكاملة: الأدعية الأربعة والخمسون وملحقاتها"),
+    FULLBOOK("fullbook", "الكتاب كاملاً", "كل أبواب مفاتيح الجنان وفصوله بالترتيب")
 }
 
 data class MafatihItem(
@@ -15,10 +19,6 @@ data class MafatihItem(
     val category: MafatihCategoryType,
     val title: String,
     val arabicText: String,
-    val virtueOrSource: String = "",
-    val hasCounter: Boolean = false,
-    val targetCount: Int = 1
-) {
-    /** True when the bundled text is abridged (marked with an ellipsis) rather than the full printed text. */
-    val isExcerpt: Boolean get() = category != MafatihCategoryType.FULLBOOK && arabicText.contains("...")
-}
+    /** True for sections of the Mafatih book (shown in [MafatihCategoryType.FULLBOOK]); false for the Sahifa. */
+    val fromMafatihBook: Boolean = true
+)

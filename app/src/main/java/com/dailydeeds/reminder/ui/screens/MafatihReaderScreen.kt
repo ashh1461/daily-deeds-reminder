@@ -63,7 +63,9 @@ fun MafatihReaderScreen(
 
     val favorites by tools.favorites.collectAsState()
     val currentItem = item ?: return
-    LaunchedEffect(currentItem.id) { tools.recordMafatih(currentItem.id) }
+    LaunchedEffect(currentItem.id) {
+        if (currentItem.fromMafatihBook) tools.recordMafatih(currentItem.id) else tools.recordSahifa(currentItem.id)
+    }
 
     Scaffold(
         topBar = {
@@ -88,9 +90,9 @@ fun MafatihReaderScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { tools.toggleFavorite(FavoriteKey.Mafatih(currentItem.id)) }) {
+                    IconButton(onClick = { tools.toggleFavorite((if (currentItem.fromMafatihBook) FavoriteKey.Mafatih(currentItem.id) else FavoriteKey.Sahifa(currentItem.id))) }) {
                         Icon(
-                            if (FavoriteKey.Mafatih(currentItem.id) in favorites) Icons.Default.Star else Icons.Default.StarBorder,
+                            if ((if (currentItem.fromMafatihBook) FavoriteKey.Mafatih(currentItem.id) else FavoriteKey.Sahifa(currentItem.id)) in favorites) Icons.Default.Star else Icons.Default.StarBorder,
                             contentDescription = "المفضلة",
                             tint = MaterialTheme.colorScheme.primary
                         )

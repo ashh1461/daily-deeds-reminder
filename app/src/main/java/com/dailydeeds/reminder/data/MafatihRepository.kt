@@ -13,12 +13,18 @@ class MafatihRepository(
         provider.items.associate { it.id to ArabicNormalizer.searchKey(it.title + " " + it.arabicText) }
     }
 
-    fun getCategories(): List<MafatihCategoryType> = MafatihCategoryType.values().toList()
+    /** The chips of the Mafatih tab. The Sahifa is a separate tab and is not part of this list. */
+    fun getCategories(): List<MafatihCategoryType> = MafatihCategoryType.mafatihChips
 
     fun getItemsByCategory(category: MafatihCategoryType): List<MafatihItem> = provider.getItemsByCategory(category)
 
     fun getItemById(id: String): MafatihItem? = provider.getItemById(id)
 
+    fun getBookItems(): List<MafatihItem> = provider.bookItems
+
+    fun getSahifaItems(): List<MafatihItem> = provider.sahifaItems
+
+    /** Every searchable item: the book followed by the Sahifa. */
     fun getAllItems(): List<MafatihItem> = provider.items
 
     /** Builds the search index; call from a background thread before the first query. */
@@ -26,8 +32,12 @@ class MafatihRepository(
         searchKeys
     }
 
-    fun searchMafatih(query: String, category: MafatihCategoryType? = null): List<MafatihItem> {
-        val pool = if (category == null) provider.items else getItemsByCategory(category)
+    fun searchMafatih(query: String, category: MafatihCategoryType = MafatihCategoryType.INDEX): List<MafatihItem> =
+        filter(getItemsByCategory(category), query)
+
+    fun searchSahifa(query: String): List<MafatihItem> = filter(provider.sahifaItems, query)
+
+    private fun filter(pool: List<MafatihItem>, query: String): List<MafatihItem> {
         val key = ArabicNormalizer.searchKey(query.take(MAX_QUERY_LENGTH))
         if (key.isEmpty()) return pool
         return pool.filter { searchKeys[it.id]?.contains(key) == true }

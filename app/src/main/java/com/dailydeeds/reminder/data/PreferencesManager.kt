@@ -25,11 +25,13 @@ class PreferencesManager(context: Context) {
         const val KEY_EVENING_MINUTE = "pref_evening_minute"
         const val KEY_PRAYER_ENABLED = "pref_prayer_reminder_enabled"
         const val KEY_HAPTICS_ENABLED = "pref_haptics_enabled"
-        const val KEY_SOUND_ENABLED = "pref_sound_enabled"
         const val KEY_COMPLETED_DAYS_STREAK = "pref_completed_days_streak"
         private const val KEY_FAVORITES = "pref_favorites"
         private const val KEY_LAST_SURAH = "pref_last_surah"
         private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
+        private const val KEY_LAST_SAHIFA = "pref_last_sahifa"
+        private const val KEY_THEME_MODE = "pref_theme_mode"
+        private const val KEY_ASKED_NOTIFICATIONS = "pref_asked_notifications"
         private const val KEY_PLACE_NAME = "pref_place_name"
         private const val KEY_PLACE_LAT = "pref_place_lat"
         private const val KEY_PLACE_LNG = "pref_place_lng"
@@ -177,9 +179,6 @@ class PreferencesManager(context: Context) {
     fun setHapticsEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_HAPTICS_ENABLED, enabled).apply()
 
-    fun isSoundEnabled(): Boolean = prefs.getBoolean(KEY_SOUND_ENABLED, true)
-    fun setSoundEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_SOUND_ENABLED, enabled).apply()
 
     // --- Favorites and reading position ---------------------------------------------------
 
@@ -231,4 +230,14 @@ class PreferencesManager(context: Context) {
     fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
     fun setOccasionReminderEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
+
+    fun getLastSahifaId(): String? = prefs.getString(KEY_LAST_SAHIFA, null)
+    fun setLastSahifaId(id: String) = prefs.edit().putString(KEY_LAST_SAHIFA, id).apply()
+
+    /** "system", "light" or "dark". */
+    fun getThemeMode(): String = prefs.getString(KEY_THEME_MODE, "system") ?: "system"
+    fun setThemeMode(mode: String) = prefs.edit().putString(KEY_THEME_MODE, mode).apply()
+
+    fun hasAskedNotificationPermission(): Boolean = prefs.getBoolean(KEY_ASKED_NOTIFICATIONS, false)
+    fun setAskedNotificationPermission() = prefs.edit().putBoolean(KEY_ASKED_NOTIFICATIONS, true).apply()
 }

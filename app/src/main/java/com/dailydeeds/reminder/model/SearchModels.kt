@@ -5,7 +5,9 @@ enum class SearchResultType(val labelArabic: String) {
     QURAN("القرآن الكريم"),
     TAFSIR("ملخصات الميزان"),
     MAFATIH("مفاتيح الجنان"),
-    WEEKDAY("أدعية وزيارات الأيام")
+    SAHIFA("الصحيفة السجادية"),
+    WEEKDAY("أدعية وزيارات الأيام"),
+    DEEDS("الأعمال اليومية")
 }
 
 data class SearchResultItem(
@@ -16,5 +18,6 @@ data class SearchResultItem(
     val surahNumber: Int? = null,
     val ayahNumber: Int? = null,
     val mafatihItemId: String? = null,
-    val weekdayKind: DayContentKind? = null
+    val weekdayKind: DayContentKind? = null,
+    val deedId: Int? = null
 )

@@ -1,5 +1,11 @@
 package com.dailydeeds.reminder
 
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
+import com.dailydeeds.reminder.ui.screens.CalendarScreen
+import com.dailydeeds.reminder.ui.screens.PrayerTimesScreen
+import com.dailydeeds.reminder.ui.screens.QiblaScreen
+import com.dailydeeds.reminder.ui.screens.FavoritesScreen
+import com.dailydeeds.reminder.ui.screens.HomeToolsCard
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -128,7 +134,8 @@ fun AppNavigation(
     mainViewModel: MainViewModel,
     quranViewModel: QuranViewModel = viewModel(),
     mafatihViewModel: MafatihViewModel = viewModel(),
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = viewModel(),
+    toolsViewModel: ToolsViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -183,7 +190,16 @@ fun AppNavigation(
                         navController.navigate("settings")
                     },
                     onNavigateToDuas = { navController.navigate("duas") },
-                    onNavigateToZiyarat = { navController.navigate("ziyarat") }
+                    onNavigateToZiyarat = { navController.navigate("ziyarat") },
+                    toolsContent = {
+                        HomeToolsCard(
+                            tools = toolsViewModel,
+                            onOpenRoute = { navController.navigate(it) },
+                            onResumeSurah = { navController.navigate("quran/reader/$it") },
+                            onResumeMafatih = { navController.navigate("mafatih/reader/$it") },
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                    }
                 )
             }
 
@@ -205,6 +221,7 @@ fun AppNavigation(
                 QuranReaderScreen(
                     surahNumber = surahNumber,
                     viewModel = quranViewModel,
+                    tools = toolsViewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -229,6 +246,7 @@ fun AppNavigation(
                 MafatihReaderScreen(
                     itemId = itemId,
                     viewModel = mafatihViewModel,
+                    tools = toolsViewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -251,11 +269,37 @@ fun AppNavigation(
             }
 
             composable("duas") {
-                WeekdayContentScreen(DayContentKind.DUA, onNavigateBack = { navController.popBackStack() })
+                WeekdayContentScreen(DayContentKind.DUA, toolsViewModel, onNavigateBack = { navController.popBackStack() })
             }
 
             composable("ziyarat") {
-                WeekdayContentScreen(DayContentKind.ZIYARAT, onNavigateBack = { navController.popBackStack() })
+                WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable("calendar") {
+                CalendarScreen(toolsViewModel, onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable("prayer") {
+                PrayerTimesScreen(
+                    toolsViewModel,
+                    onNavigateBack = { navController.popBackStack() },
+                    onOpenQibla = { navController.navigate("qibla") }
+                )
+            }
+
+            composable("qibla") {
+                QiblaScreen(toolsViewModel, onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable("favorites") {
+                FavoritesScreen(
+                    viewModel = toolsViewModel,
+                    onNavigateBack = { navController.popBackStack() },
+                    onOpenSurah = { navController.navigate("quran/reader/$it") },
+                    onOpenMafatih = { navController.navigate("mafatih/reader/$it") },
+                    onOpenWeekday = { navController.navigate(if (it == DayContentKind.DUA) "duas" else "ziyarat") }
+                )
             }
 
             composable(

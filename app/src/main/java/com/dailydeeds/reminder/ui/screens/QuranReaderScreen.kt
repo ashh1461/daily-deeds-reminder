@@ -1,5 +1,10 @@
 package com.dailydeeds.reminder.ui.screens
 
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.runtime.LaunchedEffect
+import com.dailydeeds.reminder.data.FavoriteKey
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +52,7 @@ import com.dailydeeds.reminder.viewmodel.QuranViewModel
 fun QuranReaderScreen(
     surahNumber: Int,
     viewModel: QuranViewModel,
+    tools: ToolsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val surah by viewModel.selectedSurah.collectAsState()
@@ -55,7 +61,9 @@ fun QuranReaderScreen(
     val isTafsirVisible by viewModel.isTafsirVisible.collectAsState()
     val fontSizeSp by viewModel.fontSizeSp.collectAsState()
 
+    val favorites by tools.favorites.collectAsState()
     val currentSurah = surah ?: return
+    LaunchedEffect(currentSurah.number) { tools.recordSurah(currentSurah.number) }
 
     Scaffold(
         topBar = {
@@ -153,6 +161,15 @@ fun QuranReaderScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                val fav = FavoriteKey.Ayah(ayah.surahNumber, ayah.ayahNumber)
+                                IconButton(onClick = { tools.toggleFavorite(fav) }) {
+                                    Icon(
+                                        if (fav in favorites) Icons.Default.Star else Icons.Default.StarBorder,
+                                        contentDescription = "المفضلة",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                                 if (viewModel.hasTafsir(ayah.surahNumber, ayah.ayahNumber)) {
                                     OutlinedButton(
                                         onClick = { viewModel.openTafsir(ayah.surahNumber, ayah.ayahNumber) }
@@ -164,8 +181,7 @@ fun QuranReaderScreen(
                                         )
                                         Text("ملخص الميزان", style = MaterialTheme.typography.labelMedium)
                                     }
-                                } else {
-                                    Spacer(modifier = Modifier.width(1.dp))
+                                }
                                 }
 
                                 Box(

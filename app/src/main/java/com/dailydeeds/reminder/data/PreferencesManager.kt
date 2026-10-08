@@ -2,7 +2,11 @@ package com.dailydeeds.reminder.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.dailydeeds.reminder.calendar.ShiaCalendar
+import com.dailydeeds.reminder.model.Place
+import com.dailydeeds.reminder.model.PlacePresets
 import com.dailydeeds.reminder.model.ReminderSettings
+import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.model.ReminderType
 import java.time.LocalDate
 
@@ -23,6 +27,15 @@ class PreferencesManager(context: Context) {
         const val KEY_HAPTICS_ENABLED = "pref_haptics_enabled"
         const val KEY_SOUND_ENABLED = "pref_sound_enabled"
         const val KEY_COMPLETED_DAYS_STREAK = "pref_completed_days_streak"
+        private const val KEY_FAVORITES = "pref_favorites"
+        private const val KEY_LAST_SURAH = "pref_last_surah"
+        private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
+        private const val KEY_PLACE_NAME = "pref_place_name"
+        private const val KEY_PLACE_LAT = "pref_place_lat"
+        private const val KEY_PLACE_LNG = "pref_place_lng"
+        private const val KEY_PLACE_ZONE = "pref_place_zone"
+        private const val KEY_HIJRI_OFFSET = "pref_hijri_offset"
+        private const val KEY_OCCASION_REMINDER = "pref_occasion_reminder"
 
         /** Days of per-day deed state kept before old keys are pruned. */
         const val RETENTION_DAYS = 90L
@@ -167,4 +180,55 @@ class PreferencesManager(context: Context) {
     fun isSoundEnabled(): Boolean = prefs.getBoolean(KEY_SOUND_ENABLED, true)
     fun setSoundEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_SOUND_ENABLED, enabled).apply()
+
+    // --- Favorites and reading position ---------------------------------------------------
+
+    fun getFavorites(): List<FavoriteKey> = FavoritesList.parse(prefs.getString(KEY_FAVORITES, null))
+
+    fun toggleFavorite(key: FavoriteKey): List<FavoriteKey> {
+        val updated = FavoritesList.toggle(getFavorites(), key)
+        prefs.edit().putString(KEY_FAVORITES, FavoritesList.serialize(updated)).apply()
+        return updated
+    }
+
+    fun getLastSurah(): Int = prefs.getInt(KEY_LAST_SURAH, 0)
+    fun setLastSurah(surah: Int) = prefs.edit().putInt(KEY_LAST_SURAH, surah).apply()
+
+    fun getLastMafatihId(): String? = prefs.getString(KEY_LAST_MAFATIH, null)
+    fun setLastMafatihId(id: String) = prefs.edit().putString(KEY_LAST_MAFATIH, id).apply()
+
+    // --- Place, calendar offset and religious reminders ------------------------------------
+
+    fun getPlace(): Place {
+        val name = prefs.getString(KEY_PLACE_NAME, null) ?: return PlacePresets.default
+        return runCatching {
+            Place(
+                name,
+                Double.fromBits(prefs.getLong(KEY_PLACE_LAT, 0L)),
+                Double.fromBits(prefs.getLong(KEY_PLACE_LNG, 0L)),
+                prefs.getString(KEY_PLACE_ZONE, "UTC") ?: "UTC"
+            )
+        }.getOrDefault(PlacePresets.default)
+    }
+
+    fun setPlace(place: Place) {
+        prefs.edit()
+            .putString(KEY_PLACE_NAME, place.name)
+            .putLong(KEY_PLACE_LAT, place.latitude.toRawBits())
+            .putLong(KEY_PLACE_LNG, place.longitude.toRawBits())
+            .putString(KEY_PLACE_ZONE, place.zoneId)
+            .apply()
+    }
+
+    fun getHijriOffset(): Int = prefs.getInt(KEY_HIJRI_OFFSET, 0).coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)
+    fun setHijriOffset(days: Int) =
+        prefs.edit().putInt(KEY_HIJRI_OFFSET, days.coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)).apply()
+
+    fun isPrayerAlarmEnabled(prayer: Prayer): Boolean = prefs.getBoolean("pref_prayer_alarm_${prayer.id}", false)
+    fun setPrayerAlarmEnabled(prayer: Prayer, enabled: Boolean) =
+        prefs.edit().putBoolean("pref_prayer_alarm_${prayer.id}", enabled).apply()
+
+    fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
+    fun setOccasionReminderEnabled(enabled: Boolean) =
+        prefs.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
 }

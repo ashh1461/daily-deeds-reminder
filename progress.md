@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.5.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.6.0`. Milestone: v1.6.0 Adhan (next: v1.7.0 Worship tools). Updated: 2026-10-08.
 
 ## Completed
 
@@ -99,3 +99,5 @@ Branch: `master`. Published release: `v1.5.0`. Milestone: Full Quran, Tafsir Al-
 - 2026-10-08: Published v1.4.0: DailyDeeds-v1.4.0.apk (17,377,700 bytes, SHA-256 b5de01322780930535450b67c6d36de5885f482b4bdddcee00a45bac442a1c73; verified to contain mafatih/items.txt, mafatih/sahifa.txt, quran/uthmani.txt and the Amiri/Tajawal fonts; versionName 1.4.0). Graph: 924 nodes, 2313 edges, 71 communities.
 - 2026-10-09: v1.5.0 "Structure" (plan: C:/Users/Administrator/.claude/plans/make-a-plan-for-rosy-meadow.md): five tabs (اليوم, العبادات, القرآن, المفاتيح, الصحيفة) with a shared top bar; Mafatih items.txt/sahifa.txt schema v2 with chapter groups, new jumuah category, weekday rows moved to their own screens, INDEX replaces FULLBOOK; Sahifa tab/search/favorites split; consolidated Settings; fixes (dead chip, stale prayer screen, one-time notification prompt, permission-health card, confirmed reset). 89/89 tests, lint OK.
 - 2026-10-09: Published v1.5.0: DailyDeeds-v1.5.0.apk (17,408,012 bytes, SHA-256 1314596fb85dd8e324a65c1b86af142137088be4d5e196a6e8897d7c88ee34b4; versionName 1.5.0; contains mafatih/items.txt, sahifa.txt, quran/uthmani.txt). Graph: 1007 nodes, 2613 edges, 78 communities.
+- 2026-10-08: v1.6.0 "Adhan": AdhanPlanner (pure), AdhanService (media foreground service), PrayerAlarmReceiver rewrite with modes/pre-adhan/late guard, channels created in App, calculation methods (Leva/Tehran/custom, Maghrib delay, Imsak), city search over GeoNames (34k), voice store + own-file import + HTTPS-only downloader with rights-gated manifest, INTERNET permission with policy tests (docs/SECURITY.md). 123/123 tests, lint OK, OSV 0/93.
+- 2026-10-08: Published v1.6.0: DailyDeeds-v1.6.0.apk (18,256,386 bytes, SHA-256 5e0a79d33093e821e33edeed92e340a1b9daff11d7455cabd408dad1b405b537; versionName 1.6.0, versionCode 10; contains quran/uthmani.txt, mafatih/items.txt, mafatih/sahifa.txt, places/cities.txt). Minified release builds (3.6 MB unsigned) and its manifest was checked: 9 permissions, networkSecurityConfig present, allowBackup=false.

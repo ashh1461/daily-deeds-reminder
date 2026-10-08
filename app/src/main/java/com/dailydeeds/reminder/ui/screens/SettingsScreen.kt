@@ -59,7 +59,10 @@ fun SettingsScreen(
             SettingsCard {
                 Text("المدينة الحالية: ${place.name}", style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = { onOpenRoute("prayer") }, modifier = Modifier.fillMaxWidth()) {
-                    Text("أوقات الصلاة وتنبيهات الأذان")
+                    Text("أوقات الصلاة")
+                }
+                OutlinedButton(onClick = { onOpenRoute("prayer/settings") }, modifier = Modifier.fillMaxWidth()) {
+                    Text("الأذان وطريقة الحساب")
                 }
             }
 

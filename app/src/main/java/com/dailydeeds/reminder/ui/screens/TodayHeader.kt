@@ -46,12 +46,13 @@ private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm"
 @Composable
 fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
     val place by tools.place.collectAsState()
+    val calc by tools.prayerContext.collectAsState()
     val offset by tools.hijriOffset.collectAsState()
     val now by rememberNow()
     val today = now.toLocalDate()
     val hijri = remember(today, offset) { ShiaCalendar.toHijri(today, offset) }
     val occasions = remember(today, offset) { ShiaCalendar.occasionsOn(today, offset) }
-    val next = remember(place, now) { PrayerSchedule.next(now, place) }
+    val next = remember(place, now, calc) { PrayerSchedule.next(now, place, calc) }
 
     EmeraldBanner(modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -91,9 +92,10 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
 @Composable
 fun PrayerStrip(tools: ToolsViewModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val place by tools.place.collectAsState()
+    val calc by tools.prayerContext.collectAsState()
     val now by rememberNow()
-    val times = remember(place, now.toLocalDate()) { PrayerSchedule.timesFor(now.toLocalDate(), place) }
-    val next = remember(place, now) { PrayerSchedule.next(now, place) }
+    val times = remember(place, now.toLocalDate(), calc) { PrayerSchedule.timesFor(now.toLocalDate(), place, calc) }
+    val next = remember(place, now, calc) { PrayerSchedule.next(now, place, calc) }
     val cells = listOf(
         Prayer.FAJR to times.fajr, Prayer.DHUHR to times.dhuhr,
         Prayer.MAGHRIB to times.maghrib, Prayer.ISHA to times.isha

@@ -2,11 +2,15 @@ package com.dailydeeds.reminder.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
+import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
+import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.notification.ReligiousAlarms
 import com.dailydeeds.reminder.util.Prayer
+import com.dailydeeds.reminder.util.PrayerContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +28,23 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
     private val _hijriOffset = MutableStateFlow(prefs.getHijriOffset())
     val hijriOffset: StateFlow<Int> = _hijriOffset.asStateFlow()
 
-    private val _prayerAlarms = MutableStateFlow(Prayer.values().associateWith { prefs.isPrayerAlarmEnabled(it) })
-    val prayerAlarms: StateFlow<Map<Prayer, Boolean>> = _prayerAlarms.asStateFlow()
+    private val _alarmConfigs = MutableStateFlow(Prayer.values().associateWith { prefs.getAlarmConfig(it) })
+    val alarmConfigs: StateFlow<Map<Prayer, PrayerAlarmConfig>> = _alarmConfigs.asStateFlow()
+
+    private val _adhanGlobal = MutableStateFlow(prefs.getAdhanGlobal())
+    val adhanGlobal: StateFlow<AdhanGlobalSettings> = _adhanGlobal.asStateFlow()
+
+    private val _prayerSettings = MutableStateFlow(prefs.getPrayerSettings())
+    val prayerSettings: StateFlow<PrayerSettings> = _prayerSettings.asStateFlow()
+
+    /** Calculation parameters plus manual offsets; what every screen uses to compute prayer times. */
+    private val _prayerContext = MutableStateFlow(buildContext())
+    val prayerContext: StateFlow<PrayerContext> = _prayerContext.asStateFlow()
+
+    private fun buildContext() = PrayerContext(
+        _prayerSettings.value.params(),
+        _alarmConfigs.value.mapValues { it.value.offsetMinutes }
+    )
 
     private val _occasionReminder = MutableStateFlow(prefs.isOccasionReminderEnabled())
     val occasionReminder: StateFlow<Boolean> = _occasionReminder.asStateFlow()
@@ -68,9 +87,22 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _hijriOffset.value = prefs.getHijriOffset()
     }
 
-    fun setPrayerAlarm(prayer: Prayer, enabled: Boolean) {
-        prefs.setPrayerAlarmEnabled(prayer, enabled)
-        _prayerAlarms.value = _prayerAlarms.value + (prayer to enabled)
+    fun setAlarmConfig(prayer: Prayer, config: PrayerAlarmConfig) {
+        prefs.setAlarmConfig(prayer, config)
+        _alarmConfigs.value = _alarmConfigs.value + (prayer to config)
+        _prayerContext.value = buildContext()
+        ReligiousAlarms.schedulePrayer(getApplication())
+    }
+
+    fun setAdhanGlobal(settings: AdhanGlobalSettings) {
+        prefs.setAdhanGlobal(settings)
+        _adhanGlobal.value = settings
+    }
+
+    fun setPrayerSettings(settings: PrayerSettings) {
+        prefs.setPrayerSettings(settings)
+        _prayerSettings.value = settings
+        _prayerContext.value = buildContext()
         ReligiousAlarms.schedulePrayer(getApplication())
     }
 

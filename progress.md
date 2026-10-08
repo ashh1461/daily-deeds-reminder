@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.4.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.5.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -97,3 +97,5 @@ Branch: `master`. Published release: `v1.4.0`. Milestone: Full Quran, Tafsir Al-
 - 2026-10-08: Published v1.3.0: DailyDeeds-v1.3.0.apk (16,799,848 bytes, SHA-256 668e54816d1fe6fa2594d9bf0f1201a634f2442a75bf0d87245eba91ee076ee3, verified versionName 1.3.0 and bundled Quran + Mafatih resources). Graph: 888 nodes, 2189 edges, 74 communities.
 - 2026-10-08: v1.4.0 prepared on `feature/v1.4.0` after user feedback: (1) all Mafatih duas/ziyarat now complete from the full book (130 named sections, abridged samples and 'check the book' notices removed; weekday duas/ziyarat verified against the book, Saturday second ziyarah added); (2) picture/scan wording removed from deeds, settings, README and docs; (3) emerald-and-gold UI with Amiri/Tajawal fonts and star-lattice banners; (4) full Sahifa Sajjadiyya (54 duas + supplements, 82 sections). Fixed word-gluing at page breaks in the Mafatih conversion. 80/80 tests, lint OK.
 - 2026-10-08: Published v1.4.0: DailyDeeds-v1.4.0.apk (17,377,700 bytes, SHA-256 b5de01322780930535450b67c6d36de5885f482b4bdddcee00a45bac442a1c73; verified to contain mafatih/items.txt, mafatih/sahifa.txt, quran/uthmani.txt and the Amiri/Tajawal fonts; versionName 1.4.0). Graph: 924 nodes, 2313 edges, 71 communities.
+- 2026-10-09: v1.5.0 "Structure" (plan: C:/Users/Administrator/.claude/plans/make-a-plan-for-rosy-meadow.md): five tabs (اليوم, العبادات, القرآن, المفاتيح, الصحيفة) with a shared top bar; Mafatih items.txt/sahifa.txt schema v2 with chapter groups, new jumuah category, weekday rows moved to their own screens, INDEX replaces FULLBOOK; Sahifa tab/search/favorites split; consolidated Settings; fixes (dead chip, stale prayer screen, one-time notification prompt, permission-health card, confirmed reset). 89/89 tests, lint OK.
+- 2026-10-09: Published v1.5.0: DailyDeeds-v1.5.0.apk (17,408,012 bytes, SHA-256 1314596fb85dd8e324a65c1b86af142137088be4d5e196a6e8897d7c88ee34b4; versionName 1.5.0; contains mafatih/items.txt, sahifa.txt, quran/uthmani.txt). Graph: 1007 nodes, 2613 edges, 78 communities.

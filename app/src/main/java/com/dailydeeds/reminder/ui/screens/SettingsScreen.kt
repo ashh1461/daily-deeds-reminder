@@ -2,102 +2,134 @@ package com.dailydeeds.reminder.ui.screens
 
 import android.app.TimePickerDialog
 import android.text.format.DateFormat
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.model.ReminderType
+import com.dailydeeds.reminder.ui.components.PermissionHealthCard
+import com.dailydeeds.reminder.ui.components.cardBorder
 import com.dailydeeds.reminder.viewmodel.MainViewModel
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** All settings in one grouped screen: prayer, calendar, deed reminders, appearance and credits. */
 @Composable
-fun SettingsScreen(viewModel: MainViewModel, onNavigateBack: () -> Unit) {
+fun SettingsScreen(
+    viewModel: MainViewModel,
+    tools: ToolsViewModel,
+    onNavigateBack: () -> Unit,
+    onOpenRoute: (String) -> Unit
+) {
     val reminders by viewModel.reminders.collectAsState()
     val hapticsEnabled by viewModel.hapticsEnabled.collectAsState()
-    val soundEnabled by viewModel.soundEnabled.collectAsState()
-    var showResetDialog by remember { mutableStateOf(false) }
+    val themeMode by tools.themeMode.collectAsState()
+    val place by tools.place.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("التنبيهات والإعدادات") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    ToolScaffold("الإعدادات", onNavigateBack) {
         Column(
-            Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("مواعيد التنبيهات", style = MaterialTheme.typography.titleLarge)
+            PermissionHealthCard()
+
+            SectionTitle("الأذان والصلاة")
+            SettingsCard {
+                Text("المدينة الحالية: ${place.name}", style = MaterialTheme.typography.bodyMedium)
+                OutlinedButton(onClick = { onOpenRoute("prayer") }, modifier = Modifier.fillMaxWidth()) {
+                    Text("أوقات الصلاة وتنبيهات الأذان")
+                }
+            }
+
+            SectionTitle("التقويم")
+            SettingsCard {
+                Text("تعديل رؤية الهلال وتذكير مناسبات أهل البيت (ع).", style = MaterialTheme.typography.bodyMedium)
+                OutlinedButton(onClick = { onOpenRoute("calendar") }, modifier = Modifier.fillMaxWidth()) {
+                    Text("التقويم والمناسبات")
+                }
+            }
+
+            SectionTitle("تذكيرات الأعمال")
             Text(
-                "أوقات الليل والنوم وصباح الخميس أوقات تذكير مقترحة قابلة للتعديل، وليست ساعات محددة في النصوص. جميع الأوقات بحسب توقيت الجهاز.",
-                style = MaterialTheme.typography.bodyMedium
+                "أوقات الليل والنوم وصباح الخميس أوقات تذكير مقترحة قابلة للتعديل. جميع الأوقات بحسب توقيت الجهاز.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             ReminderType.values().forEach { type ->
                 val settings = reminders[type] ?: ReminderSettings(true, type.defaultHour, 0)
                 ReminderSettingCard(type, settings) { viewModel.setReminder(type, it) }
             }
             Text(
-                "الزيارة المختصرة ودعاء استيداع المستقبل متاحان في قسم «في أي وقت»، وليس لهما موعد محدد.",
-                style = MaterialTheme.typography.bodyMedium
+                "الزيارة المختصرة ودعاء استيداع المستقبل متاحان ضمن «في أي وقت» وليس لهما موعد محدد.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Text("التفاعل", style = MaterialTheme.typography.titleLarge)
-            Card {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("الاهتزاز أثناء العد", Modifier.weight(1f))
-                        Switch(checked = hapticsEnabled, onCheckedChange = viewModel::toggleHaptics)
-                    }
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("الأصوات التفاعلية", Modifier.weight(1f))
-                        Switch(checked = soundEnabled, onCheckedChange = viewModel::toggleSound)
+
+            SectionTitle("المظهر والتفاعل")
+            SettingsCard {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    listOf("system" to "حسب النظام", "light" to "فاتح", "dark" to "داكن").forEach { (mode, label) ->
+                        FilterChip(selected = themeMode == mode, onClick = { tools.setThemeMode(mode) }, label = { Text(label) })
                     }
                 }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text("الاهتزاز أثناء العد", Modifier.weight(1f))
+                    Switch(checked = hapticsEnabled, onCheckedChange = viewModel::toggleHaptics)
+                }
             }
-            Card {
+
+            SectionTitle("حول التطبيق")
+            SettingsCard {
                 Text(
-                    "يضم التطبيق الأعمال الإحدى عشرة الأصلية، وخمس إضافات. تظهر قراءات الخميس ضمن أعمال اليوم يوم الخميس فقط، ويمكن فتحها دائماً من قسم «صباح الخميس».",
-                    Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium
+                    "يضم التطبيق الأعمال اليومية، والقرآن الكريم كاملاً، ومفاتيح الجنان كاملاً، والصحيفة السجادية الكاملة، وأوقات الصلاة والقبلة والتقويم.",
+                    style = MaterialTheme.typography.bodyMedium
                 )
-            }
-            Card {
                 Text(
                     "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني. نص مفاتيح الجنان والصحيفة السجادية: مدونة OpenITI (رخصة MIT) المأخوذة عن المكتبة الشاملة. الخطوط: أميري وتجوال (رخصة SIL OFL).",
-                    Modifier.padding(16.dp), style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-            OutlinedButton(onClick = { showResetDialog = true }, modifier = Modifier.fillMaxWidth()) {
-                Text("إعادة تصفير إنجاز اليوم")
             }
         }
     }
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("تأكيد إعادة التصفير") },
-            text = { Text("هل تود تصفير تقدم الأعمال والعدادات لليوم؟") },
-            confirmButton = {
-                TextButton(onClick = { viewModel.resetToday(); showResetDialog = false }) { Text("نعم، صفّر الإنجاز") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text("إلغاء") }
-            }
-        )
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+}
+
+@Composable
+private fun SettingsCard(content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        border = cardBorder(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { content() }
     }
 }
 
@@ -108,29 +140,27 @@ private fun ReminderSettingCard(
     onChange: (ReminderSettings) -> Unit
 ) {
     val context = LocalContext.current
-    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(type.title, style = MaterialTheme.typography.titleMedium)
+    SettingsCard {
+        Text(type.title, style = MaterialTheme.typography.titleMedium)
+        Text(
+            if (type.dayOfWeek != null) "كل خميس صباحاً، عند الخروج لطلب الحاجة" else "كل يوم",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (type.dayOfWeek != null) "كل خميس صباحاً، عند الخروج لطلب الحاجة" else "كل يوم",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                String.format(Locale.getDefault(), "%02d:%02d", settings.hour, settings.minute),
+                Modifier.weight(1f), style = MaterialTheme.typography.titleMedium
             )
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    String.format(Locale.getDefault(), "%02d:%02d", settings.hour, settings.minute),
-                    Modifier.weight(1f), style = MaterialTheme.typography.titleMedium
-                )
-                OutlinedButton(onClick = {
-                    TimePickerDialog(
-                        context,
-                        { _, hour, minute -> onChange(settings.copy(hour = hour, minute = minute)) },
-                        settings.hour, settings.minute, DateFormat.is24HourFormat(context)
-                    ).show()
-                }) { Text("تعديل الوقت") }
-                Spacer(Modifier.width(12.dp))
-                Switch(checked = settings.enabled, onCheckedChange = { onChange(settings.copy(enabled = it)) })
-            }
+            OutlinedButton(onClick = {
+                TimePickerDialog(
+                    context,
+                    { _, hour, minute -> onChange(settings.copy(hour = hour, minute = minute)) },
+                    settings.hour, settings.minute, DateFormat.is24HourFormat(context)
+                ).show()
+            }) { Text("تعديل الوقت") }
+            Spacer(Modifier.width(12.dp))
+            Switch(checked = settings.enabled, onCheckedChange = { onChange(settings.copy(enabled = it)) })
         }
     }
 }

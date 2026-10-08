@@ -15,6 +15,10 @@ sealed class FavoriteKey {
         override fun encode() = "mafatih:$itemId"
     }
 
+    data class Sahifa(val itemId: String) : FavoriteKey() {
+        override fun encode() = "sahifa:$itemId"
+    }
+
     data class Weekday(val kind: DayContentKind, val day: DayOfWeek) : FavoriteKey() {
         override fun encode() = "weekday:${kind.name}:${day.name}"
     }
@@ -26,7 +30,13 @@ sealed class FavoriteKey {
             return try {
                 when (p.firstOrNull()) {
                     "ayah" -> if (p.size == 3) Ayah(p[1].toInt(), p[2].toInt()) else null
-                    "mafatih" -> if (p.size == 2 && p[1].isNotBlank()) Mafatih(p[1]) else null
+                    // Before the Sahifa had its own tab, its items were saved as "mafatih:sj_N".
+                    "mafatih" -> when {
+                        p.size != 2 || p[1].isBlank() -> null
+                        p[1].startsWith("sj_") -> Sahifa(p[1])
+                        else -> Mafatih(p[1])
+                    }
+                    "sahifa" -> if (p.size == 2 && p[1].isNotBlank()) Sahifa(p[1]) else null
                     "weekday" -> if (p.size == 3) Weekday(DayContentKind.valueOf(p[1]), DayOfWeek.valueOf(p[2])) else null
                     else -> null
                 }

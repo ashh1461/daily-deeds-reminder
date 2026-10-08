@@ -49,8 +49,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _hapticsEnabled = MutableStateFlow(true)
     val hapticsEnabled: StateFlow<Boolean> = _hapticsEnabled.asStateFlow()
 
-    private val _soundEnabled = MutableStateFlow(true)
-    val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
 
     private val _morningEnabled = MutableStateFlow(true)
     val morningEnabled: StateFlow<Boolean> = _morningEnabled.asStateFlow()
@@ -101,7 +99,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _reminders.value = ReminderType.values().associateWith { prefs.getReminder(it) }
 
         _hapticsEnabled.value = prefs.isHapticsEnabled()
-        _soundEnabled.value = prefs.isSoundEnabled()
         _morningEnabled.value = prefs.isMorningReminderEnabled()
         _morningTime.value = prefs.getMorningReminderTime()
         _eveningEnabled.value = prefs.isEveningReminderEnabled()
@@ -219,10 +216,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _hapticsEnabled.value = enabled
     }
 
-    fun toggleSound(enabled: Boolean) {
-        prefs.setSoundEnabled(enabled)
-        _soundEnabled.value = enabled
-    }
 
     private fun getVibrator(): Vibrator? {
         val context = getApplication<Application>()

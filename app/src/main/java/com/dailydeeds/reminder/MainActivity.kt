@@ -147,7 +147,7 @@ fun AppNavigation(
             if (showBottomBar) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 6.dp
+                    tonalElevation = 0.dp
                 ) {
                     bottomTabs.forEach { tab ->
                         NavigationBarItem(

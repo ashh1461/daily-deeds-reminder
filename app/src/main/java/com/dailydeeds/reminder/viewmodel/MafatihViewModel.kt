@@ -1,12 +1,18 @@
 package com.dailydeeds.reminder.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.data.MafatihRepository
 import com.dailydeeds.reminder.model.MafatihCategoryType
 import com.dailydeeds.reminder.model.MafatihItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MafatihViewModel(
     private val repository: MafatihRepository = MafatihRepository()
@@ -17,9 +23,7 @@ class MafatihViewModel(
     private val _selectedCategory = MutableStateFlow(MafatihCategoryType.ADIYAH)
     val selectedCategory: StateFlow<MafatihCategoryType> = _selectedCategory.asStateFlow()
 
-    private val _items = MutableStateFlow<List<MafatihItem>>(
-        repository.getItemsByCategory(MafatihCategoryType.ADIYAH)
-    )
+    private val _items = MutableStateFlow<List<MafatihItem>>(emptyList())
     val items: StateFlow<List<MafatihItem>> = _items.asStateFlow()
 
     private val _selectedItem = MutableStateFlow<MafatihItem?>(null)
@@ -34,26 +38,42 @@ class MafatihViewModel(
     private val _fontSizeSp = MutableStateFlow(22f)
     val fontSizeSp: StateFlow<Float> = _fontSizeSp.asStateFlow()
 
+    private var searchJob: Job? = null
+
+    init {
+        // Loading the bundled book and building the search index happen off the main thread.
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) { repository.warmUp() }
+            refresh()
+        }
+    }
+
     fun selectCategory(category: MafatihCategoryType) {
         _selectedCategory.value = category
         _searchQuery.value = ""
-        _items.value = repository.getItemsByCategory(category)
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch { refresh() }
     }
 
     fun selectItem(itemId: String) {
-        val item = repository.getItemById(itemId)
-        _selectedItem.value = item
+        _selectedItem.value = repository.getItemById(itemId)
         _counter.value = 0
     }
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
-        if (query.isBlank()) {
-            _items.value = repository.getItemsByCategory(_selectedCategory.value)
-        } else {
-            _items.value = repository.searchMafatih(query).filter { item: MafatihItem ->
-                item.category == _selectedCategory.value
-            }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            if (query.isNotBlank()) delay(DEBOUNCE_MS)
+            refresh()
+        }
+    }
+
+    private suspend fun refresh() {
+        val category = _selectedCategory.value
+        val query = _searchQuery.value
+        _items.value = withContext(Dispatchers.Default) {
+            if (query.isBlank()) repository.getItemsByCategory(category) else repository.searchMafatih(query, category)
         }
     }
 
@@ -75,5 +95,9 @@ class MafatihViewModel(
         if (_fontSizeSp.value > 16f) {
             _fontSizeSp.value -= 2f
         }
+    }
+
+    private companion object {
+        const val DEBOUNCE_MS = 250L
     }
 }

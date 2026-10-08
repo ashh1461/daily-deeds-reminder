@@ -1,5 +1,11 @@
 package com.dailydeeds.reminder.ui.screens
 
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Color
+import com.dailydeeds.reminder.ui.components.EmeraldBanner
+import com.dailydeeds.reminder.ui.components.OrnamentDivider
+import com.dailydeeds.reminder.ui.components.cardBorder
+import com.dailydeeds.reminder.ui.theme.GoldBright
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.LaunchedEffect
@@ -112,30 +118,26 @@ fun QuranReaderScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (currentSurah.number != 9) {
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                item {
+                    EmeraldBanner(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "سورة ${currentSurah.nameArabic}",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = GoldBright,
+                                textAlign = TextAlign.Center
                             )
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
+                            Text(
+                                text = "${currentSurah.revelationType.arabicName} • ${currentSurah.ayahCount} آية • الجزء ${currentSurah.juzStart}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.85f)
+                            )
+                            if (currentSurah.number != 1 && currentSurah.number != 9) {
+                                OrnamentDivider(Modifier.padding(vertical = 10.dp), color = GoldBright)
                                 Text(
                                     text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                                    style = MaterialTheme.typography.headlineMedium.copy(
-                                        fontSize = (fontSizeSp + 2).sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    ),
-                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.headlineMedium.copy(fontSize = (fontSizeSp + 2).sp),
+                                    color = Color.White,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -146,10 +148,9 @@ fun QuranReaderScreen(
                 items(ayahs) { ayah ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
+                        shape = MaterialTheme.shapes.medium,
+                        border = cardBorder(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Column(
                             modifier = Modifier
@@ -186,8 +187,9 @@ fun QuranReaderScreen(
 
                                 Box(
                                     modifier = Modifier
+                                        .border(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f), CircleShape)
                                         .background(
-                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
                                             shape = CircleShape
                                         )
                                         .padding(horizontal = 10.dp, vertical = 4.dp)
@@ -207,7 +209,7 @@ fun QuranReaderScreen(
                                 text = ayah.textArabic,
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontSize = fontSizeSp.sp,
-                                    lineHeight = (fontSizeSp * 1.7f).sp
+                                    lineHeight = (fontSizeSp * 1.9f).sp
                                 ),
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier.fillMaxWidth()

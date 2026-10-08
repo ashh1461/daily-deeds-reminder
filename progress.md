@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.3.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.4.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -95,3 +95,5 @@ Branch: `master`. Published release: `v1.3.0`. Milestone: Full Quran, Tafsir Al-
 - 2026-10-08: Merged PRs #4 (security hardening), #3 (v1.2.2 full Mafatih), #2 (v1.2.1) into master; `v1.2.2` is the Latest release. Graph refreshed from merged master.
 - 2026-10-08: v1.3.0 prepared on `feature/v1.3.0`: Jafari prayer times (+adhan alarms), qibla compass, Hijri calendar with 42 Ahl al-Bayt occasions (+reminder), favorites and resume reading, Sahifa link-out. Compared with Shia Toolkit / Shia Muslim / Mafatih apps. 77/77 tests pass, lint OK. Sahifa text not bundled (publisher edition is rights-reserved scan; no open text found).
 - 2026-10-08: Published v1.3.0: DailyDeeds-v1.3.0.apk (16,799,848 bytes, SHA-256 668e54816d1fe6fa2594d9bf0f1201a634f2442a75bf0d87245eba91ee076ee3, verified versionName 1.3.0 and bundled Quran + Mafatih resources). Graph: 888 nodes, 2189 edges, 74 communities.
+- 2026-10-08: v1.4.0 prepared on `feature/v1.4.0` after user feedback: (1) all Mafatih duas/ziyarat now complete from the full book (130 named sections, abridged samples and 'check the book' notices removed; weekday duas/ziyarat verified against the book, Saturday second ziyarah added); (2) picture/scan wording removed from deeds, settings, README and docs; (3) emerald-and-gold UI with Amiri/Tajawal fonts and star-lattice banners; (4) full Sahifa Sajjadiyya (54 duas + supplements, 82 sections). Fixed word-gluing at page breaks in the Mafatih conversion. 80/80 tests, lint OK.
+- 2026-10-08: Published v1.4.0: DailyDeeds-v1.4.0.apk (17,377,700 bytes, SHA-256 b5de01322780930535450b67c6d36de5885f482b4bdddcee00a45bac442a1c73; verified to contain mafatih/items.txt, mafatih/sahifa.txt, quran/uthmani.txt and the Amiri/Tajawal fonts; versionName 1.4.0). Graph: 924 nodes, 2313 edges, 71 communities.

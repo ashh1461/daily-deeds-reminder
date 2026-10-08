@@ -165,49 +165,6 @@ fun MafatihReaderScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (currentItem.isExcerpt) {
-                Text(
-                    text = "تنبيه: النص المعروض هنا مختصر، وليس النص الكامل. يُرجى الرجوع إلى مفاتيح الجنان المطبوع للنص الكامل.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            if (currentItem.virtueOrSource.isNotBlank()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f)
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(
-                            text = "فضل الدعاء وسنده",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = currentItem.virtueOrSource,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Right,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

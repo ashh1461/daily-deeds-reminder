@@ -15,6 +15,7 @@ object AlarmScheduler {
 
     fun scheduleAllReminders(context: Context) {
         ReminderType.values().forEach { scheduleReminder(context, it) }
+        ReligiousAlarms.scheduleAll(context)
     }
 
     fun scheduleReminder(context: Context, type: ReminderType) {

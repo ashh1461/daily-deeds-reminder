@@ -1,5 +1,10 @@
 package com.dailydeeds.reminder.ui.screens
 
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.runtime.LaunchedEffect
+import com.dailydeeds.reminder.data.FavoriteKey
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,13 +54,16 @@ import com.dailydeeds.reminder.viewmodel.MafatihViewModel
 fun MafatihReaderScreen(
     itemId: String,
     viewModel: MafatihViewModel,
+    tools: ToolsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val item by viewModel.selectedItem.collectAsState()
     val counter by viewModel.counter.collectAsState()
     val fontSizeSp by viewModel.fontSizeSp.collectAsState()
 
+    val favorites by tools.favorites.collectAsState()
     val currentItem = item ?: return
+    LaunchedEffect(currentItem.id) { tools.recordMafatih(currentItem.id) }
 
     Scaffold(
         topBar = {
@@ -80,6 +88,13 @@ fun MafatihReaderScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { tools.toggleFavorite(FavoriteKey.Mafatih(currentItem.id)) }) {
+                        Icon(
+                            if (FavoriteKey.Mafatih(currentItem.id) in favorites) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = "المفضلة",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = { viewModel.increaseFontSize() }) {
                         Icon(Icons.Default.ZoomIn, contentDescription = "تكبير الخط")
                     }

@@ -47,7 +47,8 @@ fun HomeScreen(
     onNavigateToDeed: (Int) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToDuas: () -> Unit,
-    onNavigateToZiyarat: () -> Unit
+    onNavigateToZiyarat: () -> Unit,
+    toolsContent: @Composable () -> Unit
 ) {
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val completedMap by viewModel.completedMap.collectAsState()
@@ -61,7 +62,7 @@ fun HomeScreen(
     HomeContent(
         selectedCategory, filteredDeeds, completedMap, countsMap, dailyProgress,
         viewModel::selectCategory, viewModel::resetToday, viewModel::toggleDeedCompleted,
-        onNavigateToDeed, onNavigateToSettings, onNavigateToDuas, onNavigateToZiyarat
+        onNavigateToDeed, onNavigateToSettings, onNavigateToDuas, onNavigateToZiyarat, toolsContent
     )
 }
 
@@ -79,7 +80,8 @@ private fun HomeContent(
     onNavigateToDeed: (Int) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToDuas: () -> Unit,
-    onNavigateToZiyarat: () -> Unit
+    onNavigateToZiyarat: () -> Unit,
+    toolsContent: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -109,6 +111,7 @@ private fun HomeContent(
                 TodayWeekdayCard(onNavigateToDuas, onNavigateToZiyarat,
                     modifier = Modifier.padding(horizontal = 16.dp))
             }
+            item(key = "tools", contentType = "tools") { toolsContent() }
             item(key = "categories", contentType = "filters") {
                 FilterChipRow(selectedCategory, onCategorySelected)
             }
@@ -190,7 +193,7 @@ private fun HomePreview() {
             completedMap = mapOf(1 to true), countsMap = mapOf(2 to 12), dailyProgress = 1 to 16,
             onCategorySelected = {}, onResetToday = {}, onToggleCompleted = {},
             onNavigateToDeed = {}, onNavigateToSettings = {},
-            onNavigateToDuas = {}, onNavigateToZiyarat = {}
+            onNavigateToDuas = {}, onNavigateToZiyarat = {}, toolsContent = {}
         )
     }
 }

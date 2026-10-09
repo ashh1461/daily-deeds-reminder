@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,11 +10,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.dailydeeds.reminder"
+        applicationId = "io.github.ashh1461.wird"
         minSdk = 26
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.7.0"
+        versionCode = 12
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -20,15 +22,22 @@ android {
         }
     }
 
-    // Release signing comes from the environment only; nothing secret is stored in the repo.
-    val releaseKeystore = System.getenv("RELEASE_KEYSTORE_PATH")
+    // Release signing never lives in the repo. It comes from the RELEASE_* environment variables (CI) or from
+    // ~/.android/wird-keystore.properties (storeFile, storePassword, keyAlias, keyPassword) on the release machine.
+    val signingProps = Properties().apply {
+        val file = File(System.getProperty("user.home"), ".android/wird-keystore.properties")
+        if (file.isFile) file.inputStream().use { load(it) }
+    }
+    fun signingValue(env: String, key: String): String? = System.getenv(env) ?: signingProps.getProperty(key)
+    val releaseKeystore = signingValue("RELEASE_KEYSTORE_PATH", "storeFile")
     signingConfigs {
         if (releaseKeystore != null) {
             create("release") {
                 storeFile = file(releaseKeystore)
-                storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
-                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+                storePassword = signingValue("RELEASE_KEYSTORE_PASSWORD", "storePassword")
+                keyAlias = signingValue("RELEASE_KEY_ALIAS", "keyAlias")
+                keyPassword = signingValue("RELEASE_KEY_PASSWORD", "keyPassword")
+                enableV3Signing = true   // allows a later signing-key rotation
             }
         }
     }

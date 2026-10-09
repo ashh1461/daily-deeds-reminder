@@ -22,6 +22,8 @@ jobs:
         run: ./gradlew.bat --no-daemon :app:testDebugUnitTest
       - name: Lint and debug APK
         run: ./gradlew.bat --no-daemon :app:lintDebug :app:assembleDebug
+      - name: Minified release build (unsigned here) to catch R8 problems
+        run: ./gradlew.bat --no-daemon :app:assembleRelease
       - name: Guard against placeholder Quran text and leaked keys
         shell: bash
         run: |

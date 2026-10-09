@@ -24,6 +24,11 @@ jobs:
         run: ./gradlew.bat --no-daemon :app:lintDebug :app:assembleDebug
       - name: Minified release build (unsigned here) to catch R8 problems
         run: ./gradlew.bat --no-daemon :app:assembleRelease
+      - name: Guard against empty source files
+        shell: bash
+        run: |
+          empty=$(git ls-files 'app/src/*' 'scripts/*' 'docs/releases/*' | while read -r f; do [ -s "$f" ] || echo "$f"; done)
+          if [ -n "$empty" ]; then echo "empty files:"; echo "$empty"; exit 1; fi
       - name: Guard against placeholder Quran text and leaked keys
         shell: bash
         run: |

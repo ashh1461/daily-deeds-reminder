@@ -59,12 +59,11 @@ fun QuranReaderScreen(
     surahNumber: Int,
     viewModel: QuranViewModel,
     tools: ToolsViewModel,
+    onOpenMizan: (Int, Int) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val surah by viewModel.selectedSurah.collectAsState()
     val ayahs by viewModel.ayahs.collectAsState()
-    val selectedTafsir by viewModel.selectedTafsir.collectAsState()
-    val isTafsirVisible by viewModel.isTafsirVisible.collectAsState()
     val fontSizeSp by viewModel.fontSizeSp.collectAsState()
 
     val favorites by tools.favorites.collectAsState()
@@ -171,17 +170,15 @@ fun QuranReaderScreen(
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
-                                if (viewModel.hasTafsir(ayah.surahNumber, ayah.ayahNumber)) {
-                                    OutlinedButton(
-                                        onClick = { viewModel.openTafsir(ayah.surahNumber, ayah.ayahNumber) }
-                                    ) {
-                                        Icon(
-                                            Icons.Default.MenuBook,
-                                            contentDescription = "ملخص موضوعي من الميزان",
-                                            modifier = Modifier.padding(end = 4.dp)
-                                        )
-                                        Text("ملخص الميزان", style = MaterialTheme.typography.labelMedium)
-                                    }
+                                OutlinedButton(
+                                    onClick = { onOpenMizan(ayah.surahNumber, ayah.ayahNumber) }
+                                ) {
+                                    Icon(
+                                        Icons.Default.MenuBook,
+                                        contentDescription = "تفسير الميزان",
+                                        modifier = Modifier.padding(end = 4.dp)
+                                    )
+                                    Text("تفسير الميزان", style = MaterialTheme.typography.labelMedium)
                                 }
                                 }
 
@@ -221,13 +218,6 @@ fun QuranReaderScreen(
                 item {
                     Spacer(modifier = Modifier.height(32.dp))
                 }
-            }
-
-            if (isTafsirVisible && selectedTafsir != null) {
-                TafsirBottomSheet(
-                    tafsir = selectedTafsir!!,
-                    onDismiss = { viewModel.dismissTafsir() }
-                )
             }
         }
     }

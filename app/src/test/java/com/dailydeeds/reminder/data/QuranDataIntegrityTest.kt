@@ -42,10 +42,4 @@ class QuranDataIntegrityTest {
         val sha = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
         assertEquals("0f36e155aa79d2f12fb28b6f573d4588545398eb95c37f39532b26db89236adf", sha)
     }
-
-    @Test
-    fun tafsirIsNeverInventedForAyatWithoutAnEntry() {
-        assertEquals(null, repository.getTafsirForAyah(18, 5))
-        assertEquals(null, repository.getTafsirForAyah(2, 1))
-    }
 }

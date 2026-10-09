@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Mosque
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.TouchApp
@@ -46,6 +47,7 @@ private val hubEntries = listOf(
     HubEntry("رمضان والإمساك", "جدول الإمساك والإفطار وليالي القدر مع PDF", Icons.Default.NightsStay, "ramadan"),
     HubEntry("صلاة الآيات", "الكيفية والخسوف والكسوف القادم", Icons.Default.DarkMode, "ayat"),
     HubEntry("حاسبة الخمس", "حساب الخمس ورأس السنة الخمسية", Icons.Default.Calculate, "khums"),
+    HubEntry("تفسير الميزان", "الميزان في تفسير القرآن كاملاً للعلامة الطباطبائي مع البحث", Icons.Default.LibraryBooks, "mizan"),
     HubEntry("أدعية الأيام", "دعاء لكل يوم من أيام الأسبوع", Icons.Default.AutoStories, "duas"),
     HubEntry("زيارات الأيام", "زيارة لكل يوم من أيام الأسبوع", Icons.Default.Mosque, "ziyarat")
 )

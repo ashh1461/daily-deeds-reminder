@@ -8,7 +8,7 @@ import com.dailydeeds.reminder.model.SearchResultType
 import com.dailydeeds.reminder.util.ArabicNormalizer
 
 /**
- * Diacritic-neutral search over the Quran, Tafsir summaries, Mafatih, the Sahifa, weekday duas/ziyarat
+ * Diacritic-neutral search over the Quran, Mafatih, the Sahifa, weekday duas/ziyarat
  * and the daily deeds.
  *
  * Every searchable string is normalized exactly once, when the index is first built, so a query only
@@ -16,8 +16,7 @@ import com.dailydeeds.reminder.util.ArabicNormalizer
  */
 class SearchRepository(
     private val quranRepo: QuranRepository = QuranRepository(),
-    private val mafatihRepo: MafatihRepository = MafatihRepository(),
-    private val tafsirProvider: TafsirAlMizanProvider = TafsirAlMizanProvider
+    private val mafatihRepo: MafatihRepository = MafatihRepository()
 ) {
 
     private class Entry(
@@ -86,21 +85,6 @@ class SearchRepository(
             }
         }
 
-        val tafsir = tafsirProvider.getAllEntries().map { t ->
-            Entry(
-                listOfNotNull(t.title, t.commentaryArabic, t.intellectualTheme).map(ArabicNormalizer::searchKey)
-            ) { q ->
-                SearchResultItem(
-                    id = "tafsir_${t.id}",
-                    type = SearchResultType.TAFSIR,
-                    title = t.title,
-                    snippet = createSnippet(t.commentaryArabic, q),
-                    surahNumber = t.surahNumber,
-                    ayahNumber = t.ayahStart
-                )
-            }
-        }
-
         fun textEntries(items: List<com.dailydeeds.reminder.model.MafatihItem>, type: SearchResultType) = items.map { item ->
             Entry(listOf(item.title, item.arabicText).map(ArabicNormalizer::searchKey)) { q ->
                 SearchResultItem(
@@ -124,7 +108,6 @@ class SearchRepository(
 
         return mapOf(
             SearchResultType.QURAN to quran,
-            SearchResultType.TAFSIR to tafsir,
             SearchResultType.MAFATIH to mafatih,
             SearchResultType.SAHIFA to sahifa,
             SearchResultType.WEEKDAY to weekday,
@@ -168,7 +151,7 @@ class SearchRepository(
         const val MAX_RESULTS = 50
         const val MAX_QUERY_LENGTH = 200
         private val SEARCH_ORDER = listOf(
-            SearchResultType.QURAN, SearchResultType.TAFSIR, SearchResultType.MAFATIH,
+            SearchResultType.QURAN, SearchResultType.MAFATIH,
             SearchResultType.SAHIFA, SearchResultType.WEEKDAY, SearchResultType.DEEDS
         )
     }

@@ -3,7 +3,8 @@
 | Item | Source | Licence |
 | --- | --- | --- |
 | Holy Quran text (Uthmani, 6,236 ayat) | Tanzil Project (tanzil.net), via alquran.cloud `quran-uthmani` | Tanzil licence: free to use unmodified with attribution |
-| Mafatih al-Jinan and al-Sahifa al-Sajjadiyya texts | OpenITI corpus (github.com/OpenITI), digitized from al-Maktaba al-Shamela | OpenITI: MIT. The works themselves are by Shaykh Abbas al-Qummi (d. 1941) and Imam Zayn al-Abidin (d. 95 AH) |
+| Mafatih al-Jinan and al-Sahifa al-Sajjadiyya texts | OpenITI corpus (github.com/OpenITI), digitized from al-Maktaba al-Shamela | OpenITI corpus: **CC BY-NC-SA 4.0** (corrected in 1.8.1; earlier notices said MIT). The works are by Shaykh Abbas al-Qummi (d. 1941) and Imam Zayn al-Abidin (d. 95 AH). See `DATA_LICENSE.md` |
+| Tafsir al-Mizan, complete Arabic text | OpenITI corpus (github.com/OpenITI/1425AH), versions `Rafed0001433Vols` (rafed.net) and `Tafsir04056` (altafsir.com); author Allamah Sayyid Muhammad Husayn Tabataba'i (d. 1981) | OpenITI corpus: CC BY-NC-SA 4.0; the copyright of the book itself is not cleared (see `DATA_LICENSE.md`) |
 | Amiri typeface | The Amiri Project Authors | SIL Open Font License 1.1 (OFL-Amiri.txt) |
 | Tajawal typeface | The Tajawal Project Authors | SIL Open Font License 1.1 (OFL-Tajawal.txt) |
 | Prayer-time and qibla formulas | PrayTimes.org method, reimplemented | n/a (formulas) |

@@ -59,5 +59,13 @@ If Play rejects `SCHEDULE_EXACT_ALARM` for this category, the alternative is `US
 ## Content rating and audience
 Religious reference app: no violence, sexual content, gambling, user-generated content, purchases or ads. Target audience 13+ (general audience content; not designed for children).
 
+## Content rights (read before submitting)
+The app bundles the complete text of al-Mizan (Allamah Tabataba'i, d. 1981), Mafatih al-Jinan and the Sahifa from the
+OpenITI corpus (CC BY-NC-SA 4.0). Google Play can remove an app after a copyright complaint, and the OpenITI licence does
+not clear the copyright of a book that is still protected. Before submitting: obtain the permission of the rights holder
+of al-Mizan (or confirm the book is public domain where you publish), keep the app free and ad-free (NonCommercial), and
+keep the attribution in Settings and `docs/licenses/`. If permission cannot be obtained, ship al-Mizan as an optional
+download pack (like the adhan voices) and keep it out of the store build.
+
 ## Release checklist
 Signed AAB from `bundleRelease` with `targetSdk` at the level Play requires (v1.8.1), upload key = the key in `docs/DISTRIBUTION.md`, internal testing track first, then production.

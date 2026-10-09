@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="512" height="512">
+  <title>Wird launcher icon</title>
+  <rect width="108" height="108" fill="#063F34"/>
+  <circle cx="54" cy="54" r="41" fill="none" stroke="#C9A24B" stroke-opacity="0.6" stroke-width="1.2"/>
+  <circle cx="54" cy="54" r="45" fill="none" stroke="#C9A24B" stroke-opacity="0.3" stroke-width="0.8"/>
+  <path fill="#E2BF66" fill-rule="evenodd" d="M54,27 L61.91,34.91 L73.09,34.91 L73.09,46.09 L81,54 L73.09,61.91 L73.09,73.09 L61.91,73.09 L54,81 L46.09,73.09 L34.91,73.09 L34.91,61.91 L27,54 L34.91,46.09 L34.91,34.91 L46.09,34.91 Z M40,54 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z"/>
+  <path fill="#E2BF66" d="M57.03,46.54 A9,9 0 1,0 57.03,61.46 A7.6,7.6 0 1,1 57.03,46.54 Z"/>
+  <circle cx="60.5" cy="54" r="1.7" fill="#E2BF66"/>
+</svg>

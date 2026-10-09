@@ -1,0 +1,78 @@
+name: Release
+
+# Builds, signs and verifies the release APK and AAB when a version tag is pushed. It only uploads them as a
+# workflow artifact; publishing the GitHub release (with notes) stays a deliberate manual step.
+# Required repository secrets: RELEASE_KEYSTORE_B64 (base64 of the .jks), RELEASE_KEYSTORE_PASSWORD,
+# RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD. See docs/DISTRIBUTION.md.
+# Without those secrets the workflow does nothing and finishes green with a notice, so a tag pushed before the
+# secrets exist does not put a red check on the pull requests.
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check for the signing secrets
+        id: signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Signed release skipped::Add the RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS and RELEASE_KEY_PASSWORD repository secrets (see docs/DISTRIBUTION.md) to build a signed release on tag pushes."
+          fi
+      - if: steps.signing.outputs.available == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - if: steps.signing.outputs.available == 'true'
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - if: steps.signing.outputs.available == 'true'
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
+      - name: Decode the signing key
+        if: steps.signing.outputs.available == 'true'
+        shell: pwsh
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+        run: |
+          $path = Join-Path $env:RUNNER_TEMP "wird-release.jks"
+          [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($env:KEYSTORE_B64))
+          "RELEASE_KEYSTORE_PATH=$path" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+      - name: Unit tests
+        if: steps.signing.outputs.available == 'true'
+        run: ./gradlew.bat --no-daemon :app:testDebugUnitTest
+      - name: Signed release APK and AAB
+        if: steps.signing.outputs.available == 'true'
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew.bat --no-daemon :app:assembleRelease :app:bundleRelease
+      - name: Verify the APK (signature, id, not debuggable, permissions)
+        if: steps.signing.outputs.available == 'true'
+        shell: bash
+        run: python scripts/verify_release.py app/build/outputs/apk/release/app-release.apk
+      - name: Name the files and write the checksum
+        if: steps.signing.outputs.available == 'true'
+        shell: bash
+        run: |
+          mkdir dist
+          name="Wird-${GITHUB_REF_NAME}"
+          cp app/build/outputs/apk/release/app-release.apk "dist/${name}.apk"
+          cp app/build/outputs/bundle/release/app-release.aab "dist/${name}.aab"
+          (cd dist && sha256sum "${name}.apk" > "${name}.apk.sha256")
+      - if: steps.signing.outputs.available == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: wird-release
+          path: dist/*

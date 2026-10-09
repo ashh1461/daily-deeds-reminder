@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1791490836.8580077,
-    "seen": 1791491628.277858,
-    "ast_hash": "2ef8e319ef949b5a9680ffe0971ad0c0",
+    "mtime": 1791531838.9381852,
+    "seen": 1791533768.593233,
+    "ast_hash": "80d4f1c39e30eb18752286279ef4afb0",
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/MainActivity.kt": {
@@ -150,9 +150,9 @@
     "semantic_hash": "7ea3c94a2151ad7669b274060f899387"
   },
   "README.md": {
-    "mtime": 1791490868.1850011,
-    "seen": 1791491628.277858,
-    "ast_hash": "a24436c0ea947662f1b8543d230c345b",
+    "mtime": 1791530649.112039,
+    "seen": 1791533768.5942671,
+    "ast_hash": "8177a62073c31942a64a225c2cccf3af",
     "semantic_hash": ""
   },
   "docs/releases/v1.1.0.md": {
@@ -234,9 +234,9 @@
     "semantic_hash": ""
   },
   "progress.md": {
-    "mtime": 1791491605.7748086,
-    "seen": 1791491628.277858,
-    "ast_hash": "713b9fc469ad96ef648002e53f6a964a",
+    "mtime": 1791533741.8236732,
+    "seen": 1791533768.5942671,
+    "ast_hash": "fff6395649140b70e984004cf0528134",
     "semantic_hash": ""
   },
   "docs/releases/v1.1.1.md": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1791442534.761134,
-    "seen": 1791442582.0501235,
-    "ast_hash": "792745a8cd7f061ed668bc00996e1f49",
+    "mtime": 1791530545.4949603,
+    "seen": 1791533768.5942671,
+    "ast_hash": "f4a2421f5a7e75b1f23ac05d92721830",
     "semantic_hash": ""
   },
   "app/src/main/resources/quran/uthmani.txt": {
@@ -822,9 +822,9 @@
     "semantic_hash": ""
   },
   "docs/SECURITY.md": {
-    "mtime": 1791490861.4640324,
-    "seen": 1791491628.277858,
-    "ast_hash": "031eb6f3cea7bc6e6356d1cbc9756555",
+    "mtime": 1791530649.1134405,
+    "seen": 1791533768.5942671,
+    "ast_hash": "0af92ed88a300e7b2c7db5c630ccb496",
     "semantic_hash": ""
   },
   "docs/releases/v1.6.0.md": {
@@ -981,6 +981,72 @@
     "mtime": 1791490860.2565286,
     "seen": 1791491628.277858,
     "ast_hash": "8c0e4785e5c9bab5136e1b72100c25aa",
+    "semantic_hash": ""
+  },
+  "branding/generate_icons.py": {
+    "mtime": 1791530379.7528338,
+    "seen": 1791533768.593233,
+    "ast_hash": "43529794b8b6bc3edec80badafb9997a",
+    "semantic_hash": ""
+  },
+  "scripts/emulator_smoke.py": {
+    "mtime": 1791532284.542577,
+    "seen": 1791533768.5942671,
+    "ast_hash": "4d534958b190ffc7bf5bd953cc9e9547",
+    "semantic_hash": ""
+  },
+  "scripts/verify_release.py": {
+    "mtime": 1791531824.336874,
+    "seen": 1791533768.5942671,
+    "ast_hash": "49f318653e3e7534f5adb413f3bb57b6",
+    "semantic_hash": ""
+  },
+  ".github/workflows/release.yml": {
+    "mtime": 1791530545.6187768,
+    "seen": 1791533768.5942671,
+    "ast_hash": "a66dfd3b1d9dd265b8a2070b9532e662",
+    "semantic_hash": ""
+  },
+  "docs/DISTRIBUTION.md": {
+    "mtime": 1791531706.887969,
+    "seen": 1791533768.5942671,
+    "ast_hash": "4a666ef1119c042ecabfa466c882c593",
+    "semantic_hash": ""
+  },
+  "docs/PLAY_LISTING.md": {
+    "mtime": 1791530616.3443356,
+    "seen": 1791533768.5942671,
+    "ast_hash": "e7e1b3e5337352a56ab437f6e4888d4c",
+    "semantic_hash": ""
+  },
+  "docs/PRIVACY.md": {
+    "mtime": 1791530615.406275,
+    "seen": 1791533768.5942671,
+    "ast_hash": "5f4d1f0de91b87d61d3c654bbf101804",
+    "semantic_hash": ""
+  },
+  "docs/releases/v1.8.0.md": {
+    "mtime": 1791533741.80223,
+    "seen": 1791533768.5942671,
+    "ast_hash": "8ddb2483bd8759bbab75171a066e73ba",
+    "semantic_hash": ""
+  },
+  "branding/play/feature-graphic-1024x500.png": {
+    "mtime": 1791530384.095951,
+    "seen": 1791533768.5942671,
+    "ast_hash": "a54102f72023704f832b040f958413ee",
+    "semantic_hash": ""
+  },
+  "branding/play/icon-512.png": {
+    "mtime": 1791530383.13434,
+    "seen": 1791533768.5942671,
+    "ast_hash": "1ed209a698068f35f6e2005f5de76dd9",
+    "semantic_hash": ""
+  },
+  "branding/wird-icon.svg": {
+    "mtime": 1791530381.7486584,
+    "seen": 1791533768.5942671,
+    "ast_hash": "590ca4db0d2c263aba965cb60ca3987a",
     "semantic_hash": ""
   }
 }

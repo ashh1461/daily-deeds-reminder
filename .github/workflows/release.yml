@@ -51,6 +51,9 @@ jobs:
       - name: Unit tests
         if: steps.signing.outputs.available == 'true'
         run: ./gradlew.bat --no-daemon :app:testDebugUnitTest
+      - name: Lint
+        if: steps.signing.outputs.available == 'true'
+        run: ./gradlew.bat --no-daemon :app:lintDebug
       - name: Signed release APK and AAB
         if: steps.signing.outputs.available == 'true'
         env:

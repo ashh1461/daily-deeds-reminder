@@ -4,7 +4,8 @@ actually runs.
 
     python scripts/emulator_smoke.py app/build/outputs/apk/release/app-release.apk --out build/smoke
 
-Needs one emulator or device visible to adb (ANDROID_HOME, default e:/Antigravity/tools/android-sdk).
+Needs one emulator visible to adb (ANDROID_HOME, default e:/Antigravity/tools/android-sdk). It refuses a physical
+device unless --allow-physical-device is passed, because it uninstalls the app and changes system settings.
 The bottom bar has five tabs (right to left: today, worship, Quran, Mafatih, Sahifa).
 """
 import argparse
@@ -44,8 +45,19 @@ def main():
     parser.add_argument("apk")
     parser.add_argument("--out", default="build/smoke")
     parser.add_argument("--package", default=APP_ID)
+    parser.add_argument("--allow-physical-device", action="store_true",
+                        help="run on a real phone too (this script uninstalls the app and changes system settings)")
     args = parser.parse_args()
     os.makedirs(args.out, exist_ok=True)
+
+    serial = adb("get-serialno", check=False).strip()
+    # ro.kernel.qemu on older images, ro.boot.qemu on API 31+; an emulator attached over TCP has a host:port serial.
+    is_emulator = serial.startswith("emulator-") or any(
+        adb("shell", "getprop", prop, check=False).strip() == "1" for prop in ("ro.kernel.qemu", "ro.boot.qemu"))
+    if not is_emulator and not args.allow_physical_device:
+        sys.exit("refusing to run: the adb device (%s) is not an emulator. This script uninstalls %s, disables "
+                 "com.android.bluetooth and hides error dialogs. Start an emulator, or pass --allow-physical-device "
+                 "if you really mean to use this device." % (serial or "none", args.package))
 
     adb("shell", "pm", "uninstall", args.package, check=False)
     print(adb("install", "-r", args.apk).strip())

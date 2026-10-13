@@ -99,8 +99,12 @@ class VoiceAndPolicyTest {
         assertEquals(expected, declared)
         assertTrue(xml.contains("android:networkSecurityConfig"))
         assertTrue(xml.contains("android:allowBackup=\"false\""))
-        // Only the boot receiver is exported (plus the launcher activity).
-        assertEquals(2, Regex("android:exported=\"true\"").findAll(xml).count())
+        // Device-to-device transfer is excluded too, not only cloud backup.
+        assertTrue(xml.contains("android:dataExtractionRules=\"@xml/data_extraction_rules\""))
+        // Only the launcher activity is exported. The boot receiver is not: the system's boot/time broadcasts
+        // reach it anyway, and another app must not be able to trigger rescheduling.
+        assertEquals(1, Regex("android:exported=\"true\"").findAll(xml).count())
+        assertTrue(Regex("BootReceiver\"\\s+android:exported=\"false\"").containsMatchIn(xml))
     }
 
     @Test

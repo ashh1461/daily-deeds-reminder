@@ -4,6 +4,7 @@ import com.dailydeeds.reminder.model.MizanKind
 import com.dailydeeds.reminder.util.ArabicNormalizer
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.security.MessageDigest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -196,5 +197,48 @@ class MizanDataTest {
         } catch (e: IOException) {
             // expected
         }
+    }
+
+    @Test
+    fun oldVersionsAndLeftoverTempFilesAreRemovedBeforeCopying() {
+        val dir = folder.newFolder("store")
+        val data = File(dir, "mizan-13.txt")
+        val index = File(dir, "mizan-13.idx")
+        val stale = listOf("mizan-12.txt", "mizan-12.idx", "mizan-12.txt.tmp", "mizan-13.txt.tmp", "mizan-13.idx.tmp")
+        (stale.map { File(dir, it) } + data + index + File(dir, "other.txt")).forEach { it.writeText("x") }
+        MizanStore.removeStale(dir, data, index)
+        assertEquals(setOf("mizan-13.txt", "mizan-13.idx", "other.txt"), dir.list()!!.toSet())
+    }
+
+    @Test
+    fun aFailedCopyLeavesNoPartialFiles() {
+        val dir = folder.newFolder("failed")
+        val dataFile = File(dir, "mizan-13.txt")
+        val indexFile = File(dir, "mizan-13.idx")
+        // The first chunk is written, then the disk is full.
+        val diskFull = object : InputStream() {
+            private var chunks = 0
+            override fun read(): Int = throw IOException("No space left on device")
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                if (chunks++ > 0) throw IOException("No space left on device")
+                b.fill('a'.code.toByte(), off, off + len)
+                return len
+            }
+        }
+        try {
+            MizanData.prepare(diskFull, dataFile, indexFile)
+            throw AssertionError("the copy must fail")
+        } catch (e: IOException) {
+            // expected
+        }
+        assertTrue(dir.list()!!.isEmpty())
+
+        try {
+            MizanData.prepare("not a record\n".byteInputStream(), dataFile, indexFile)
+            throw AssertionError("a malformed book must be rejected")
+        } catch (e: IllegalStateException) {
+            // expected
+        }
+        assertTrue(dir.list()!!.isEmpty())
     }
 }

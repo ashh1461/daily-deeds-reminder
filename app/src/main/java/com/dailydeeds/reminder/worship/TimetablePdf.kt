@@ -68,7 +68,7 @@ object TimetablePdf {
                 c.drawText("الأسطر الملوّنة: اليوم الذي تبدأ بمغربه ليلة من ليالي القدر (19 و21 و23).", PAGE_WIDTH / 2f, y, note)
                 y += 14f
             }
-            c.drawText("المواعيد تقريبية بحسب الحساب الفلكي؛ احتط في الإمساك وأفطر عند تحقق المغرب. تطبيق الأعمال اليومية.", PAGE_WIDTH / 2f, y, note)
+            c.drawText("المواعيد تقريبية بحسب الحساب الفلكي؛ احتط في الإمساك وأفطر عند تحقق المغرب. تطبيق ورد.", PAGE_WIDTH / 2f, y, note)
             doc.finishPage(page)
             doc.writeTo(out)
         } finally {

@@ -3,6 +3,7 @@ package com.dailydeeds.reminder.data
 import com.dailydeeds.reminder.adhan.AdhanPlanner
 import com.dailydeeds.reminder.adhan.AlarmKind
 import com.dailydeeds.reminder.adhan.AdhanMode
+import com.dailydeeds.reminder.adhan.PlannedAlarm
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.model.PlacePresets
 import com.dailydeeds.reminder.util.Prayer
@@ -146,6 +147,32 @@ class ImsakPlannerTest {
         val now = ZonedDateTime.of(2026, 10, 15, 1, 0, 0, 0, zone)
         assertEquals(AlarmKind.IMSAK, AdhanPlanner.next(now, beirut, PrayerContext(), on) { true }!!.kind)
         assertEquals(AlarmKind.MAIN, AdhanPlanner.next(now, beirut, PrayerContext(), on)!!.kind)
+    }
+
+    @Test
+    fun aFajrPreAlarmAtTheSameInstantAsImsakIsHandledWithIt() {
+        // A 10-minute pre-alarm and the default Imsak (10 minutes before Fajr) are due at the same instant.
+        val on = off + (Prayer.FAJR to PrayerAlarmConfig(mode = AdhanMode.ADHAN, preMinutes = 10))
+        val now = ZonedDateTime.of(2026, 10, 15, 1, 0, 0, 0, zone)
+        val first = AdhanPlanner.next(now, beirut, PrayerContext(), on) { true }!!
+        // The receiver handles the other one in the same run instead of setting an alarm for a past time.
+        val tied = AdhanPlanner.dueWith(first, beirut, PrayerContext(), on) { true }
+        assertEquals(1, tied.size)
+        assertEquals(first.triggerAt, tied.single().triggerAt)
+        assertEquals(listOf(AlarmKind.PRE, AlarmKind.IMSAK), listOf(first.kind, tied.single().kind))
+        assertTrue(AdhanPlanner.dueWith(tied.single(), beirut, PrayerContext(), on) { true }.isEmpty())
+        // As the receiver rebuilds the fired alarm from its intent: another zone, only the trigger time known.
+        val utc = first.triggerAt.withZoneSameInstant(ZoneId.of("UTC"))
+        assertEquals(tied, AdhanPlanner.dueWith(PlannedAlarm(first.prayer, first.kind, utc, utc), beirut, PrayerContext(), on) { true })
+        // Planning after the last one handled gives the Fajr adhan, and is in the future whenever the receiver runs.
+        val third = AdhanPlanner.next(first.triggerAt.plusSeconds(2), beirut, PrayerContext(), on, after = tied.last()) { true }!!
+        assertEquals(AlarmKind.MAIN, third.kind)
+        assertEquals(first.prayerAt, third.triggerAt)
+        for (delay in listOf(0L, 1L, 60L, 9 * 60L + 59, 10 * 60L, 15 * 60L, 3 * 3600L)) {
+            val clock = first.triggerAt.plusSeconds(delay)
+            val planned = AdhanPlanner.next(clock, beirut, PrayerContext(), on, after = tied.last()) { true }!!
+            assertTrue("after ${delay}s: $planned", planned.triggerAt.isAfter(clock))
+        }
     }
 
     @Test

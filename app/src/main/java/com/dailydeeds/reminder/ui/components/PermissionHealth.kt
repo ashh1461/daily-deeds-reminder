@@ -81,7 +81,7 @@ fun PermissionHealthCard(modifier: Modifier = Modifier) {
             }
             if (!exactOk && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Text(
-                    "لم يُسمح بالمنبّهات الدقيقة، فقد تتأخر التنبيهات عن موعدها بدقائق. اسمح بـ «المنبّهات والتذكيرات» لهذا التطبيق.",
+                    "لم يُسمح بالمنبّهات الدقيقة، فقد تتأخر التنبيهات عن موعدها بدقائق، وقد لا يُشغَّل صوت الأذان فيصلك إشعار عادي بدلًا منه. اسمح بـ «المنبّهات والتذكيرات» لهذا التطبيق.",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Button(onClick = {

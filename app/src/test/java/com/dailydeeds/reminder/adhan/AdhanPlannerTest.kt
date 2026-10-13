@@ -65,6 +65,26 @@ class AdhanPlannerTest {
     }
 
     @Test
+    fun planningAfterAnAlarmNeverReturnsThatAlarmAgain() {
+        val configs = allOn(pre = 15)
+        val first = AdhanPlanner.next(at(1), beirut, calc, configs)!!
+        // Even with the clock a moment before the alarm's own time, the following alarm is planned.
+        val next = AdhanPlanner.next(first.triggerAt.minusSeconds(1), beirut, calc, configs, after = first)!!
+        assertEquals(AlarmKind.MAIN, next.kind)
+        assertEquals(first.prayer, next.prayer)
+    }
+
+    @Test
+    fun anAlarmWithoutATwinHasNothingDueWithIt() {
+        val configs = allOn(pre = 15)
+        val first = AdhanPlanner.next(at(1), beirut, calc, configs)!!
+        assertTrue(AdhanPlanner.dueWith(first, beirut, calc, configs).isEmpty())
+        // Planning after it is then strictly in the future, even when the receiver runs late.
+        val clock = first.triggerAt.plusMinutes(5)
+        assertTrue(AdhanPlanner.next(clock, beirut, calc, configs, after = first)!!.triggerAt.isAfter(clock))
+    }
+
+    @Test
     fun silentModeNeverGetsAPreAlarm() {
         val p = AdhanPlanner.next(at(1), beirut, calc, allOn(AdhanMode.SILENT, pre = 15))!!
         assertEquals(AlarmKind.MAIN, p.kind)

@@ -11,8 +11,8 @@ android {
         applicationId = "com.dailydeeds.reminder"
         minSdk = 26
         targetSdk = 34
-        versionCode = 9
-        versionName = "1.5.0"
+        versionCode = 10
+        versionName = "1.6.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -84,6 +84,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     testImplementation("junit:junit:4.13.2")
+    // Android's org.json is a stub on the JVM; the real library lets unit tests parse the voice manifest.
+    testImplementation("org.json:json:20231013")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(composeBom)

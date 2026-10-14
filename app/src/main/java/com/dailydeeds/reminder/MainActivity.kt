@@ -1,5 +1,8 @@
 package com.dailydeeds.reminder
 
+import com.dailydeeds.reminder.ui.screens.PrayerSettingsScreen
+import com.dailydeeds.reminder.ui.screens.VoicePacksScreen
+import com.dailydeeds.reminder.viewmodel.VoiceViewModel
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -142,7 +145,8 @@ fun AppNavigation(
     quranViewModel: QuranViewModel = viewModel(),
     mafatihViewModel: MafatihViewModel = viewModel(),
     sahifaViewModel: SahifaViewModel = viewModel(),
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = viewModel(),
+    voiceViewModel: VoiceViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -289,8 +293,17 @@ fun AppNavigation(
             composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { back() }) }
             composable("calendar") { CalendarScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("prayer") {
-                PrayerTimesScreen(toolsViewModel, onNavigateBack = { back() }, onOpenQibla = { go("qibla") })
+                PrayerTimesScreen(
+                    toolsViewModel,
+                    onNavigateBack = { back() },
+                    onOpenQibla = { go("qibla") },
+                    onOpenSettings = { go("prayer/settings") }
+                )
             }
+            composable("prayer/settings") {
+                PrayerSettingsScreen(toolsViewModel, voiceViewModel, onNavigateBack = { back() }, onOpenVoices = { go("prayer/voices") })
+            }
+            composable("prayer/voices") { VoicePacksScreen(voiceViewModel, onNavigateBack = { back() }) }
             composable("qibla") { QiblaScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("favorites") {
                 FavoritesScreen(

@@ -5,23 +5,29 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.dailydeeds.reminder.adhan.AdhanPlanner
+import com.dailydeeds.reminder.adhan.AlarmKind
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.receiver.OccasionAlarmReceiver
 import com.dailydeeds.reminder.receiver.PrayerAlarmReceiver
 import com.dailydeeds.reminder.util.Prayer
-import com.dailydeeds.reminder.util.PrayerSchedule
+import com.dailydeeds.reminder.util.PrayerContext
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 /**
- * Alarms for prayer times and Ahl al-Bayt occasions. Each alarm fires once, shows its notification,
- * and the receiver schedules the next one, so only a single alarm per kind is ever pending.
+ * Alarms for prayer times and Ahl al-Bayt occasions. Each alarm fires once, the receiver handles it and
+ * schedules the next, so at most one prayer alarm (plus one snooze) is ever pending.
  */
 object ReligiousAlarms {
     const val EXTRA_PRAYER_ID = "extra_prayer_id"
+    const val EXTRA_KIND = "extra_alarm_kind"
+    const val EXTRA_SCHEDULED_AT = "extra_scheduled_at"
+    const val EXTRA_SNOOZE = "extra_snooze"
     private const val PRAYER_REQUEST_CODE = 3000
     private const val OCCASION_REQUEST_CODE = 3001
+    private const val SNOOZE_REQUEST_CODE = 3002
     const val OCCASION_HOUR = 8
 
     fun scheduleAll(context: Context) {
@@ -29,27 +35,32 @@ object ReligiousAlarms {
         scheduleOccasion(context)
     }
 
-    /** Schedules the next enabled prayer alarm, or cancels the pending one if none are enabled. */
+    /** Schedules the next prayer or pre-adhan alarm from the saved configuration, or cancels it if none is on. */
     fun schedulePrayer(context: Context) {
         val prefs = PreferencesManager(context)
-        val enabled = Prayer.values().filter { prefs.isPrayerAlarmEnabled(it) }.toSet()
-        if (enabled.isEmpty()) {
+        val configs = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
+        val calc = PrayerContext(prefs.getPrayerSettings().params(), configs.mapValues { it.value.offsetMinutes })
+        val planned = AdhanPlanner.next(ZonedDateTime.now(), prefs.getPlace(), calc, configs)
+        if (planned == null) {
             cancel(context, PRAYER_REQUEST_CODE, PrayerAlarmReceiver::class.java)
             return
         }
-        val place = prefs.getPlace()
-        var cursor = ZonedDateTime.now()
-        // Skip prayers the user has not enabled; bounded so a bad state can never loop forever.
-        repeat(12) {
-            val next = PrayerSchedule.next(cursor, place) ?: return
-            if (next.prayer in enabled) {
-                val intent = Intent(context, PrayerAlarmReceiver::class.java)
-                    .putExtra(EXTRA_PRAYER_ID, next.prayer.id)
-                set(context, PRAYER_REQUEST_CODE, next.time.toInstant().toEpochMilli(), intent)
-                return
-            }
-            cursor = next.time
-        }
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .putExtra(EXTRA_PRAYER_ID, planned.prayer.id)
+            .putExtra(EXTRA_KIND, planned.kind.name)
+            .putExtra(EXTRA_SCHEDULED_AT, planned.triggerAt.toInstant().toEpochMilli())
+        set(context, PRAYER_REQUEST_CODE, planned.triggerAt.toInstant().toEpochMilli(), intent)
+    }
+
+    /** One-off "play the adhan again in [minutes]" alarm. */
+    fun scheduleSnooze(context: Context, prayer: Prayer, minutes: Int) {
+        val at = System.currentTimeMillis() + minutes * 60_000L
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .putExtra(EXTRA_PRAYER_ID, prayer.id)
+            .putExtra(EXTRA_KIND, AlarmKind.MAIN.name)
+            .putExtra(EXTRA_SCHEDULED_AT, at)
+            .putExtra(EXTRA_SNOOZE, true)
+        set(context, SNOOZE_REQUEST_CODE, at, intent)
     }
 
     fun scheduleOccasion(context: Context) {

@@ -21,8 +21,33 @@ data class PrayerTimesResult(
     val maghrib: LocalTime?,
     val isha: LocalTime?,
     /** Legal midnight: halfway between sunset and the next day's Fajr. */
-    val midnight: LocalTime?
+    val midnight: LocalTime?,
+    /** Start of the fast: [PrayerParams.imsakMinutes] before Fajr. */
+    val imsak: LocalTime? = null
 )
+
+/**
+ * Calculation parameters. The two Jafari presets are the Leva Research Institute (Qom) method and the
+ * University of Tehran method. A positive [maghribDelayMinutes] replaces the Maghrib angle by
+ * "minutes after sunset".
+ */
+data class PrayerParams(
+    val fajrAngle: Double = 16.0,
+    val ishaAngle: Double = 14.0,
+    val maghribAngle: Double = 4.0,
+    val maghribDelayMinutes: Int = 0,
+    val imsakMinutes: Int = 10
+) {
+    init {
+        require(fajrAngle in 5.0..25.0 && ishaAngle in 5.0..25.0 && maghribAngle in 0.0..10.0)
+        require(maghribDelayMinutes in 0..60 && imsakMinutes in 0..60)
+    }
+
+    companion object {
+        val LEVA = PrayerParams()
+        val TEHRAN = PrayerParams(fajrAngle = 17.7, ishaAngle = 14.0, maghribAngle = 4.5)
+    }
+}
 
 /**
  * Jafari (Ithna Ashari) prayer-time calculation: Fajr at 16 degrees, Maghrib 4 degrees below the
@@ -35,10 +60,16 @@ object PrayerTimes {
     const val ISHA_ANGLE = 14.0
     private const val RISE_SET_ANGLE = 0.833
 
-    fun compute(date: LocalDate, latitude: Double, longitude: Double, zone: ZoneId): PrayerTimesResult {
+    fun compute(
+        date: LocalDate,
+        latitude: Double,
+        longitude: Double,
+        zone: ZoneId,
+        params: PrayerParams = PrayerParams.LEVA
+    ): PrayerTimesResult {
         val tzHours = zone.rules.getOffset(LocalDateTime.of(date, LocalTime.NOON)).totalSeconds / 3600.0
-        val today = raw(date, latitude, longitude)
-        val tomorrow = raw(date.plusDays(1), latitude, longitude)
+        val today = raw(date, latitude, longitude, params)
+        val tomorrow = raw(date.plusDays(1), latitude, longitude, params)
 
         fun toTime(hours: Double?): LocalTime? {
             if (hours == null || hours.isNaN()) return null
@@ -59,7 +90,8 @@ object PrayerTimes {
         return PrayerTimesResult(
             fajr = toTime(today.fajr), sunrise = toTime(today.sunrise), dhuhr = toTime(today.dhuhr),
             sunset = toTime(today.sunset), maghrib = toTime(today.maghrib), isha = toTime(today.isha),
-            midnight = toTime(midnight)
+            midnight = toTime(midnight),
+            imsak = toTime(today.fajr?.minus(params.imsakMinutes / 60.0))
         )
     }
 
@@ -68,7 +100,7 @@ object PrayerTimes {
         val sunset: Double?, val maghrib: Double?, val isha: Double?
     )
 
-    private fun raw(date: LocalDate, lat: Double, lng: Double): Raw {
+    private fun raw(date: LocalDate, lat: Double, lng: Double, params: PrayerParams): Raw {
         val jd = julian(date.year, date.monthValue, date.dayOfMonth) - lng / (15.0 * 24.0)
 
         fun midDay(t: Double): Double = fixHour(12.0 - sunPosition(jd + t).second)
@@ -88,15 +120,16 @@ object PrayerTimes {
         var rFajr: Double? = null; var rSunrise: Double? = null; var rSunset: Double? = null
         var rMaghrib: Double? = null; var rIsha: Double? = null
         repeat(2) {
-            rFajr = angleTime(FAJR_ANGLE, fajr / 24.0, true)
+            rFajr = angleTime(params.fajrAngle, fajr / 24.0, true)
             rSunrise = angleTime(RISE_SET_ANGLE, sunrise / 24.0, true)
             dhuhr = midDay(dhuhr / 24.0)
             rSunset = angleTime(RISE_SET_ANGLE, sunset / 24.0, false)
-            rMaghrib = angleTime(MAGHRIB_ANGLE, maghrib / 24.0, false)
-            rIsha = angleTime(ISHA_ANGLE, isha / 24.0, false)
+            rMaghrib = angleTime(params.maghribAngle, maghrib / 24.0, false)
+            rIsha = angleTime(params.ishaAngle, isha / 24.0, false)
             rFajr?.let { fajr = it }; rSunrise?.let { sunrise = it }
             rSunset?.let { sunset = it }; rMaghrib?.let { maghrib = it }; rIsha?.let { isha = it }
         }
+        if (params.maghribDelayMinutes > 0) rMaghrib = rSunset?.plus(params.maghribDelayMinutes / 60.0)
         return Raw(rFajr, rSunrise, dhuhr, rSunset, rMaghrib, rIsha)
     }
 

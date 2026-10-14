@@ -33,6 +33,7 @@ private data class HubEntry(val title: String, val subtitle: String, val icon: I
 
 private val hubEntries = listOf(
     HubEntry("أوقات الصلاة والأذان", "المواعيد بالفقه الجعفري وتنبيهات الأذان", Icons.Default.AccessTime, "prayer"),
+    HubEntry("إعدادات الأذان", "الصوت، التنبيه قبل الصلاة، طريقة الحساب", Icons.Default.AccessTime, "prayer/settings"),
     HubEntry("اتجاه القبلة", "بوصلة القبلة من مدينتك", Icons.Default.Explore, "qibla"),
     HubEntry("التقويم والمناسبات", "التاريخ الهجري ومناسبات أهل البيت (ع)", Icons.Default.CalendarMonth, "calendar"),
     HubEntry("أدعية الأيام", "دعاء لكل يوم من أيام الأسبوع", Icons.Default.AutoStories, "duas"),

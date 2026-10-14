@@ -45,39 +45,25 @@ fun GlobalSearchScreen(
     viewModel: SearchViewModel,
     onNavigateToQuran: (surahNumber: Int, ayahNumber: Int?) -> Unit,
     onNavigateToMafatih: (itemId: String) -> Unit,
-    onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind) -> Unit
+    onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind) -> Unit,
+    onNavigateToDeed: (Int) -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val query by viewModel.query.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
     val results by viewModel.results.collectAsState()
 
+    ToolScaffold("البحث", onNavigateBack) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "البحث الشامل",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         OutlinedTextField(
             value = query,
             onValueChange = { viewModel.onQueryChanged(it) },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("ابحث في القرآن، تفسير الميزان، مفاتيح الجنان...", textAlign = TextAlign.Right) },
+            placeholder = { Text("ابحث في القرآن والمفاتيح والصحيفة والأعمال...", textAlign = TextAlign.Right) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث") },
             trailingIcon = {
                 if (query.isNotEmpty()) {
@@ -94,8 +80,7 @@ fun GlobalSearchScreen(
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            reverseLayout = true
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(SearchResultType.values()) { filter ->
                 FilterChip(
@@ -146,11 +131,12 @@ fun GlobalSearchScreen(
                                         onNavigateToQuran(item.surahNumber, item.ayahNumber)
                                     }
                                 }
-                                SearchResultType.MAFATIH -> {
+                                SearchResultType.MAFATIH, SearchResultType.SAHIFA -> {
                                     if (item.mafatihItemId != null) {
                                         onNavigateToMafatih(item.mafatihItemId)
                                     }
                                 }
+                                SearchResultType.DEEDS -> item.deedId?.let(onNavigateToDeed)
                                 SearchResultType.WEEKDAY -> item.weekdayKind?.let(onNavigateToWeekday)
                                 SearchResultType.ALL -> {}
                             }
@@ -163,6 +149,7 @@ fun GlobalSearchScreen(
                 }
             }
         }
+    }
     }
 }
 
@@ -197,7 +184,7 @@ private fun SearchResultCard(
                             color = when (item.type) {
                                 SearchResultType.QURAN -> MaterialTheme.colorScheme.primaryContainer
                                 SearchResultType.TAFSIR -> MaterialTheme.colorScheme.tertiaryContainer
-                                SearchResultType.MAFATIH, SearchResultType.WEEKDAY -> MaterialTheme.colorScheme.secondaryContainer
+                                SearchResultType.MAFATIH, SearchResultType.SAHIFA, SearchResultType.WEEKDAY, SearchResultType.DEEDS -> MaterialTheme.colorScheme.secondaryContainer
                                 else -> MaterialTheme.colorScheme.surfaceVariant
                             },
                             shape = RoundedCornerShape(8.dp)

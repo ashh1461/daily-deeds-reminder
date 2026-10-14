@@ -57,6 +57,8 @@ fun FavoritesScreen(
                 }
                 is FavoriteKey.Mafatih -> mafatih.getItemById(key.itemId)
                     ?.let { FavoriteRow(key, it.title, it.category.titleArabic) }
+                is FavoriteKey.Sahifa -> mafatih.getItemById(key.itemId)
+                    ?.let { FavoriteRow(key, it.title, "الصحيفة السجادية") }
                 is FavoriteKey.Weekday -> {
                     val c = WeekdayRepository.get(key.kind, key.day)
                     FavoriteRow(key, c.title, key.kind.titleArabic)
@@ -84,6 +86,7 @@ fun FavoritesScreen(
                             when (val k = row.key) {
                                 is FavoriteKey.Ayah -> onOpenSurah(k.surah)
                                 is FavoriteKey.Mafatih -> onOpenMafatih(k.itemId)
+                                is FavoriteKey.Sahifa -> onOpenMafatih(k.itemId)
                                 is FavoriteKey.Weekday -> onOpenWeekday(k.kind)
                             }
                         }

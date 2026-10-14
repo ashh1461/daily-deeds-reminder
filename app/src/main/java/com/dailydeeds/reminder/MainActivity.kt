@@ -1,11 +1,5 @@
 package com.dailydeeds.reminder
 
-import com.dailydeeds.reminder.viewmodel.ToolsViewModel
-import com.dailydeeds.reminder.ui.screens.CalendarScreen
-import com.dailydeeds.reminder.ui.screens.PrayerTimesScreen
-import com.dailydeeds.reminder.ui.screens.QiblaScreen
-import com.dailydeeds.reminder.ui.screens.FavoritesScreen
-import com.dailydeeds.reminder.ui.screens.HomeToolsCard
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -14,15 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoStories
-import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Mosque
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -32,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -45,34 +41,43 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.notification.AlarmScheduler
 import com.dailydeeds.reminder.notification.NotificationHelper
+import com.dailydeeds.reminder.ui.components.AppTopBar
+import com.dailydeeds.reminder.ui.screens.CalendarScreen
+import com.dailydeeds.reminder.ui.screens.FavoritesScreen
 import com.dailydeeds.reminder.ui.screens.GlobalSearchScreen
-import com.dailydeeds.reminder.ui.screens.HomeScreen
 import com.dailydeeds.reminder.ui.screens.MafatihReaderScreen
 import com.dailydeeds.reminder.ui.screens.MafatihScreen
+import com.dailydeeds.reminder.ui.screens.PrayerTimesScreen
+import com.dailydeeds.reminder.ui.screens.QiblaScreen
 import com.dailydeeds.reminder.ui.screens.QuranReaderScreen
 import com.dailydeeds.reminder.ui.screens.QuranScreen
 import com.dailydeeds.reminder.ui.screens.ReaderCounterScreen
+import com.dailydeeds.reminder.ui.screens.SahifaScreen
 import com.dailydeeds.reminder.ui.screens.SettingsScreen
+import com.dailydeeds.reminder.ui.screens.TodayScreen
 import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
+import com.dailydeeds.reminder.ui.screens.WorshipHubScreen
 import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
 import com.dailydeeds.reminder.viewmodel.MafatihViewModel
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.viewmodel.QuranViewModel
+import com.dailydeeds.reminder.viewmodel.SahifaViewModel
 import com.dailydeeds.reminder.viewmodel.SearchViewModel
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private val toolsViewModel: ToolsViewModel by viewModels()
 
     private val requestNotificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                AlarmScheduler.scheduleAllReminders(this)
-            }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            AlarmScheduler.scheduleAllReminders(this)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,27 +88,31 @@ class MainActivity : ComponentActivity() {
             DeedCategory.values().find { it.name == name }?.let(viewModel::selectCategory)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                AlarmScheduler.scheduleAllReminders(this)
-            }
-        } else {
-            AlarmScheduler.scheduleAllReminders(this)
+        // Alarms are always scheduled; the permission prompt is shown once, not on every launch. If it was
+        // declined, the permission-health card in Settings and the worship hub explains how to enable it.
+        AlarmScheduler.scheduleAllReminders(this)
+        val prefs = PreferencesManager(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
+            !prefs.hasAskedNotificationPermission()
+        ) {
+            prefs.setAskedNotificationPermission()
+            requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         setContent {
-            DailyReminderTheme {
+            val themeMode by toolsViewModel.themeMode.collectAsState()
+            val dark = when (themeMode) {
+                "dark" -> true
+                "light" -> false
+                else -> isSystemInDarkTheme()
+            }
+            DailyReminderTheme(darkTheme = dark) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation(viewModel)
+                    AppNavigation(viewModel, toolsViewModel)
                 }
             }
         }
@@ -115,41 +124,57 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class BottomTab(
-    val route: String,
-    val label: String,
-    val icon: ImageVector
-)
+private data class AppTab(val route: String, val label: String, val title: String, val icon: ImageVector)
 
-private val bottomTabs = listOf(
-    BottomTab("home", "الأعمال", Icons.Default.Checklist),
-    BottomTab("quran", "القرآن", Icons.Default.AutoStories),
-    BottomTab("mafatih", "المفاتيح", Icons.Default.Mosque),
-    BottomTab("search", "البحث", Icons.Default.Search),
-    BottomTab("settings", "الإعدادات", Icons.Default.Settings)
+/** The five bottom tabs. Search, Favorites and Settings live in the shared top bar. */
+private val appTabs = listOf(
+    AppTab("home", "اليوم", "اليوم", Icons.Default.Today),
+    AppTab("worship", "العبادات", "العبادات", Icons.Default.Mosque),
+    AppTab("quran", "القرآن", "القرآن الكريم", Icons.Default.AutoStories),
+    AppTab("mafatih", "المفاتيح", "مفاتيح الجنان", Icons.Default.MenuBook),
+    AppTab("sahifa", "الصحيفة", "الصحيفة السجادية", Icons.Default.Book)
 )
 
 @Composable
 fun AppNavigation(
     mainViewModel: MainViewModel,
+    toolsViewModel: ToolsViewModel,
     quranViewModel: QuranViewModel = viewModel(),
     mafatihViewModel: MafatihViewModel = viewModel(),
-    searchViewModel: SearchViewModel = viewModel(),
-    toolsViewModel: ToolsViewModel = viewModel()
+    sahifaViewModel: SahifaViewModel = viewModel(),
+    searchViewModel: SearchViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
-    val showBottomBar = bottomTabs.any { it.route == currentRoute }
+    val currentTab = appTabs.firstOrNull { it.route == currentRoute }
+
+    fun go(route: String) = navController.navigate(route)
+    fun back() { navController.popBackStack() }
+    fun openReader(itemId: String) {
+        mafatihViewModel.selectItem(itemId)
+        go("mafatih/reader/$itemId")
+    }
+    fun openWeekday(kind: DayContentKind) = go(if (kind == DayContentKind.DUA) "duas" else "ziyarat")
 
     Scaffold(
+        topBar = {
+            if (currentTab != null) {
+                AppTopBar(
+                    title = currentTab.title,
+                    onSearch = { go("search") },
+                    onFavorites = { go("favorites") },
+                    onSettings = { go("settings") }
+                )
+            }
+        },
         bottomBar = {
-            if (showBottomBar) {
+            if (currentTab != null) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
                     tonalElevation = 0.dp
                 ) {
-                    bottomTabs.forEach { tab ->
+                    appTabs.forEach { tab ->
                         NavigationBarItem(
                             selected = currentRoute == tab.route,
                             onClick = {
@@ -180,38 +205,35 @@ fun AppNavigation(
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
+            // ---- tabs
             composable("home") {
-                HomeScreen(
+                TodayScreen(
                     viewModel = mainViewModel,
-                    onNavigateToDeed = { deedId ->
-                        navController.navigate("deed/$deedId")
-                    },
-                    onNavigateToSettings = {
-                        navController.navigate("settings")
-                    },
-                    onNavigateToDuas = { navController.navigate("duas") },
-                    onNavigateToZiyarat = { navController.navigate("ziyarat") },
-                    toolsContent = {
-                        HomeToolsCard(
-                            tools = toolsViewModel,
-                            onOpenRoute = { navController.navigate(it) },
-                            onResumeSurah = { navController.navigate("quran/reader/$it") },
-                            onResumeMafatih = { navController.navigate("mafatih/reader/$it") },
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                    }
+                    tools = toolsViewModel,
+                    onOpenDeed = { go("deed/$it") },
+                    onOpenRoute = { go(it) },
+                    onResumeSurah = { go("quran/reader/$it") },
+                    onResumeMafatih = { openReader(it) },
+                    onResumeSahifa = { openReader(it) }
                 )
             }
-
+            composable("worship") { WorshipHubScreen(onOpenRoute = { go(it) }) }
             composable("quran") {
-                QuranScreen(
-                    viewModel = quranViewModel,
-                    onNavigateToSurah = { surahNumber ->
-                        navController.navigate("quran/reader/$surahNumber")
-                    }
+                QuranScreen(viewModel = quranViewModel, onNavigateToSurah = { go("quran/reader/$it") })
+            }
+            composable("mafatih") {
+                MafatihScreen(
+                    viewModel = mafatihViewModel,
+                    onNavigateToItem = { go("mafatih/reader/$it") },
+                    onNavigateToDuas = { go("duas") },
+                    onNavigateToZiyarat = { go("ziyarat") }
                 )
             }
+            composable("sahifa") {
+                SahifaScreen(viewModel = sahifaViewModel, onOpenItem = { openReader(it) })
+            }
 
+            // ---- readers
             composable(
                 route = "quran/reader/{surahNumber}",
                 arguments = listOf(navArgument("surahNumber") { type = NavType.IntType })
@@ -222,21 +244,9 @@ fun AppNavigation(
                     surahNumber = surahNumber,
                     viewModel = quranViewModel,
                     tools = toolsViewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { back() }
                 )
             }
-
-            composable("mafatih") {
-                MafatihScreen(
-                    viewModel = mafatihViewModel,
-                    onNavigateToItem = { itemId ->
-                        navController.navigate("mafatih/reader/$itemId")
-                    },
-                    onNavigateToDuas = { navController.navigate("duas") },
-                    onNavigateToZiyarat = { navController.navigate("ziyarat") }
-                )
-            }
-
             composable(
                 route = "mafatih/reader/{itemId}",
                 arguments = listOf(navArgument("itemId") { type = NavType.StringType })
@@ -247,77 +257,56 @@ fun AppNavigation(
                     itemId = itemId,
                     viewModel = mafatihViewModel,
                     tools = toolsViewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { back() }
+                )
+            }
+            composable(
+                route = "deed/{deedId}",
+                arguments = listOf(navArgument("deedId") { type = NavType.IntType })
+            ) { entry ->
+                ReaderCounterScreen(
+                    deedId = entry.arguments?.getInt("deedId") ?: 1,
+                    viewModel = mainViewModel,
+                    onNavigateBack = { back() }
                 )
             }
 
+            // ---- pushed screens
             composable("search") {
                 GlobalSearchScreen(
                     viewModel = searchViewModel,
                     onNavigateToQuran = { surahNum, _ ->
                         quranViewModel.selectSurah(surahNum)
-                        navController.navigate("quran/reader/$surahNum")
+                        go("quran/reader/$surahNum")
                     },
-                    onNavigateToMafatih = { itemId ->
-                        mafatihViewModel.selectItem(itemId)
-                        navController.navigate("mafatih/reader/$itemId")
-                    },
-                    onNavigateToWeekday = { kind ->
-                        navController.navigate(if (kind == DayContentKind.DUA) "duas" else "ziyarat")
-                    }
+                    onNavigateToMafatih = { openReader(it) },
+                    onNavigateToWeekday = { openWeekday(it) },
+                    onNavigateToDeed = { go("deed/$it") },
+                    onNavigateBack = { back() }
                 )
             }
-
-            composable("duas") {
-                WeekdayContentScreen(DayContentKind.DUA, toolsViewModel, onNavigateBack = { navController.popBackStack() })
-            }
-
-            composable("ziyarat") {
-                WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { navController.popBackStack() })
-            }
-
-            composable("calendar") {
-                CalendarScreen(toolsViewModel, onNavigateBack = { navController.popBackStack() })
-            }
-
+            composable("duas") { WeekdayContentScreen(DayContentKind.DUA, toolsViewModel, onNavigateBack = { back() }) }
+            composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { back() }) }
+            composable("calendar") { CalendarScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("prayer") {
-                PrayerTimesScreen(
-                    toolsViewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                    onOpenQibla = { navController.navigate("qibla") }
-                )
+                PrayerTimesScreen(toolsViewModel, onNavigateBack = { back() }, onOpenQibla = { go("qibla") })
             }
-
-            composable("qibla") {
-                QiblaScreen(toolsViewModel, onNavigateBack = { navController.popBackStack() })
-            }
-
+            composable("qibla") { QiblaScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("favorites") {
                 FavoritesScreen(
                     viewModel = toolsViewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                    onOpenSurah = { navController.navigate("quran/reader/$it") },
-                    onOpenMafatih = { navController.navigate("mafatih/reader/$it") },
-                    onOpenWeekday = { navController.navigate(if (it == DayContentKind.DUA) "duas" else "ziyarat") }
+                    onNavigateBack = { back() },
+                    onOpenSurah = { go("quran/reader/$it") },
+                    onOpenMafatih = { openReader(it) },
+                    onOpenWeekday = { openWeekday(it) }
                 )
             }
-
-            composable(
-                route = "deed/{deedId}",
-                arguments = listOf(navArgument("deedId") { type = NavType.IntType })
-            ) { entry ->
-                val deedId = entry.arguments?.getInt("deedId") ?: 1
-                ReaderCounterScreen(
-                    deedId = deedId,
-                    viewModel = mainViewModel,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-
             composable("settings") {
                 SettingsScreen(
                     viewModel = mainViewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    tools = toolsViewModel,
+                    onNavigateBack = { back() },
+                    onOpenRoute = { go(it) }
                 )
             }
         }

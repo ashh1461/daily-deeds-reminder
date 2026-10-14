@@ -1,5 +1,7 @@
 package com.dailydeeds.reminder.ui.screens
 
+import com.dailydeeds.reminder.ui.components.PermissionHealthCard
+import com.dailydeeds.reminder.ui.components.rememberNow
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -81,9 +83,11 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
         if (granted) useDeviceLocation()
     }
 
-    val today = remember { LocalDate.now() }
-    val times = remember(place) { PrayerSchedule.timesFor(today, place) }
-    val next = remember(place) { PrayerSchedule.next(ZonedDateTime.now(), place) }
+    // Refreshes every 30 s, so the highlighted "next prayer" and the date roll over without reopening the screen.
+    val now by rememberNow()
+    val today = now.toLocalDate()
+    val times = remember(place, today) { PrayerSchedule.timesFor(today, place) }
+    val next = remember(place, now) { PrayerSchedule.next(now, place) }
 
     val rows: List<Triple<String, LocalTime?, Prayer?>> = listOf(
         Triple("الفجر", times.fajr, Prayer.FAJR),
@@ -101,6 +105,7 @@ fun PrayerTimesScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit, onO
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxSize()
         ) {
+            item { PermissionHealthCard() }
             item {
                 Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

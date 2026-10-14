@@ -45,7 +45,7 @@ class SearchRepositoryTest {
         val ashura = searchRepository.search("عاشوراء", SearchResultType.MAFATIH)
         assertTrue(ashura.any { it.title.contains("زيارة عاشوراء") })
 
-        val sahifa = searchRepository.search("الحمد لله الاول بلا اول كان قبله", SearchResultType.MAFATIH)
+        val sahifa = searchRepository.search("الحمد لله الاول بلا اول كان قبله", SearchResultType.SAHIFA)
         assertTrue(sahifa.any { it.title.contains("الدعاء 1") })
     }
 
@@ -77,6 +77,13 @@ class SearchRepositoryTest {
         val results = searchRepository.search("ا".repeat(5_000_000) + "الله")
         val ms = (System.nanoTime() - start) / 1_000_000
         assertTrue("took $ms ms", ms < 5_000)
-        assertTrue(results.size <= 4 * SearchRepository.MAX_RESULTS)
+        assertTrue(results.size <= 6 * SearchRepository.MAX_RESULTS)
+    }
+
+    @Test
+    fun dailyDeedsAreSearchable() {
+        val results = searchRepository.search("آية الكرسي", SearchResultType.DEEDS)
+        assertTrue(results.any { it.deedId != null })
+        assertTrue(results.all { it.type == SearchResultType.DEEDS })
     }
 }

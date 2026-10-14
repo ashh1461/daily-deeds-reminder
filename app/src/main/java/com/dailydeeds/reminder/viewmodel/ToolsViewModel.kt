@@ -36,6 +36,23 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
     private val _lastMafatihId = MutableStateFlow(prefs.getLastMafatihId())
     val lastMafatihId: StateFlow<String?> = _lastMafatihId.asStateFlow()
 
+    private val _lastSahifaId = MutableStateFlow(prefs.getLastSahifaId())
+    val lastSahifaId: StateFlow<String?> = _lastSahifaId.asStateFlow()
+
+    private val _themeMode = MutableStateFlow(prefs.getThemeMode())
+    val themeMode: StateFlow<String> = _themeMode.asStateFlow()
+
+    fun setThemeMode(mode: String) {
+        prefs.setThemeMode(mode)
+        _themeMode.value = mode
+    }
+
+    fun recordSahifa(id: String) {
+        if (id == _lastSahifaId.value) return
+        prefs.setLastSahifaId(id)
+        _lastSahifaId.value = id
+    }
+
     fun toggleFavorite(key: FavoriteKey) {
         _favorites.value = prefs.toggleFavorite(key)
     }

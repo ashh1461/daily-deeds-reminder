@@ -3,6 +3,7 @@ package com.dailydeeds.reminder.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
+import com.dailydeeds.reminder.adhan.AdhanMode
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.data.FavoriteKey
@@ -85,12 +86,15 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
     fun setHijriOffset(days: Int) {
         prefs.setHijriOffset(days)
         _hijriOffset.value = prefs.getHijriOffset()
+        // The offset decides which days are in Ramadan (Imsak alarm) and the widget's Hijri date.
+        ReligiousAlarms.schedulePrayer(getApplication())
     }
 
     fun setAlarmConfig(prayer: Prayer, config: PrayerAlarmConfig) {
         prefs.setAlarmConfig(prayer, config)
         _alarmConfigs.value = _alarmConfigs.value + (prayer to config)
         _prayerContext.value = buildContext()
+        if (config.mode == AdhanMode.OFF) ReligiousAlarms.cancelSnooze(getApplication(), prayer)
         ReligiousAlarms.schedulePrayer(getApplication())
     }
 

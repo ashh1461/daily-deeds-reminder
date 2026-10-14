@@ -51,7 +51,7 @@ Icon `icon-512.png` (512×512), feature graphic `feature-graphic-1024x500.png`. 
 | `RECEIVE_BOOT_COMPLETED` | Re-schedule alarms after a reboot, time change or app update. |
 | `WAKE_LOCK` | Keep the CPU awake while the adhan plays. |
 | `VIBRATE` | Vibration with the adhan and tasbih counters. |
-| `ACCESS_COARSE_LOCATION` | Optional "my location" to choose the city for prayer times. |
+| `ACCESS_COARSE_LOCATION` | Optional "my location": reads the last-known location once and saves it (rounded to about 1 km) on the device as the place for prayer times. |
 | `INTERNET` | Optional download of adhan voice packs from GitHub over HTTPS (host allow-list, size and checksum checks). |
 
 If Play rejects `SCHEDULE_EXACT_ALARM` for this category, the alternative is `USE_EXACT_ALARM` (auto-granted, intended for alarm and calendar apps) with the matching declaration.
@@ -68,4 +68,4 @@ keep the attribution in Settings and `docs/licenses/`. If permission cannot be o
 download pack (like the adhan voices) and keep it out of the store build.
 
 ## Release checklist
-Signed AAB from `bundleRelease` with `targetSdk` at the level Play requires (v1.8.1), upload key = the key in `docs/DISTRIBUTION.md`, internal testing track first, then production.
+Signed AAB from `bundleRelease` with `targetSdk` at the level Play requires (planned for v1.8.2), upload key = the key in `docs/DISTRIBUTION.md`, internal testing track first, then production.

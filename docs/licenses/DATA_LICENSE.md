@@ -24,7 +24,8 @@ Terms that follow from the licence:
 - **NonCommercial:** the app must stay free, without advertising, paid features or sponsorship. Do not monetize an
   app that contains these texts.
 - **ShareAlike:** adaptations of these texts, including the three files above, are shared under the same licence.
-  Anyone may reuse them on those terms; the scripts that produce them are in this repository.
+  Anyone may reuse them on those terms. The builder for al-Mizan (`scripts/build_mizan.py`) is in this repository; the
+  builders for the Mafatih and Sahifa files are not.
 
 ## Copyright of the original works
 OpenITI's licence covers the digital corpus. It does not by itself grant rights in a book that is still protected by

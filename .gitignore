@@ -15,3 +15,5 @@ graphify-out/202*
 graphify-out/.*
 .linear_token
 .env
+__pycache__/
+*.pyc

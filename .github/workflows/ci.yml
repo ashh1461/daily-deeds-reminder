@@ -32,8 +32,8 @@ jobs:
       - name: Guard against placeholder Quran text and leaked keys
         shell: bash
         run: |
-          ! grep -rn "آية رقم" app/src/main
-          ! git grep -nE "lin_api_[A-Za-z0-9]{20,}"
+          if grep -rn "آية رقم" app/src/main; then echo "placeholder Quran text found"; exit 1; fi
+          if git grep -nE "lin_api_[A-Za-z0-9]{20,}"; then echo "leaked key found"; exit 1; fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: debug-apk

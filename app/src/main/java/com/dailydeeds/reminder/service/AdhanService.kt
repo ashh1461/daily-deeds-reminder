@@ -22,6 +22,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import com.dailydeeds.reminder.adhan.PrayerAlarmText
 import com.dailydeeds.reminder.adhan.VoiceIds
 import com.dailydeeds.reminder.adhan.VoiceStore
 import com.dailydeeds.reminder.data.PreferencesManager
@@ -94,6 +95,7 @@ class AdhanService : Service() {
         if (!test && settings.followRinger && audio.ringerMode != AudioManager.RINGER_MODE_NORMAL) {
             // The phone is on silent or vibrate: respect it, only vibrate if that is what the user chose.
             if (settings.vibrate && audio.ringerMode == AudioManager.RINGER_MODE_VIBRATE) vibrate()
+            postReminder()
             handler.postDelayed(timeout, 3000)
             return
         }
@@ -122,6 +124,7 @@ class AdhanService : Service() {
             mp.setOnCompletionListener { shutdown() }
             mp.setOnErrorListener { _, what, extra ->
                 Log.w(TAG, "MediaPlayer error $what/$extra")
+                if (!test) postReminder()
                 shutdown()
                 true
             }
@@ -131,8 +134,19 @@ class AdhanService : Service() {
             if (settings.vibrate) vibrate()
         } catch (e: Exception) {
             Log.w(TAG, "Could not start adhan playback", e)
+            if (!test) postReminder()
             shutdown()
         }
+    }
+
+    /** Shutdown removes the foreground notification, so leave the usual prayer-time notification behind. */
+    private fun postReminder() {
+        val prayer = prayerForSnooze ?: return
+        val text = PrayerAlarmText.reminder(prayer)
+        NotificationHelper.showNotification(
+            this, PrayerAlarmText.notificationId(prayer), text.title, text.text,
+            channelId = NotificationHelper.CHANNEL_PRAYER_REMINDER
+        )
     }
 
     private fun requestFocus(audio: AudioManager) {

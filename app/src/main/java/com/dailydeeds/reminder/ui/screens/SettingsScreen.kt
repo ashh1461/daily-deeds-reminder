@@ -134,7 +134,7 @@ fun SettingsScreen(
             SectionTitle("الودجت")
             SettingsCard {
                 Text(
-                    "أضف ودجت «الصلاة القادمة» إلى شاشتك الرئيسية: اضغط مطولاً على مساحة فارغة، اختر الأدوات (Widgets)، ثم «الأعمال اليومية».",
+                    "أضف ودجت «الصلاة القادمة» إلى شاشتك الرئيسية: اضغط مطولاً على مساحة فارغة، اختر الأدوات (Widgets)، ثم «ورد».",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -167,11 +167,21 @@ fun SettingsScreen(
                     "يضم التطبيق الأعمال اليومية، والقرآن الكريم كاملاً، وتفسير الميزان كاملاً، ومفاتيح الجنان كاملاً، والصحيفة السجادية الكاملة، وأوقات الصلاة والقبلة والتقويم.",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text(
-                    "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني. نصوص مفاتيح الجنان والصحيفة السجادية وتفسير الميزان: مدونة OpenITI (رخصة CC BY-NC-SA 4.0) المأخوذة عن المكتبة الشاملة ومكتبات رقمية، وقد قُسِّم الميزان بحسب الآيات دون حذف حرف منه؛ والتطبيق مجاني وغير تجاري. الخطوط: أميري وتجوال (رخصة SIL OFL).",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Attribution required by the data licences; keep in step with docs/licenses/DATA_LICENSE.md and
+                // THIRD_PARTY_NOTICES.md. The licence URL has its own line so it does not break the RTL sentence order.
+                listOf(
+                    "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني.",
+                    "مفاتيح الجنان للشيخ عباس القمي، والصحيفة السجادية للإمام زين العابدين (ع)، والميزان في تفسير القرآن للعلامة السيد محمد حسين الطباطبائي: نصوص مقتبسة من مدونة OpenITI، عن رقمنة المكتبة الشاملة وموقعَي rafed.net و altafsir.com.",
+                    "التعديلات: قُسِّمت النصوص إلى المواضع التي يعرضها التطبيق، وحُوِّلت علامات OpenITI أو أُزيلت، ووُضعت الآيات المقتبسة في الميزان بين قوسين مزخرفين، وأُبقيت أرقام الصفحات علاماتٍ. لم يُحذف حرف من نص الميزان، ولم يُعدَّل لفظ ولم يُختصر.",
+                    "رخصة هذه النصوص: المشاع الإبداعي، نَسب المصنَّف - غير تجاري - الترخيص بالمثل 4.0 الدولية (CC BY-NC-SA 4.0)، والتطبيق مجاني وغير تجاري. نص الرخصة:",
+                    "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                    "أسماء المدن للبحث دون اتصال: GeoNames (geonames.org)، برخصة CC BY 4.0:",
+                    "https://creativecommons.org/licenses/by/4.0/",
+                    "جدول الكسوف والخسوف لصلاة الآيات: NASA/GSFC، إعداد Fred Espenak.",
+                    "الخطوط: أميري وتجوال (رخصة SIL OFL)."
+                ).forEach { line ->
+                    Text(line, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
     }

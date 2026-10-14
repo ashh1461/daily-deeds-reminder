@@ -24,18 +24,29 @@ data class PlannedAlarm(
  */
 object AdhanPlanner {
 
-    /** [imsakOn] says whether the Imsak alarm is wanted on a given date (the user's switch, and Ramadan only). */
+    /** Total order of alarms (time, then kind, then prayer) so that alarms due at the same instant fire one by one. */
+    private val ORDER = compareBy<PlannedAlarm>({ it.triggerAt.toInstant() }, { it.kind.ordinal }, { it.prayer.id })
+
+    /**
+     * [imsakOn] says whether the Imsak alarm is wanted on a given date (the user's switch, and Ramadan only).
+     * [after] is the last alarm handled: the result then comes strictly after it in [ORDER], and one due at the
+     * same instant as [after] counts even when not after [now] (that is how [dueWith] collects them). Once those
+     * are handled too, the result after the last of them is strictly after [now].
+     */
     fun next(
         now: ZonedDateTime,
         place: Place,
         context: PrayerContext,
         configs: Map<Prayer, PrayerAlarmConfig>,
+        after: PlannedAlarm? = null,
         imsakOn: (LocalDate) -> Boolean = { false }
     ): PlannedAlarm? {
         val zoned = now.withZoneSameInstant(place.zone)
         var best: PlannedAlarm? = null
         fun consider(c: PlannedAlarm) {
-            if (c.triggerAt.isAfter(zoned) && (best == null || c.triggerAt.isBefore(best!!.triggerAt))) best = c
+            val due = if (after == null) c.triggerAt.isAfter(zoned)
+            else ORDER.compare(c, after) > 0 && (c.triggerAt.isAfter(zoned) || c.triggerAt.isEqual(after.triggerAt))
+            if (due && (best == null || ORDER.compare(c, best!!) < 0)) best = c
         }
         for (dayOffset in 0L..2L) {
             val date = zoned.toLocalDate().plusDays(dayOffset)
@@ -63,5 +74,26 @@ object AdhanPlanner {
             if (best != null) break
         }
         return best
+    }
+
+    /**
+     * The other alarms due at the same instant as [fired] (a 10-minute Fajr pre-alarm and Imsak), in [ORDER].
+     * The receiver handles them in the same run instead of setting an alarm for a time that has already come,
+     * then plans [next] after the last one handled, which is then strictly in the future.
+     */
+    fun dueWith(
+        fired: PlannedAlarm,
+        place: Place,
+        context: PrayerContext,
+        configs: Map<Prayer, PrayerAlarmConfig>,
+        imsakOn: (LocalDate) -> Boolean = { false }
+    ): List<PlannedAlarm> {
+        val tied = mutableListOf<PlannedAlarm>()
+        var c = next(fired.triggerAt, place, context, configs, fired, imsakOn)
+        while (c != null && c.triggerAt.isEqual(fired.triggerAt)) {
+            tied += c
+            c = next(fired.triggerAt, place, context, configs, c, imsakOn)
+        }
+        return tied
     }
 }

@@ -63,8 +63,12 @@ internal fun lastKnownPlace(context: Context): Place? {
     val loc = listOf(LocationManager.NETWORK_PROVIDER, LocationManager.PASSIVE_PROVIDER, LocationManager.GPS_PROVIDER)
         .mapNotNull { runCatching { lm.getLastKnownLocation(it) }.getOrNull() }
         .maxByOrNull { it.time } ?: return null
-    return Place("موقعي الحالي", loc.latitude, loc.longitude, ZoneId.systemDefault().id)
+    // The place is stored and exported in backups, so keep only ~1 km precision; prayer times move by seconds.
+    return Place("موقعي الحالي", roundCoordinate(loc.latitude), roundCoordinate(loc.longitude), ZoneId.systemDefault().id)
 }
+
+/** Rounds a latitude or longitude to 2 decimals (about 1.1 km). */
+internal fun roundCoordinate(degrees: Double): Double = Math.round(degrees * 100) / 100.0
 
 @Composable
 fun PrayerTimesScreen(

@@ -55,7 +55,12 @@ class MafatihViewModel(
         searchJob = viewModelScope.launch { refresh() }
     }
 
+    /**
+     * Opens an item with a fresh counter. Selecting the item that is already open is a no-op, so its counter survives
+     * a rotation (and a back-and-reopen of the same item); the reader's reset button clears it.
+     */
     fun selectItem(itemId: String) {
+        if (_selectedItem.value?.id == itemId) return
         _selectedItem.value = repository.getItemById(itemId)
         _counter.value = 0
     }

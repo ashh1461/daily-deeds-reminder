@@ -7,8 +7,11 @@ import android.content.Intent
 import android.os.Build
 import com.dailydeeds.reminder.adhan.AdhanPlanner
 import com.dailydeeds.reminder.adhan.AlarmKind
+import com.dailydeeds.reminder.adhan.PlannedAlarm
+import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.data.PreferencesManager
+import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.receiver.OccasionAlarmReceiver
 import com.dailydeeds.reminder.receiver.PrayerAlarmReceiver
 import com.dailydeeds.reminder.util.Prayer
@@ -20,8 +23,9 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 /**
- * Alarms for prayer times and Ahl al-Bayt occasions. Each alarm fires once, the receiver handles it and
- * schedules the next, so at most one prayer alarm (plus one snooze) is ever pending.
+ * Alarms for prayer times and Ahl al-Bayt occasions. Each alarm fires once, the receiver handles it (with any
+ * other due at the same instant) and schedules the next, so at most one prayer alarm (plus one snooze per
+ * prayer) is ever pending.
  */
 object ReligiousAlarms {
     const val EXTRA_PRAYER_ID = "extra_prayer_id"
@@ -30,7 +34,8 @@ object ReligiousAlarms {
     const val EXTRA_SNOOZE = "extra_snooze"
     private const val PRAYER_REQUEST_CODE = 3000
     private const val OCCASION_REQUEST_CODE = 3001
-    private const val SNOOZE_REQUEST_CODE = 3002
+    /** Plus the prayer id, so that one prayer's snooze can be cancelled without touching another's. */
+    private const val SNOOZE_REQUEST_CODE = 3010
     const val OCCASION_HOUR = 8
     private const val RAMADAN = 9
 
@@ -39,15 +44,14 @@ object ReligiousAlarms {
         scheduleOccasion(context)
     }
 
-    /** Schedules the next prayer or pre-adhan alarm from the saved configuration, or cancels it if none is on. */
-    fun schedulePrayer(context: Context) {
-        val prefs = PreferencesManager(context)
-        val configs = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
-        val calc = PrayerContext(prefs.getPrayerSettings().params(), configs.mapValues { it.value.offsetMinutes })
-        val offset = prefs.getHijriOffset()
-        val imsakOn = prefs.isImsakAlarmEnabled()
-        val planned = AdhanPlanner.next(ZonedDateTime.now(), prefs.getPlace(), calc, configs) { date ->
-            imsakOn && ShiaCalendar.toHijri(date, offset).month == RAMADAN
+    /**
+     * Schedules the next prayer or pre-adhan alarm from the saved configuration, or cancels it if none is on.
+     * [after] is the last alarm the receiver has just handled (together with those of [dueWith]), so that the
+     * next one is planned strictly after it and never for a time that has already come.
+     */
+    fun schedulePrayer(context: Context, after: PlannedAlarm? = null) {
+        val planned = withSavedConfig(context) { place, calc, configs, imsakOn ->
+            AdhanPlanner.next(ZonedDateTime.now(), place, calc, configs, after, imsakOn)
         }
         WidgetUpdater.refresh(context)
         if (planned == null) {
@@ -61,6 +65,26 @@ object ReligiousAlarms {
         set(context, PRAYER_REQUEST_CODE, planned.triggerAt.toInstant().toEpochMilli(), intent)
     }
 
+    /** The other alarms due at the same instant as [fired], for the receiver to handle in the same run. */
+    fun dueWith(context: Context, fired: PlannedAlarm): List<PlannedAlarm> =
+        withSavedConfig(context) { place, calc, configs, imsakOn ->
+            AdhanPlanner.dueWith(fired, place, calc, configs, imsakOn)
+        }
+
+    /** Reads the saved alarm configuration for [plan], so that [schedulePrayer] and [dueWith] see the same inputs. */
+    private fun <T> withSavedConfig(
+        context: Context,
+        plan: (Place, PrayerContext, Map<Prayer, PrayerAlarmConfig>, (LocalDate) -> Boolean) -> T
+    ): T {
+        val prefs = PreferencesManager(context)
+        val configs = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
+        val calc = PrayerContext(prefs.getPrayerSettings().params(), configs.mapValues { it.value.offsetMinutes })
+        val offset = prefs.getHijriOffset()
+        val imsakOn = prefs.isImsakAlarmEnabled()
+        val imsakFor: (LocalDate) -> Boolean = { date -> imsakOn && ShiaCalendar.toHijri(date, offset).month == RAMADAN }
+        return plan(prefs.getPlace(), calc, configs, imsakFor)
+    }
+
     /** One-off "play the adhan again in [minutes]" alarm. */
     fun scheduleSnooze(context: Context, prayer: Prayer, minutes: Int) {
         val at = System.currentTimeMillis() + minutes * 60_000L
@@ -69,8 +93,12 @@ object ReligiousAlarms {
             .putExtra(EXTRA_KIND, AlarmKind.MAIN.name)
             .putExtra(EXTRA_SCHEDULED_AT, at)
             .putExtra(EXTRA_SNOOZE, true)
-        set(context, SNOOZE_REQUEST_CODE, at, intent)
+        set(context, SNOOZE_REQUEST_CODE + prayer.id, at, intent)
     }
+
+    /** Drops a pending snooze of [prayer], e.g. once its alarm is switched off. */
+    fun cancelSnooze(context: Context, prayer: Prayer) =
+        cancel(context, SNOOZE_REQUEST_CODE + prayer.id, PrayerAlarmReceiver::class.java)
 
     fun scheduleOccasion(context: Context) {
         val prefs = PreferencesManager(context)

@@ -78,7 +78,7 @@ private fun StatusBox(state: MizanState, onRetry: () -> Unit, content: @Composab
         }
         is MizanState.Failed -> Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("تعذّر فتح تفسير الميزان: ${state.message}", textAlign = TextAlign.Center)
+                Text(state.message, textAlign = TextAlign.Center)
                 Button(onClick = onRetry) { Text("إعادة المحاولة") }
             }
         }

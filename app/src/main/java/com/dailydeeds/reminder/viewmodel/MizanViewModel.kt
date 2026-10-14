@@ -1,6 +1,7 @@
 package com.dailydeeds.reminder.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.data.MizanData
@@ -50,8 +51,11 @@ class MizanViewModel(app: Application) : AndroidViewModel(app) {
     fun load() {
         _state.value = MizanState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            _state.value = runCatching { MizanStore.open(getApplication()) }
-                .fold({ MizanState.Ready(it) }, { MizanState.Failed(it.message ?: "تعذّر تجهيز الكتاب") })
+            _state.value = runCatching { MizanStore.open(getApplication()) }.fold({ MizanState.Ready(it) }, {
+                // The technical reason goes to the log; the screen shows a plain Arabic message.
+                Log.w(TAG, "could not open the Mizan book", it)
+                MizanState.Failed(FAILED_MESSAGE)
+            })
             pendingQuery?.let { pending ->
                 pendingQuery = null
                 search(pending)
@@ -100,4 +104,10 @@ class MizanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun readEntry(data: MizanData, id: Int) = withContext(Dispatchers.IO) { data.readEntry(id) }
+
+    private companion object {
+        const val TAG = "MizanViewModel"
+        const val FAILED_MESSAGE =
+            "تعذّر فتح تفسير الميزان. أعد المحاولة، وإن تكرّر ذلك فتأكّد من وجود مساحة فارغة في الجهاز (نحو 25 ميغابايت)."
+    }
 }

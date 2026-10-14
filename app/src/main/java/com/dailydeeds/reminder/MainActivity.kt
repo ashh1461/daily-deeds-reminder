@@ -15,6 +15,7 @@ import com.dailydeeds.reminder.ui.screens.QadaScreen
 import com.dailydeeds.reminder.ui.screens.RamadanScreen
 import com.dailydeeds.reminder.ui.screens.TasbihScreen
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -48,6 +49,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -98,9 +101,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         NotificationHelper.createNotificationChannel(this)
-        intent.getStringExtra(NotificationHelper.EXTRA_CATEGORY)?.let { name ->
-            DeedCategory.values().find { it.name == name }?.let(viewModel::selectCategory)
-        }
+        // Only on a fresh start: a recreated activity (rotation, theme change) keeps the category the user picked.
+        if (savedInstanceState == null) applyReminderCategory(intent)
 
         // Alarms are always scheduled; the permission prompt is shown once, not on every launch. If it was
         // declined, the permission-health card in Settings and the worship hub explains how to enable it.
@@ -132,9 +134,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Reminder notifications open the activity with SINGLE_TOP, so a tap while the app is alive lands here.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        applyReminderCategory(intent)
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.loadDailyState()
+    }
+
+    private fun applyReminderCategory(intent: Intent) {
+        intent.getStringExtra(NotificationHelper.EXTRA_CATEGORY)?.let { name ->
+            DeedCategory.values().find { it.name == name }?.let(viewModel::selectCategory)
+        }
     }
 }
 
@@ -158,9 +173,13 @@ fun AppNavigation(
     sahifaViewModel: SahifaViewModel = viewModel(),
     searchViewModel: SearchViewModel = viewModel(),
     voiceViewModel: VoiceViewModel = viewModel(),
-    worshipViewModel: WorshipViewModel = viewModel(),
-    mizanViewModel: MizanViewModel = viewModel()
+    worshipViewModel: WorshipViewModel = viewModel()
 ) {
+    // MizanViewModel copies the 24 MB book the first time it is created, so it is fetched only when a Mizan screen
+    // or a Mizan search needs it, not at cold start. It stays activity-scoped so all Mizan screens share it.
+    val activityOwner = checkNotNull(LocalViewModelStoreOwner.current)
+    fun mizan(): MizanViewModel = ViewModelProvider(activityOwner)[MizanViewModel::class.java]
+
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -270,6 +289,8 @@ fun AppNavigation(
                 arguments = listOf(navArgument("itemId") { type = NavType.StringType })
             ) { entry ->
                 val itemId = entry.arguments?.getString("itemId") ?: ""
+                // Selected while composing so that the first frame already shows this item (the reader screens do not
+                // check the id). A no-op when the item is already selected, so a rotation keeps the counter.
                 mafatihViewModel.selectItem(itemId)
                 MafatihReaderScreen(
                     itemId = itemId,
@@ -301,7 +322,7 @@ fun AppNavigation(
                     onNavigateToWeekday = { openWeekday(it) },
                     onNavigateToDeed = { go("deed/$it") },
                     onSearchMizan = { query ->
-                        mizanViewModel.search(query)
+                        mizan().search(query)
                         go("mizan")
                     },
                     onNavigateBack = { back() }
@@ -309,7 +330,7 @@ fun AppNavigation(
             }
             composable("mizan") {
                 MizanHomeScreen(
-                    viewModel = mizanViewModel,
+                    viewModel = mizan(),
                     onOpenSurah = { go("mizan/surah/$it") },
                     onOpenEntry = { id, paragraph -> go("mizan/read/$id?p=$paragraph") },
                     onNavigateBack = { back() }
@@ -321,7 +342,7 @@ fun AppNavigation(
             ) { entry ->
                 MizanSurahScreen(
                     surah = entry.arguments?.getInt("surah") ?: 1,
-                    viewModel = mizanViewModel,
+                    viewModel = mizan(),
                     onOpenEntry = { id, paragraph -> go("mizan/read/$id?p=$paragraph") },
                     onNavigateBack = { back() }
                 )
@@ -338,7 +359,7 @@ fun AppNavigation(
                 MizanAyahScreen(
                     surah = surah,
                     ayah = ayah,
-                    viewModel = mizanViewModel,
+                    viewModel = mizan(),
                     onResolved = { id ->
                         navController.navigate("mizan/read/$id?p=0") {
                             popUpTo("mizan/ayah/{surah}/{ayah}") { inclusive = true }
@@ -358,7 +379,7 @@ fun AppNavigation(
                 MizanReaderScreen(
                     entryId = id,
                     paragraph = entry.arguments?.getInt("p") ?: 0,
-                    viewModel = mizanViewModel,
+                    viewModel = mizan(),
                     onOpenEntry = { target ->
                         navController.navigate("mizan/read/$target?p=0") {
                             popUpTo("mizan/read/{id}?p={p}") { inclusive = true }

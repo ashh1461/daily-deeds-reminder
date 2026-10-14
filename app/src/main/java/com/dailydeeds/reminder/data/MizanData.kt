@@ -98,30 +98,39 @@ class MizanData private constructor(private val file: File, val headers: List<Mi
             return MizanData(dataFile, headers)
         }
 
-        /** Copies [input] to [dataFile] while building [indexFile]; both are written under a temporary name first. */
+        /**
+         * Copies [input] to [dataFile] while building [indexFile]; both are written under a temporary name first,
+         * and the temporary files are deleted if anything fails (a full disk must not leave a partial copy behind).
+         */
         fun prepare(input: InputStream, dataFile: File, indexFile: File) {
             val tmpData = File(dataFile.path + ".tmp")
             val tmpIndex = File(indexFile.path + ".tmp")
             val builder = MizanIndexBuilder()
-            input.use { src ->
-                tmpData.outputStream().use { out ->
-                    val buffer = ByteArray(64 * 1024)
-                    while (true) {
-                        val n = src.read(buffer)
-                        if (n < 0) break
-                        out.write(buffer, 0, n)
-                        builder.feed(buffer, n)
+            try {
+                input.use { src ->
+                    tmpData.outputStream().use { out ->
+                        val buffer = ByteArray(64 * 1024)
+                        while (true) {
+                            val n = src.read(buffer)
+                            if (n < 0) break
+                            out.write(buffer, 0, n)
+                            builder.feed(buffer, n)
+                        }
                     }
                 }
-            }
-            val headers = builder.finish()
-            tmpIndex.bufferedWriter(Charsets.UTF_8).use { w ->
-                w.write("$INDEX_VERSION|${tmpData.length()}|${headers.size}\n")
-                for (h in headers) {
-                    w.write("${h.offset}|${h.length}|${kindCode(h.kind)}|${h.surah}|${h.from}|${h.to}|${h.title}\n")
+                val headers = builder.finish()
+                tmpIndex.bufferedWriter(Charsets.UTF_8).use { w ->
+                    w.write("$INDEX_VERSION|${tmpData.length()}|${headers.size}\n")
+                    for (h in headers) {
+                        w.write("${h.offset}|${h.length}|${kindCode(h.kind)}|${h.surah}|${h.from}|${h.to}|${h.title}\n")
+                    }
                 }
+                if (!tmpData.renameTo(dataFile) || !tmpIndex.renameTo(indexFile)) throw IOException("could not store the Mizan files")
+            } finally {
+                // After a successful rename these no longer exist; after a failure they are partial.
+                tmpData.delete()
+                tmpIndex.delete()
             }
-            if (!tmpData.renameTo(dataFile) || !tmpIndex.renameTo(indexFile)) throw IOException("could not store the Mizan files")
         }
 
         private fun kindCode(kind: MizanKind) = when (kind) {
@@ -150,17 +159,23 @@ class MizanData private constructor(private val file: File, val headers: List<Mi
 
 /** Opens the bundled book, copying it to the app's private storage the first time (and after an update). */
 object MizanStore {
+    // Synchronized: a copy still running after its screen was closed must not share the temporary files with a
+    // second open (removeStale would delete them, and the renames would fail).
+    @Synchronized
     fun open(context: Context): MizanData {
         val dir = File(context.filesDir, "mizan").apply { mkdirs() }
         val stamp = PackageInfoCompat.getLongVersionCode(context.packageManager.getPackageInfo(context.packageName, 0))
         val data = File(dir, "mizan-$stamp.txt")
         val index = File(dir, "mizan-$stamp.idx")
+        // Before copying, so that after an update the old 24 MB copy no longer takes the space the new one needs.
+        removeStale(dir, data, index)
         if (!data.isFile || !index.isFile) {
+            data.delete()
+            index.delete()
             val stream = MizanStore::class.java.classLoader?.getResourceAsStream(MizanFormat.RESOURCE_PATH)
                 ?: throw IOException("missing bundled resource ${MizanFormat.RESOURCE_PATH}")
             MizanData.prepare(stream, data, index)
         }
-        dir.listFiles()?.filter { it.name.startsWith("mizan-") && !it.name.startsWith("mizan-$stamp.") }?.forEach { it.delete() }
         return try {
             MizanData.open(data, index)
         } catch (e: IOException) {
@@ -172,5 +187,11 @@ object MizanStore {
             MizanData.prepare(stream, data, index)
             MizanData.open(data, index)
         }
+    }
+
+    /** Deletes every Mizan file in [dir] except [keep]: copies of older versions and leftover temporary files. */
+    internal fun removeStale(dir: File, vararg keep: File) {
+        val names = keep.map { it.name }.toSet()
+        dir.listFiles()?.filter { it.name.startsWith("mizan-") && it.name !in names }?.forEach { it.delete() }
     }
 }

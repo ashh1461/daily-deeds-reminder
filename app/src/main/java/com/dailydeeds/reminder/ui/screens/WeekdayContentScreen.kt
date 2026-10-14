@@ -1,5 +1,10 @@
 package com.dailydeeds.reminder.ui.screens
 
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.runtime.collectAsState
+import com.dailydeeds.reminder.data.FavoriteKey
+import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -65,12 +70,14 @@ import java.time.LocalDate
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeekdayContentScreen(kind: DayContentKind, onNavigateBack: (() -> Unit)? = null) {
+fun WeekdayContentScreen(kind: DayContentKind, tools: ToolsViewModel, onNavigateBack: (() -> Unit)? = null) {
     val today = remember(kind) { LocalDate.now().dayOfWeek }
     var selectedName by rememberSaveable(kind.name) { mutableStateOf(today.name) }
     var fontSize by rememberSaveable(kind.name + "_font") { mutableIntStateOf(21) }
     val selectedDay = DayOfWeek.valueOf(selectedName)
     val content = WeekdayRepository.get(kind, selectedDay)
+    val favorites by tools.favorites.collectAsState()
+    val favKey = FavoriteKey.Weekday(kind, selectedDay)
 
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
@@ -103,6 +110,13 @@ fun WeekdayContentScreen(kind: DayContentKind, onNavigateBack: (() -> Unit)? = n
                     }
                 },
                 actions = {
+                    IconButton(onClick = { tools.toggleFavorite(favKey) }) {
+                        Icon(
+                            if (favKey in favorites) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = "المفضلة",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = { if (fontSize > 16) fontSize -= 2 }) {
                         Icon(
                             Icons.Default.TextDecrease,

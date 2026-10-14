@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.2.2`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
+Branch: `master`. Published release: `v1.3.0`. Milestone: Full Quran, Tafsir Al-Mizan, Mafatih Al-Jinan & Search Engine. Updated: 2026-10-06.
 
 ## Completed
 
@@ -93,3 +93,5 @@ Branch: `master`. Published release: `v1.2.2`. Milestone: Full Quran, Tafsir Al-
 - 2026-10-07: Published GitHub release `v1.2.2`: `DailyDeeds-v1.2.2.apk` (16,708,256 bytes, SHA-256 `6430b47c32a11540d41ad64a1d2b410f73acbc85e2c0a8f47f1c740ea098bf6b`, verified to contain `mafatih/fullbook.txt` and versionName 1.2.2). Graph refreshed: 686 nodes, 1605 edges, 53 communities. Linear ALI-20 updated.
 - 2026-10-07: Security hardening pass (branch `security/hardening`): OSV scan of 84 resolved libraries = 0 advisories; pinned Gradle distribution SHA-256, SHA-pinned CI actions with read-only token, Dependabot config, bounded search query length (+ hostile-input test). 57/57 tests pass, lint OK.
 - 2026-10-08: Merged PRs #4 (security hardening), #3 (v1.2.2 full Mafatih), #2 (v1.2.1) into master; `v1.2.2` is the Latest release. Graph refreshed from merged master.
+- 2026-10-08: v1.3.0 prepared on `feature/v1.3.0`: Jafari prayer times (+adhan alarms), qibla compass, Hijri calendar with 42 Ahl al-Bayt occasions (+reminder), favorites and resume reading, Sahifa link-out. Compared with Shia Toolkit / Shia Muslim / Mafatih apps. 77/77 tests pass, lint OK. Sahifa text not bundled (publisher edition is rights-reserved scan; no open text found).
+- 2026-10-08: Published v1.3.0: DailyDeeds-v1.3.0.apk (16,799,848 bytes, SHA-256 668e54816d1fe6fa2594d9bf0f1201a634f2442a75bf0d87245eba91ee076ee3, verified versionName 1.3.0 and bundled Quran + Mafatih resources). Graph: 888 nodes, 2189 edges, 74 communities.

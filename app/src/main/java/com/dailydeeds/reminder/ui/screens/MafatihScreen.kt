@@ -1,5 +1,7 @@
 package com.dailydeeds.reminder.ui.screens
 
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,6 +74,11 @@ fun MafatihScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         WeekdayShortcuts(onNavigateToDuas, onNavigateToZiyarat)
+
+        val uriHandler = LocalUriHandler.current
+        TextButton(onClick = { uriHandler.openUri(SAHIFA_URL) }) {
+            Text("الصحيفة السجادية (نسخة مكتبة المعارف على الإنترنت)")
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -190,3 +197,6 @@ internal fun WeekdayShortcuts(onDuas: () -> Unit, onZiyarat: () -> Unit, modifie
         FilledTonalButton(onClick = onDuas, modifier = Modifier.weight(1f)) { Text("أدعية الأيام") }
     }
 }
+
+/** Official online edition of al-Sahifa al-Sajjadiyya; opened in the browser, not bundled. */
+private const val SAHIFA_URL = "https://books.almaaref.org/static/documents/uploads/pdf/sahifa.pdf"

@@ -1,0 +1,2 @@
+# Bundled content is hashed by tests: never convert line endings.
+app/src/main/resources/** -text

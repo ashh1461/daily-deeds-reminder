@@ -30,13 +30,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
 import com.dailydeeds.reminder.adhan.AdhanMode
+import com.dailydeeds.reminder.adhan.AdhanVoiceChoice
+import com.dailydeeds.reminder.adhan.BundledVoices
 import com.dailydeeds.reminder.adhan.CalcMethod
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.adhan.VoiceIds
+import com.dailydeeds.reminder.adhan.VoiceStore
 import com.dailydeeds.reminder.service.AdhanService
 import com.dailydeeds.reminder.ui.components.PermissionHealthCard
 import com.dailydeeds.reminder.ui.components.cardBorder
@@ -103,7 +107,37 @@ fun PrayerSettingsScreen(
             }
 
             Heading("تنبيه كل صلاة")
-            Prayer.values().forEach { prayer ->
+            SettingsBox {
+                Text("صوت الأذان لكل الصلوات", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                var allMenu by remember { mutableStateOf(false) }
+                val commonVoice = AdhanVoiceChoice.commonVoiceId(configs, AdhanVoiceChoice.ALARM_PRAYERS)
+                val allName = commonVoice?.let { voiceLabel(it, installed) } ?: "مختلف حسب الصلاة"
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.weight(1f)) {
+                        OutlinedButton(onClick = { allMenu = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("الصوت: $allName", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        VoiceMenu(allMenu, commonVoice, installed, onDismiss = { allMenu = false }) { id ->
+                            val updated = AdhanVoiceChoice.withVoiceForAll(configs, AdhanVoiceChoice.ALARM_PRAYERS, id)
+                            AdhanVoiceChoice.ALARM_PRAYERS.forEach { p ->
+                                val next = updated.getValue(p)
+                                if (next != configs[p]) tools.setAlarmConfig(p, next)
+                            }
+                        }
+                    }
+                    OutlinedButton(onClick = {
+                        val testVoice = commonVoice
+                            ?: (configs[AdhanVoiceChoice.ALARM_PRAYERS.first()] ?: PrayerAlarmConfig()).voiceId
+                        AdhanService.play(context, Prayer.FAJR, testVoice, test = true)
+                    }) { Text("تجربة") }
+                }
+                Text(
+                    "يُستعمل الصوت في الصلوات المضبوطة على «أذان»؛ اختر الوضع من بطاقة كل صلاة.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            AdhanVoiceChoice.ALARM_PRAYERS.forEach { prayer ->
                 val config = configs[prayer] ?: PrayerAlarmConfig()
                 SettingsBox {
                     Text(prayer.nameArabic, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -130,20 +164,14 @@ fun PrayerSettingsScreen(
                     }
                     if (config.mode == AdhanMode.ADHAN) {
                         var menu by remember { mutableStateOf(false) }
-                        val currentName = if (config.voiceId == VoiceIds.DEFAULT) "نغمة الهاتف الافتراضية"
-                        else installed.firstOrNull { it.id == config.voiceId }?.nameAr ?: "صوت غير مثبّت (سيُستخدم الافتراضي)"
+                        val currentName = voiceLabel(config.voiceId, installed)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Box(Modifier.weight(1f)) {
-                                OutlinedButton(onClick = { menu = true }, modifier = Modifier.fillMaxWidth()) { Text("الصوت: $currentName", maxLines = 1) }
-                                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                                    DropdownMenuItem(text = { Text("نغمة الهاتف الافتراضية") }, onClick = {
-                                        tools.setAlarmConfig(prayer, config.copy(voiceId = VoiceIds.DEFAULT)); menu = false
-                                    })
-                                    installed.forEach { v ->
-                                        DropdownMenuItem(text = { Text(v.nameAr) }, onClick = {
-                                            tools.setAlarmConfig(prayer, config.copy(voiceId = v.id)); menu = false
-                                        })
-                                    }
+                                OutlinedButton(onClick = { menu = true }, modifier = Modifier.fillMaxWidth()) {
+                                    Text("الصوت: $currentName", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                }
+                                VoiceMenu(menu, config.voiceId, installed, onDismiss = { menu = false }) { id ->
+                                    tools.setAlarmConfig(prayer, config.copy(voiceId = id))
                                 }
                             }
                             OutlinedButton(onClick = { AdhanService.play(context, prayer, config.voiceId, test = true) }) { Text("تجربة") }
@@ -169,7 +197,7 @@ fun PrayerSettingsScreen(
 
             Button(onClick = onOpenVoices, modifier = Modifier.fillMaxWidth()) { Text("أصوات الأذان وتنزيلها") }
             Text(
-                "عند وضع «أذان» يُشغَّل الصوت المختار عبر قناة المنبّه. إن لم يُثبَّت صوت يُستخدم صوت الإشعار الافتراضي في هاتفك.",
+                "عند وضع «أذان» يُشغَّل الصوت المختار عبر قناة المنبّه. الأذان الافتراضي مضمَّن في التطبيق، ويُشغَّل إن حُذف الصوت المختار.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -180,6 +208,40 @@ fun PrayerSettingsScreen(
 @Composable
 private fun Heading(text: String) {
     Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+}
+
+/** The Arabic name of [voiceId] as the voice buttons show it. */
+private fun voiceLabel(voiceId: String, installed: List<VoiceStore.Installed>): String = when (voiceId) {
+    VoiceIds.DEFAULT -> BundledVoices.byId(BundledVoices.DEFAULT_ID)?.nameAr.orEmpty() + " (افتراضي)"
+    VoiceIds.SYSTEM_TONE -> "نغمة الهاتف"
+    else -> BundledVoices.byId(voiceId)?.nameAr
+        ?: installed.firstOrNull { it.id == voiceId }?.nameAr
+        ?: "صوت غير مثبّت (سيُستخدم الأذان الافتراضي)"
+}
+
+/**
+ * The voice menu of both the all-prayers picker and each prayer's picker: the bundled voices, the phone's tone,
+ * then the installed voices. The item matching [selectedId] (null = none) is marked with a check.
+ */
+@Composable
+private fun VoiceMenu(
+    expanded: Boolean,
+    selectedId: String?,
+    installed: List<VoiceStore.Installed>,
+    onDismiss: () -> Unit,
+    onPick: (String) -> Unit
+) {
+    val selected = selectedId?.let { AdhanVoiceChoice.effectiveVoiceId(it) }
+    val entries = BundledVoices.all.map { it.id to it.nameAr } +
+        listOf(VoiceIds.SYSTEM_TONE to "نغمة الهاتف") +
+        installed.map { it.id to it.nameAr }
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        entries.forEach { (id, name) ->
+            DropdownMenuItem(text = { Text(if (id == selected) "✓ $name" else name) }, onClick = {
+                onPick(id); onDismiss()
+            })
+        }
+    }
 }
 
 @Composable

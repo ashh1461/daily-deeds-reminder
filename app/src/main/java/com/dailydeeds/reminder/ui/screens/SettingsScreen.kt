@@ -167,8 +167,9 @@ fun SettingsScreen(
                     "يضم التطبيق الأعمال اليومية، والقرآن الكريم كاملاً، وتفسير الميزان كاملاً، ومفاتيح الجنان كاملاً، والصحيفة السجادية الكاملة، وأوقات الصلاة والقبلة والتقويم.",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // Attribution required by the data licences; keep in step with docs/licenses/DATA_LICENSE.md and
-                // THIRD_PARTY_NOTICES.md. The licence URL has its own line so it does not break the RTL sentence order.
+                // Attribution required by the data licences, plus the provenance of the bundled adhan; keep in step with
+                // docs/licenses/DATA_LICENSE.md, THIRD_PARTY_NOTICES.md and ADHAN_AUDIO.md. The licence URL has its own
+                // line so it does not break the RTL sentence order.
                 listOf(
                     "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني.",
                     "مفاتيح الجنان للشيخ عباس القمي، والصحيفة السجادية للإمام زين العابدين (ع)، والميزان في تفسير القرآن للعلامة السيد محمد حسين الطباطبائي: نصوص مقتبسة من مدونة OpenITI، عن رقمنة المكتبة الشاملة وموقعَي rafed.net و altafsir.com.",
@@ -178,7 +179,8 @@ fun SettingsScreen(
                     "أسماء المدن للبحث دون اتصال: GeoNames (geonames.org)، برخصة CC BY 4.0:",
                     "https://creativecommons.org/licenses/by/4.0/",
                     "جدول الكسوف والخسوف لصلاة الآيات: NASA/GSFC، إعداد Fred Espenak.",
-                    "الخطوط: أميري وتجوال (رخصة SIL OFL)."
+                    "الخطوط: أميري وتجوال (رخصة SIL OFL).",
+                    "تسجيلا الأذان المضمَّنان (الحرم الحسيني في كربلاء، والحرم الرضوي في مشهد): قدّمهما مالكُ المشروع وأكّد أنهما خاليان من قيود الترخيص، ولا يرد اسم المؤذن في الملفين. قُصَّ الصمت من بداية أذان كربلاء ومن نهاية أذان مشهد، ووُحِّدت شدة الصوت، وضُغطا بصيغة Opus. التفاصيل في docs/licenses/ADHAN_AUDIO.md."
                 ).forEach { line ->
                     Text(line, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

@@ -1,7 +1,9 @@
 # Adhan voice packs
 
-The app never ships a copyrighted recording. Voices are optional downloads listed in `voices/manifest.json`
-(served over HTTPS from this repository), or files the user picks from their own phone.
+Two adhan recordings are bundled in the APK as built-in voices; their provenance, and the fact that their rights were
+not independently verified, are in `docs/licenses/ADHAN_AUDIO.md`. Every other voice is an optional download listed in
+`voices/manifest.json` (served over HTTPS from this repository), or a file the user picks from their own phone. A
+manifest entry may not use the id of a bundled voice, `default` or `system_tone`.
 
 ## Rights gate
 A voice is shown in the app **only if** its manifest entry has a non-empty `licence` and `permission` note,

@@ -22,6 +22,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import com.dailydeeds.reminder.adhan.BundledVoices
 import com.dailydeeds.reminder.adhan.PrayerAlarmText
 import com.dailydeeds.reminder.adhan.VoiceIds
 import com.dailydeeds.reminder.adhan.VoiceStore
@@ -33,7 +34,8 @@ import com.dailydeeds.reminder.util.Prayer
 /**
  * Plays the adhan as a foreground media service so Android keeps the process alive for the whole call.
  * The audio uses the alarm stream; the notification offers Stop and Snooze. The service stops itself when
- * the audio ends, fails, or the configured maximum duration is reached.
+ * the audio ends, fails, another app takes audio focus, or the time limit is reached (never shorter than a
+ * bundled adhan; a test plays only the first seconds).
  */
 class AdhanService : Service() {
 
@@ -88,7 +90,7 @@ class AdhanService : Service() {
         )
     }
 
-    private fun startPlayback(voiceId: String, test: Boolean) {
+    private fun startPlayback(voiceId: String, test: Boolean, toneRetryAllowed: Boolean = true) {
         val settings = PreferencesManager(this).getAdhanGlobal()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -102,6 +104,8 @@ class AdhanService : Service() {
 
         val mp = MediaPlayer()
         player = mp
+        var bundledAttempt = false   // the source is a bundled adhan (also when it replaces an unknown voice)
+        var started = false          // the player got as far as playing
         try {
             mp.setAudioAttributes(
                 AudioAttributes.Builder()
@@ -109,34 +113,63 @@ class AdhanService : Service() {
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build()
             )
-            val file = VoiceStore(this).fileFor(voiceId)
-            if (file != null) {
-                mp.setDataSource(file.absolutePath)
-            } else {
-                val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) ?: Settings.System.DEFAULT_NOTIFICATION_URI
-                mp.setDataSource(this, uri)
+            val bundled = BundledVoices.resolve(voiceId)
+            val file = if (bundled == null) VoiceStore(this).fileFor(voiceId) else null
+            // A removed or unknown voice plays the bundled default adhan: a real adhan beats a tone.
+            val voice = bundled
+                ?: if (file == null && voiceId != VoiceIds.SYSTEM_TONE) BundledVoices.resolve(VoiceIds.DEFAULT) else null
+            when {
+                // Assets are stored uncompressed (build.gradle.kts), so they can be played straight from the APK.
+                voice != null -> assets.openFd(voice.assetPath).use { afd ->
+                    mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                }
+                file != null -> mp.setDataSource(file.absolutePath)
+                else -> {
+                    val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) ?: Settings.System.DEFAULT_NOTIFICATION_URI
+                    mp.setDataSource(this, uri)
+                }
             }
-            requestFocus(audio)
+            // The time limit (300 s by default) must not cut a bundled adhan before its last phrase; a test only
+            // needs a few seconds, and has no other way to be stopped from inside the app.
+            val fullSeconds = if (voice != null) maxOf(settings.maxSeconds, voice.seconds + 10) else settings.maxSeconds
+            val timeoutSeconds = if (test) minOf(fullSeconds, TEST_SECONDS) else fullSeconds
+            bundledAttempt = voice != null
+            requestFocus(audio, test)
             val lock = (getSystemService(Context.POWER_SERVICE) as PowerManager)
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "dailydeeds:adhan")
-            lock.acquire((settings.maxSeconds + 15) * 1000L)
+            lock.acquire((timeoutSeconds + 15) * 1000L)
             wakeLock = lock
             mp.setOnCompletionListener { shutdown() }
             mp.setOnErrorListener { _, what, extra ->
                 Log.w(TAG, "MediaPlayer error $what/$extra")
-                if (!test) postReminder()
-                shutdown()
+                failed(bundledAttempt && !started, test, toneRetryAllowed)
                 true
             }
-            mp.setOnPreparedListener { it.start() }
+            mp.setOnPreparedListener {
+                started = true
+                it.start()
+            }
             mp.prepareAsync()
-            handler.postDelayed(timeout, settings.maxSeconds * 1000L)
+            handler.postDelayed(timeout, timeoutSeconds * 1000L)
             if (settings.vibrate) vibrate()
         } catch (e: Exception) {
             Log.w(TAG, "Could not start adhan playback", e)
-            if (!test) postReminder()
-            shutdown()
+            failed(bundledAttempt && !started, test, toneRetryAllowed)
         }
+    }
+
+    /**
+     * Playback failed. A bundled adhan that never started (a codec problem on this device) falls back once to the
+     * phone's sound, so a prayer time is never silent; anything else leaves the usual notification behind and stops.
+     */
+    private fun failed(bundledNeverStarted: Boolean, test: Boolean, toneRetryAllowed: Boolean) {
+        if (bundledNeverStarted && toneRetryAllowed) {
+            releasePlayback()
+            startPlayback(VoiceIds.SYSTEM_TONE, test, toneRetryAllowed = false)
+            return
+        }
+        if (!test) postReminder()
+        shutdown()
     }
 
     /** Shutdown removes the foreground notification, so leave the usual prayer-time notification behind. */
@@ -149,10 +182,16 @@ class AdhanService : Service() {
         )
     }
 
-    private fun requestFocus(audio: AudioManager) {
+    private fun requestFocus(audio: AudioManager, test: Boolean) {
         val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
             .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
-            .setOnAudioFocusChangeListener { }
+            .setOnAudioFocusChangeListener { change ->
+                // A call or another app took over: stop rather than play on top of it (the adhan runs about 5 minutes).
+                if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                    if (!test) postReminder()
+                    shutdown()
+                }
+            }
             .build()
         focusRequest = request
         audio.requestAudioFocus(request)
@@ -194,6 +233,8 @@ class AdhanService : Service() {
 
     companion object {
         private const val TAG = "AdhanService"
+        /** How long the «تجربة» button plays: enough to hear the voice, short enough not to need a Stop. */
+        private const val TEST_SECONDS = 20
         const val NOTIFICATION_ID = 7001
         const val EXTRA_PRAYER_ID = "extra_prayer_id"
         const val EXTRA_VOICE_ID = "extra_voice_id"

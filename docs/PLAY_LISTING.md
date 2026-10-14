@@ -14,7 +14,7 @@ Fields marked **owner** must be filled by the Play account owner.
 ### Full description (English)
 Wird brings the daily worship of a Shia Muslim into one calm, ad-free app.
 
-- Prayer times by the Jafari method (Leva / Qom, University of Tehran or custom), with a full-length adhan, pre-adhan reminder, snooze and manual adjustments. Search over 34,000 cities offline.
+- Prayer times by the Jafari method (Leva / Qom, University of Tehran or custom), with two built-in adhan recordings from the shrines of Imam Hussain (Karbala) and Imam al-Ridha (Mashhad) or your own audio file, pre-adhan reminder, snooze and manual adjustments. Search over 34,000 cities offline.
 - Daily deeds with counters and reminders, tasbih al-Zahra, a make-up (qada) prayers and fasts tracker.
 - The complete Quran with Tafsir al-Mizan, the complete Mafatih al-Jinan and Sahifa Sajjadiyya, weekday duas and ziyarat, favorites, resume reading and global search.
 - Hijri calendar with the occasions of the Ahl al-Bayt, Ramadan and Imsak timetable with PDF export, Salat al-Ayat guide and eclipse calendar, khums calculator, qibla compass and a home-screen widget.
@@ -24,7 +24,7 @@ The Arabic interface is complete; more languages are planned.
 ### الوصف الكامل (العربية)
 «ورد» يجمع عبادات المؤمن اليومية في تطبيق هادئ بلا إعلانات.
 
-- أوقات الصلاة بالطريقة الجعفرية (ليفا / قم، جامعة طهران، أو مخصصة) مع أذان كامل وتنبيه قبل الصلاة وتأجيل وتعديل يدوي، وبحث بلا إنترنت في 34 ألف مدينة.
+- أوقات الصلاة بالطريقة الجعفرية (ليفا / قم، جامعة طهران، أو مخصصة) مع أذانين مضمَّنين من الحرم الحسيني في كربلاء والحرم الرضوي في مشهد أو ملف صوتي من جهازك، وتنبيه قبل الصلاة وتأجيل وتعديل يدوي، وبحث بلا إنترنت في 34 ألف مدينة.
 - الأعمال اليومية بعدّادات وتذكيرات، وتسبيح الزهراء (ع)، ومتابعة قضاء الصلوات والصيام.
 - القرآن الكريم كاملاً مع تفسير الميزان، ومفاتيح الجنان والصحيفة السجادية كاملتين، وأدعية الأيام وزياراتها، والمفضلة ومتابعة القراءة والبحث الشامل.
 - التقويم الهجري ومناسبات أهل البيت (ع)، وجدول رمضان والإمساك مع PDF، وصلاة الآيات وتقويم الخسوف والكسوف، وحاسبة الخمس، والقبلة، وودجت للشاشة الرئيسية.
@@ -66,6 +66,12 @@ not clear the copyright of a book that is still protected. Before submitting: ob
 of al-Mizan (or confirm the book is public domain where you publish), keep the app free and ad-free (NonCommercial), and
 keep the attribution in Settings and `docs/licenses/`. If permission cannot be obtained, ship al-Mizan as an optional
 download pack (like the adhan voices) and keep it out of the store build.
+
+**Owner: bundled adhan audio.** The rights in the two bundled adhan recordings (Karbala and Mashhad) are the owner's
+responsibility. The owner confirmed on 2026-10-14 that they are free of licence restrictions. They were supplied without
+a licence text, source URL or reciter's name, so that confirmation was not independently verified
+(`docs/licenses/ADHAN_AUDIO.md`). Keep the owner's confirmation on record before store publication; a copyright complaint
+could still have the app removed.
 
 ## Release checklist
 Signed AAB from `bundleRelease` with `targetSdk` at the level Play requires (planned for v1.8.2), upload key = the key in `docs/DISTRIBUTION.md`, internal testing track first, then production.

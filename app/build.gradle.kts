@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.ashh1461.wird"
         minSdk = 26
         targetSdk = 34
-        versionCode = 14
-        versionName = "1.8.1.1"
+        versionCode = 16
+        versionName = "1.8.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -74,6 +74,10 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    // The bundled adhan is played straight from the APK with AssetManager.openFd, which needs an uncompressed entry.
+    androidResources {
+        noCompress += "ogg"
     }
 }
 

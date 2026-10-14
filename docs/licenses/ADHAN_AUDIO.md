@@ -9,10 +9,10 @@ Two adhan recordings ship inside the APK, in `app/src/main/assets/adhan/`, as th
 | «أذان الحرم الرضوي – مشهد المقدسة» (Adhan, Shrine of Imam al-Ridha (a.s.), Mashhad) | `mashhad_imam_reza` | `adhan/adhan_mashhad_imam_reza.ogg` |
 
 ## Where they come from
-The recordings were supplied by the project owner, who states that they are free of licence restrictions. No licence
-text, source URL or reciter's name accompanies the files: they are MP3 files converted from videos published online.
-The rights were therefore **not independently verified**, and the reciters are not credited because the files do not
-identify them.
+The recordings were supplied by the project owner, who states that they are free of licence restrictions and
+**confirmed this again on 2026-10-14**. No licence text, source URL or reciter's name accompanies the files: they are MP3
+files converted from videos published online. The owner's confirmation is therefore the only evidence of the rights; it
+was **not independently verified**, and the reciters are not credited because the files do not identify them.
 
 If you hold rights in either recording and object to its use, open an issue at
 https://github.com/ashh1461/daily-deeds-reminder/issues and the file will be removed.

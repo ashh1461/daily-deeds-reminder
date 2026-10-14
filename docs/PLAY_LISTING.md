@@ -68,8 +68,10 @@ keep the attribution in Settings and `docs/licenses/`. If permission cannot be o
 download pack (like the adhan voices) and keep it out of the store build.
 
 **Owner: bundled adhan audio.** The rights in the two bundled adhan recordings (Karbala and Mashhad) are the owner's
-responsibility. They were supplied without a licence text, source URL or reciter's name and were not independently
-verified (`docs/licenses/ADHAN_AUDIO.md`). Confirm them before store publication.
+responsibility. The owner confirmed on 2026-10-14 that they are free of licence restrictions. They were supplied without
+a licence text, source URL or reciter's name, so that confirmation was not independently verified
+(`docs/licenses/ADHAN_AUDIO.md`). Keep the owner's confirmation on record before store publication; a copyright complaint
+could still have the app removed.
 
 ## Release checklist
 Signed AAB from `bundleRelease` with `targetSdk` at the level Play requires (planned for v1.8.2), upload key = the key in `docs/DISTRIBUTION.md`, internal testing track first, then production.

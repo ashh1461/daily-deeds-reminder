@@ -12,7 +12,6 @@ enum class DayContentKind(val titleArabic: String) {
  * محتوى مرتبط بيوم من أيام الأسبوع (دعاء أو زيارة) كما ورد في مفاتيح الجنان.
  *
  * @param honoree صاحب اليوم (المعصوم أو المعصومون المنسوب إليهم اليوم)
- * @param isExcerpt true إذا كان النص مقتطفاً وليس النص الكامل
  */
 data class DayContent(
     val day: DayOfWeek,
@@ -20,8 +19,6 @@ data class DayContent(
     val dayNameArabic: String,
     val honoree: String,
     val title: String,
-    val text: String,
-    val source: String = "مفاتيح الجنان • أعمال أيام الأسبوع",
-    val isExcerpt: Boolean = false
+    val text: String
 )
 

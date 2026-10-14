@@ -2,43 +2,40 @@ package com.dailydeeds.reminder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Spiritual Elegant Navy Palette
-val NavyDark = Color(0xFF0F1E36)
-val NavyPrimary = Color(0xFF1B3B6F) // Deep refined royal navy
-val NavySecondary = Color(0xFF284B85)
-val NavyAccent = Color(0xFF3B6DAF)
-val NavyLight = Color(0xFFDCE7F5)
+// Emerald and gold: the classical palette of Islamic manuscripts and Ahl al-Bayt shrines.
 
-// Islamic Gold Palette
-val GoldPrimary = Color(0xFFD4AF37)
-val GoldLight = Color(0xFFF3C649)
-val GoldText = Color(0xFF806000)
-val GoldDark = Color(0xFFA87F0D)
+// Emerald
+val EmeraldDeep = Color(0xFF063F34)
+val EmeraldPrimary = Color(0xFF0B5D4B)
+val EmeraldMid = Color(0xFF117A62)
+val EmeraldMint = Color(0xFFD5EFE6)
+val EmeraldInk = Color(0xFF04302A)
 
-// Surfaces & Backgrounds - Light
-val BackgroundLight = Color(0xFFF6F8FB)
-val SurfaceLight = Color(0xFFFFFFFF)
-val SurfaceVariantLight = Color(0xFFEBF1F7)
-val TextPrimaryLight = Color(0xFF0F1B2B)
-val TextSecondaryLight = Color(0xFF4A5568)
+// Gold
+val GoldBright = Color(0xFFE2BF66)
+val GoldMain = Color(0xFFC9A24B)
+val GoldText = Color(0xFF7A5C0F)
+val GoldLine = Color(0xFFD9C48E)
 
-// Surfaces & Backgrounds - Dark
-val BackgroundDark = Color(0xFF0A111A)
-val SurfaceDark = Color(0xFF101C2B)
-val SurfaceVariantDark = Color(0xFF17263A)
-val TextPrimaryDark = Color(0xFFF0F4F8)
-val TextSecondaryDark = Color(0xFF94A3B8)
+// Light surfaces (warm parchment)
+val BackgroundLight = Color(0xFFF7F3EA)
+val SurfaceLight = Color(0xFFFFFDF8)
+val SurfaceVariantLight = Color(0xFFEFE9DA)
+val TextPrimaryLight = Color(0xFF1B1A15)
+val TextSecondaryLight = Color(0xFF4B4637)
 
-// Completion & Accent
-val SuccessGreen = Color(0xFF2E7D32)
-val SuccessGreenContainer = Color(0xFFE8F5E9)
-val CardBorderColorLight = Color(0xFFD5DFEB)
-val CardBorderColorDark = Color(0xFF22354E)
+// Dark surfaces (deep green-black)
+val BackgroundDark = Color(0xFF0A1512)
+val SurfaceDark = Color(0xFF0F1F1A)
+val SurfaceVariantDark = Color(0xFF172B24)
+val TextPrimaryDark = Color(0xFFEDEFE8)
+val TextSecondaryDark = Color(0xFFA9B8B0)
 
-// Aliases for seamless integration
-val PurpleDark = NavyDark
-val PurplePrimary = NavyPrimary
-val PurpleSecondary = NavySecondary
-val PurpleAccent = NavyAccent
-val PurpleLight = NavyLight
-
+// Completion / accents
+val SuccessGreen = Color(0xFF1E7A4F)
+val SuccessGreenDark = Color(0xFF7FD6A3)
+val CardBorderColorLight = Color(0xFFDDCFA5)
+val CardBorderColorDark = Color(0xFF2A4036)
+val EmeraldSoftDark = Color(0xFF6FD3B0)
+val EmeraldContainerDark = Color(0xFF0F5C4A)
+val EmeraldOnContainerDark = Color(0xFFCFF5E8)

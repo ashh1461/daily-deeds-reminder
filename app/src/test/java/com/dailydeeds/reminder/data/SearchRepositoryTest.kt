@@ -40,10 +40,13 @@ class SearchRepositoryTest {
     fun testSearchInMafatihAlJinanReturnsDuasAndZiyarat() {
         val results = searchRepository.search("كميل", SearchResultType.MAFATIH)
         assertFalse(results.isEmpty())
-        assertTrue(results.any { it.mafatihItemId == "dua_kumayl" })
+        assertTrue(results.any { it.title.contains("دعاء كميل") })
 
         val ashura = searchRepository.search("عاشوراء", SearchResultType.MAFATIH)
-        assertTrue(ashura.any { it.mafatihItemId == "ziyarat_ashura" })
+        assertTrue(ashura.any { it.title.contains("زيارة عاشوراء") })
+
+        val sahifa = searchRepository.search("الحمد لله الاول بلا اول كان قبله", SearchResultType.MAFATIH)
+        assertTrue(sahifa.any { it.title.contains("الدعاء 1") })
     }
 
     @Test

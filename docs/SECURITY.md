@@ -1,5 +1,8 @@
 # Security notes
 
+## Signing
+Releases are signed with a dedicated key (`docs/DISTRIBUTION.md` lists its SHA-256 and where it is kept); `scripts/verify_release.py` rejects a debuggable APK, the debug certificate, an unexpected application id or permission, or a stale hash. Earlier 1.x releases were debug builds and should not be redistributed.
+
 ## Permissions (checked by `VoiceAndPolicyTest`)
 POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, RECEIVE_BOOT_COMPLETED, VIBRATE, ACCESS_COARSE_LOCATION (only when the user taps
 "موقعي"), FOREGROUND_SERVICE + FOREGROUND_SERVICE_MEDIA_PLAYBACK + WAKE_LOCK (playing the adhan), INTERNET (voice packs only).

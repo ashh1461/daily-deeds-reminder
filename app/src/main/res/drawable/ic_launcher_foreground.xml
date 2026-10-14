@@ -1,21 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Outer Golden Circle -->
     <path
-        android:strokeColor="#D4AF37"
-        android:strokeWidth="2.5"
-        android:pathData="M 54,20 A 34,34 0 1,1 53.99,20 Z" />
-    
-    <!-- Inner Golden Crescent -->
+        android:fillColor="#E2BF66"
+        android:fillType="evenOdd"
+        android:pathData="M54,27 L61.91,34.91 L73.09,34.91 L73.09,46.09 L81,54 L73.09,61.91 L73.09,73.09 L61.91,73.09 L54,81 L46.09,73.09 L34.91,73.09 L34.91,61.91 L27,54 L34.91,46.09 L34.91,34.91 L46.09,34.91 Z M40,54 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z" />
     <path
-        android:fillColor="#F3C649"
-        android:pathData="M 62,38 C 50,40 44,52 46,64 C 47,70 52,76 58,78 C 50,78 40,70 40,58 C 40,46 48,38 62,38 Z" />
-    
-    <!-- Golden Star / Sparkle -->
+        android:fillColor="#E2BF66"
+        android:pathData="M57.03,46.54 A9,9 0 1,0 57.03,61.46 A7.6,7.6 0 1,1 57.03,46.54 Z" />
     <path
-        android:fillColor="#F3C649"
-        android:pathData="M 64,46 L 66,51 L 71,52 L 67,55 L 68,60 L 64,57 L 60,60 L 61,55 L 57,52 L 62,51 Z" />
+        android:fillColor="#E2BF66"
+        android:pathData="M58.8,54 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 Z" />
 </vector>

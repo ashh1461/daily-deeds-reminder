@@ -15,8 +15,14 @@ enum class AdhanMode(val id: String, val labelArabic: String) {
 }
 
 object VoiceIds {
-    /** The phone's default notification/alarm sound; always available. */
+    /**
+     * The app's default adhan, which plays the bundled [BundledVoices.DEFAULT_ID] recording. Configs saved before
+     * audio was bundled also hold this id; they now get the bundled adhan instead of the phone's tone.
+     */
     const val DEFAULT = "default"
+
+    /** The phone's notification sound, only when the user picks it. */
+    const val SYSTEM_TONE = "system_tone"
 }
 
 /** Per-prayer alarm configuration. */
@@ -63,7 +69,7 @@ data class AdhanGlobalSettings(
     val followRinger: Boolean = true,
     val vibrate: Boolean = true,
     val snoozeMinutes: Int = 5,
-    /** Hard stop for a playing adhan. */
+    /** Time limit of a playing adhan, in seconds. A bundled adhan always plays to its end (AdhanService); only a restored backup can change this. */
     val maxSeconds: Int = 300
 ) {
     init {

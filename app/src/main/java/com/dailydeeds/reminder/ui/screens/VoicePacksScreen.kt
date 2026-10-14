@@ -69,7 +69,7 @@ fun VoicePacksScreen(voices: VoiceViewModel, onNavigateBack: () -> Unit) {
 
             Title("المثبّتة")
             if (installed.isEmpty()) {
-                Text("لا توجد أصوات مثبّتة بعد. يُستخدم صوت الإشعار الافتراضي في هاتفك.", style = MaterialTheme.typography.bodyMedium)
+                Text("لا توجد أصوات منزّلة أو مستوردة بعد. يُستخدم الأذان المضمَّن في التطبيق.", style = MaterialTheme.typography.bodyMedium)
             }
             installed.forEach { v ->
                 Box2 {

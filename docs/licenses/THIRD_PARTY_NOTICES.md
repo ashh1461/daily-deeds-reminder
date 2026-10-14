@@ -9,5 +9,6 @@
 | Tajawal typeface | The Tajawal Project Authors | SIL Open Font License 1.1 (OFL-Tajawal.txt) |
 | Prayer-time and qibla formulas | PrayTimes.org method, reimplemented | n/a (formulas) |
 | City list for offline city search | GeoNames (geonames.org), `cities15000` extract | Creative Commons Attribution 4.0 (credit: GeoNames) |
-| Adhan voices (optional, downloaded by the user) | Listed in `voices/manifest.json`, each with its own licence and permission note | Per voice; nothing is bundled in the APK |
+| Bundled adhan recordings (Shrine of Imam Hussain, Karbala; Shrine of Imam al-Ridha, Mashhad) | Supplied by the project owner; reciters not named in the files; silence trimmed at the start (Karbala) or end (Mashhad), loudness matched, Opus-encoded | No licence text accompanies the files; rights not independently verified. See `ADHAN_AUDIO.md` |
+| Adhan voices (optional, downloaded by the user) | Listed in `voices/manifest.json`, each with its own licence and permission note | Per voice; downloaded voices are not in the APK |
 | Eclipse table 2021-2040 for Salat al-Ayat | NASA/GSFC eclipse catalogue (decade tables), Fred Espenak, eclipse.gsfc.nasa.gov | NASA data, free to reproduce with acknowledgment |

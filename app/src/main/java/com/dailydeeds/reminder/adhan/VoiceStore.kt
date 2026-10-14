@@ -26,7 +26,7 @@ class VoiceStore(private val context: Context) {
             if (!file.isFile || parts.size != 2) null else Installed(id, parts[1], parts[0] == "own", file)
         }.sortedBy { it.nameAr }
 
-    /** The audio file for [voiceId], or null for the system default or a missing file. */
+    /** The downloaded or imported audio file for [voiceId], or null for the app default or a missing file. */
     fun fileFor(voiceId: String): File? =
         if (voiceId == VoiceIds.DEFAULT) null else audioFile(voiceId).takeIf { it.isFile }
 

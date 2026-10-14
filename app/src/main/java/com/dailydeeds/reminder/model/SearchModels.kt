@@ -3,7 +3,6 @@ package com.dailydeeds.reminder.model
 enum class SearchResultType(val labelArabic: String) {
     ALL("الكل"),
     QURAN("القرآن الكريم"),
-    TAFSIR("ملخصات الميزان"),
     MAFATIH("مفاتيح الجنان"),
     SAHIFA("الصحيفة السجادية"),
     WEEKDAY("أدعية وزيارات الأيام"),

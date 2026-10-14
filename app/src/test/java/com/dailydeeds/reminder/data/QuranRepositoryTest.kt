@@ -52,14 +52,6 @@ class QuranRepositoryTest {
     }
 
     @Test
-    fun testGetTafsirForAyah() {
-        val tafsir = repository.getTafsirForAyah(1, 1)
-        assertNotNull("Tafsir Al-Mizan commentary should exist for Surah Al-Fatihah Ayah 1", tafsir)
-        assertTrue(tafsir!!.commentaryArabic.isNotBlank())
-        assertTrue(tafsir.title.contains("الميزان") || tafsir.title.contains("تفسير"))
-    }
-
-    @Test
     fun testSearchSurahs() {
         val resultsArabic = repository.searchSurahs("الكهف")
         assertTrue(resultsArabic.any { it.number == 18 })

@@ -4,6 +4,11 @@ import com.dailydeeds.reminder.ui.screens.PrayerSettingsScreen
 import com.dailydeeds.reminder.ui.screens.VoicePacksScreen
 import com.dailydeeds.reminder.viewmodel.VoiceViewModel
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
+import com.dailydeeds.reminder.viewmodel.MizanViewModel
+import com.dailydeeds.reminder.ui.screens.MizanAyahScreen
+import com.dailydeeds.reminder.ui.screens.MizanHomeScreen
+import com.dailydeeds.reminder.ui.screens.MizanReaderScreen
+import com.dailydeeds.reminder.ui.screens.MizanSurahScreen
 import com.dailydeeds.reminder.ui.screens.AyatScreen
 import com.dailydeeds.reminder.ui.screens.KhumsScreen
 import com.dailydeeds.reminder.ui.screens.QadaScreen
@@ -153,7 +158,8 @@ fun AppNavigation(
     sahifaViewModel: SahifaViewModel = viewModel(),
     searchViewModel: SearchViewModel = viewModel(),
     voiceViewModel: VoiceViewModel = viewModel(),
-    worshipViewModel: WorshipViewModel = viewModel()
+    worshipViewModel: WorshipViewModel = viewModel(),
+    mizanViewModel: MizanViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -255,6 +261,7 @@ fun AppNavigation(
                     surahNumber = surahNumber,
                     viewModel = quranViewModel,
                     tools = toolsViewModel,
+                    onOpenMizan = { s, a -> go("mizan/ayah/$s/$a") },
                     onNavigateBack = { back() }
                 )
             }
@@ -293,6 +300,70 @@ fun AppNavigation(
                     onNavigateToMafatih = { openReader(it) },
                     onNavigateToWeekday = { openWeekday(it) },
                     onNavigateToDeed = { go("deed/$it") },
+                    onSearchMizan = { query ->
+                        mizanViewModel.search(query)
+                        go("mizan")
+                    },
+                    onNavigateBack = { back() }
+                )
+            }
+            composable("mizan") {
+                MizanHomeScreen(
+                    viewModel = mizanViewModel,
+                    onOpenSurah = { go("mizan/surah/$it") },
+                    onOpenEntry = { id, paragraph -> go("mizan/read/$id?p=$paragraph") },
+                    onNavigateBack = { back() }
+                )
+            }
+            composable(
+                route = "mizan/surah/{surah}",
+                arguments = listOf(navArgument("surah") { type = NavType.IntType })
+            ) { entry ->
+                MizanSurahScreen(
+                    surah = entry.arguments?.getInt("surah") ?: 1,
+                    viewModel = mizanViewModel,
+                    onOpenEntry = { id, paragraph -> go("mizan/read/$id?p=$paragraph") },
+                    onNavigateBack = { back() }
+                )
+            }
+            composable(
+                route = "mizan/ayah/{surah}/{ayah}",
+                arguments = listOf(
+                    navArgument("surah") { type = NavType.IntType },
+                    navArgument("ayah") { type = NavType.IntType }
+                )
+            ) { entry ->
+                val surah = entry.arguments?.getInt("surah") ?: 1
+                val ayah = entry.arguments?.getInt("ayah") ?: 1
+                MizanAyahScreen(
+                    surah = surah,
+                    ayah = ayah,
+                    viewModel = mizanViewModel,
+                    onResolved = { id ->
+                        navController.navigate("mizan/read/$id?p=0") {
+                            popUpTo("mizan/ayah/{surah}/{ayah}") { inclusive = true }
+                        }
+                    },
+                    onNavigateBack = { back() }
+                )
+            }
+            composable(
+                route = "mizan/read/{id}?p={p}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("p") { type = NavType.IntType; defaultValue = 0 }
+                )
+            ) { entry ->
+                val id = entry.arguments?.getInt("id") ?: 0
+                MizanReaderScreen(
+                    entryId = id,
+                    paragraph = entry.arguments?.getInt("p") ?: 0,
+                    viewModel = mizanViewModel,
+                    onOpenEntry = { target ->
+                        navController.navigate("mizan/read/$target?p=0") {
+                            popUpTo("mizan/read/{id}?p={p}") { inclusive = true }
+                        }
+                    },
                     onNavigateBack = { back() }
                 )
             }

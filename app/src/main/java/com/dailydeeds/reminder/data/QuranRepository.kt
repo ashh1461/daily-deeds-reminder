@@ -2,12 +2,10 @@ package com.dailydeeds.reminder.data
 
 import com.dailydeeds.reminder.model.Ayah
 import com.dailydeeds.reminder.model.Surah
-import com.dailydeeds.reminder.model.TafsirAlMizan
 import com.dailydeeds.reminder.util.ArabicNormalizer
 
 class QuranRepository(
-    private val dataProvider: QuranDataProvider = QuranDataProvider,
-    private val tafsirProvider: TafsirAlMizanProvider = TafsirAlMizanProvider
+    private val dataProvider: QuranDataProvider = QuranDataProvider
 ) {
 
     fun getAllSurahs(): List<Surah> {
@@ -24,10 +22,6 @@ class QuranRepository(
 
     fun getAyah(surahNumber: Int, ayahNumber: Int): Ayah? {
         return dataProvider.getAyah(surahNumber, ayahNumber)
-    }
-
-    fun getTafsirForAyah(surahNumber: Int, ayahNumber: Int): TafsirAlMizan? {
-        return tafsirProvider.getTafsir(surahNumber, ayahNumber)
     }
 
     fun searchSurahs(query: String): List<Surah> {

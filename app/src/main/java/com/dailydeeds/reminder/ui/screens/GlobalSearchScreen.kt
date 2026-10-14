@@ -25,6 +25,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ fun GlobalSearchScreen(
     onNavigateToMafatih: (itemId: String) -> Unit,
     onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind) -> Unit,
     onNavigateToDeed: (Int) -> Unit,
+    onSearchMizan: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val query by viewModel.query.collectAsState()
@@ -126,7 +128,7 @@ fun GlobalSearchScreen(
                         item = item,
                         onClick = {
                             when (item.type) {
-                                SearchResultType.QURAN, SearchResultType.TAFSIR -> {
+                                SearchResultType.QURAN -> {
                                     if (item.surahNumber != null) {
                                         onNavigateToQuran(item.surahNumber, item.ayahNumber)
                                     }
@@ -144,6 +146,13 @@ fun GlobalSearchScreen(
                     )
                 }
 
+                if (query.isNotBlank()) {
+                    item {
+                        OutlinedButton(onClick = { onSearchMizan(query) }, modifier = Modifier.fillMaxWidth()) {
+                            Text("ابحث عن «$query» في تفسير الميزان كاملاً")
+                        }
+                    }
+                }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -183,7 +192,6 @@ private fun SearchResultCard(
                         .background(
                             color = when (item.type) {
                                 SearchResultType.QURAN -> MaterialTheme.colorScheme.primaryContainer
-                                SearchResultType.TAFSIR -> MaterialTheme.colorScheme.tertiaryContainer
                                 SearchResultType.MAFATIH, SearchResultType.SAHIFA, SearchResultType.WEEKDAY, SearchResultType.DEEDS -> MaterialTheme.colorScheme.secondaryContainer
                                 else -> MaterialTheme.colorScheme.surfaceVariant
                             },

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.dailydeeds.reminder.data.QuranRepository
 import com.dailydeeds.reminder.model.Ayah
 import com.dailydeeds.reminder.model.Surah
-import com.dailydeeds.reminder.model.TafsirAlMizan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,12 +24,6 @@ class QuranViewModel(
     private val _ayahs = MutableStateFlow<List<Ayah>>(emptyList())
     val ayahs: StateFlow<List<Ayah>> = _ayahs.asStateFlow()
 
-    private val _selectedTafsir = MutableStateFlow<TafsirAlMizan?>(null)
-    val selectedTafsir: StateFlow<TafsirAlMizan?> = _selectedTafsir.asStateFlow()
-
-    private val _isTafsirVisible = MutableStateFlow(false)
-    val isTafsirVisible: StateFlow<Boolean> = _isTafsirVisible.asStateFlow()
-
     private val _fontSizeSp = MutableStateFlow(24f)
     val fontSizeSp: StateFlow<Float> = _fontSizeSp.asStateFlow()
 
@@ -45,20 +38,6 @@ class QuranViewModel(
         if (surah != null) {
             _ayahs.value = repository.getAyahsForSurah(surahNumber)
         }
-    }
-
-    fun hasTafsir(surahNumber: Int, ayahNumber: Int): Boolean =
-        repository.getTafsirForAyah(surahNumber, ayahNumber) != null
-
-    fun openTafsir(surahNumber: Int, ayahNumber: Int) {
-        val tafsir = repository.getTafsirForAyah(surahNumber, ayahNumber) ?: return
-        _selectedTafsir.value = tafsir
-        _isTafsirVisible.value = true
-    }
-
-    fun dismissTafsir() {
-        _isTafsirVisible.value = false
-        _selectedTafsir.value = null
     }
 
     fun increaseFontSize() {

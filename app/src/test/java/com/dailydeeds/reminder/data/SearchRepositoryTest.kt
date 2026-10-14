@@ -30,13 +30,6 @@ class SearchRepositoryTest {
     }
 
     @Test
-    fun testSearchInTafsirAlMizanReturnsRelevantCommentary() {
-        val results = searchRepository.search("البسملة", SearchResultType.TAFSIR)
-        assertFalse(results.isEmpty())
-        assertTrue(results.any { it.title.contains("الميزان") })
-    }
-
-    @Test
     fun testSearchInMafatihAlJinanReturnsDuasAndZiyarat() {
         val results = searchRepository.search("كميل", SearchResultType.MAFATIH)
         assertFalse(results.isEmpty())
@@ -67,7 +60,6 @@ class SearchRepositoryTest {
     fun testGlobalSearchWithAllFilterReturnsCrossDomainResults() {
         val results = searchRepository.search("الله", SearchResultType.ALL)
         assertTrue(results.any { it.type == SearchResultType.QURAN })
-        assertTrue(results.any { it.type == SearchResultType.TAFSIR })
         assertTrue(results.any { it.type == SearchResultType.MAFATIH })
     }
 

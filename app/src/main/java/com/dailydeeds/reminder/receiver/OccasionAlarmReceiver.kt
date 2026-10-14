@@ -3,23 +3,20 @@ package com.dailydeeds.reminder.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.notification.NotificationHelper
 import com.dailydeeds.reminder.notification.ReligiousAlarms
+import com.dailydeeds.reminder.worship.DailyNotes
+import java.time.ZonedDateTime
 
+/** The single morning alarm: occasion of the day, khums-year reminder and lunar-eclipse heads-up. */
 class OccasionAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val prefs = PreferencesManager(context)
-        if (prefs.isOccasionReminderEnabled()) {
-            val today = ReligiousAlarms.today()
-            val offset = prefs.getHijriOffset()
-            val occasions = ShiaCalendar.occasionsOn(today, offset)
-            if (occasions.isNotEmpty()) {
-                NotificationHelper.showNotification(
-                    context, 6000, "مناسبة اليوم: ${ShiaCalendar.toHijri(today, offset)}",
-                    occasions.joinToString("\n") { it.title }
-                )
+        val config = ReligiousAlarms.notesConfig(prefs)
+        if (config.any) {
+            DailyNotes.build(ZonedDateTime.now(), prefs.getPlace(), prefs.getHijriOffset(), config).forEach { note ->
+                NotificationHelper.showNotification(context, note.id, note.title, note.body)
             }
         }
         ReligiousAlarms.scheduleOccasion(context)

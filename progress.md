@@ -1,6 +1,6 @@
 # Progress
 
-Branch: `master`. Published release: `v1.6.0`. Milestone: v1.6.0 Adhan (next: v1.7.0 Worship tools). Updated: 2026-10-08.
+Branch: `master`. Published release: `v1.7.0`. Milestone: v1.7.0 Worship tools (plan v1.5-v1.7 complete). Updated: 2026-10-08.
 
 ## Completed
 
@@ -101,3 +101,5 @@ Branch: `master`. Published release: `v1.6.0`. Milestone: v1.6.0 Adhan (next: v1
 - 2026-10-09: Published v1.5.0: DailyDeeds-v1.5.0.apk (17,408,012 bytes, SHA-256 1314596fb85dd8e324a65c1b86af142137088be4d5e196a6e8897d7c88ee34b4; versionName 1.5.0; contains mafatih/items.txt, sahifa.txt, quran/uthmani.txt). Graph: 1007 nodes, 2613 edges, 78 communities.
 - 2026-10-08: v1.6.0 "Adhan": AdhanPlanner (pure), AdhanService (media foreground service), PrayerAlarmReceiver rewrite with modes/pre-adhan/late guard, channels created in App, calculation methods (Leva/Tehran/custom, Maghrib delay, Imsak), city search over GeoNames (34k), voice store + own-file import + HTTPS-only downloader with rights-gated manifest, INTERNET permission with policy tests (docs/SECURITY.md). 123/123 tests, lint OK, OSV 0/93.
 - 2026-10-08: Published v1.6.0: DailyDeeds-v1.6.0.apk (18,256,386 bytes, SHA-256 5e0a79d33093e821e33edeed92e340a1b9daff11d7455cabd408dad1b405b537; versionName 1.6.0, versionCode 10; contains quran/uthmani.txt, mafatih/items.txt, mafatih/sahifa.txt, places/cities.txt). Minified release builds (3.6 MB unsigned) and its manifest was checked: 9 permissions, networkSecurityConfig present, allowBackup=false.
+- 2026-10-08: v1.7.0 "Worship tools": tasbih (ZahraStages shared with the deed counter), qada tracker, Ramadan/Imsak timetable with PDF and Imsak alarm kind in AdhanPlanner, Salat al-Ayat guide + NASA eclipse table 2021-2040 with lunar visibility (Astro moon altitude), khums calculator and year reminder, DailyNotes (occasion/khums/eclipse morning alarm), home-screen widget, JSON backup (BackupCodec, hostile-input tests), getPlace validation, Fajr offset moves Imsak. 168/168 tests, lint OK, no new permission/dependency.
+- 2026-10-08: Published v1.7.0: DailyDeeds-v1.7.0.apk (18,398,385 bytes, SHA-256 3edf10fa2a43db6bb5b4efa3af9c504281c57d2682b1421fb3bd351ba7060987; versionName 1.7.0, versionCode 11; contains worship/eclipses.txt and the earlier bundled texts). Minified release (3.7 MB unsigned) manifest checked: 9 permissions unchanged, widget receiver not exported.

@@ -1,6 +1,10 @@
 package com.dailydeeds.reminder.ui.screens
 
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -19,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +40,8 @@ import com.dailydeeds.reminder.ui.components.PermissionHealthCard
 import com.dailydeeds.reminder.ui.components.cardBorder
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
+import com.dailydeeds.reminder.viewmodel.WorshipViewModel
+import java.time.LocalDate
 import java.util.Locale
 
 /** All settings in one grouped screen: prayer, calendar, deed reminders, appearance and credits. */
@@ -40,6 +49,7 @@ import java.util.Locale
 fun SettingsScreen(
     viewModel: MainViewModel,
     tools: ToolsViewModel,
+    worship: WorshipViewModel,
     onNavigateBack: () -> Unit,
     onOpenRoute: (String) -> Unit
 ) {
@@ -47,6 +57,24 @@ fun SettingsScreen(
     val hapticsEnabled by viewModel.hapticsEnabled.collectAsState()
     val themeMode by tools.themeMode.collectAsState()
     val place by tools.place.collectAsState()
+    val backup by worship.backup.collectAsState()
+    val context = LocalContext.current
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri != null) worship.exportBackup(uri)
+    }
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) worship.importBackup(uri)
+    }
+
+    if (backup?.restartNeeded == true) {
+        AlertDialog(
+            onDismissRequest = { worship.clearBackupStatus() },
+            title = { Text("تم الاستيراد") },
+            text = { Text("أعد تشغيل التطبيق لتظهر البيانات المستوردة.") },
+            confirmButton = { Button(onClick = { restartApp(context) }) { Text("إعادة التشغيل الآن") } },
+            dismissButton = { TextButton(onClick = { worship.clearBackupStatus() }) { Text("لاحقاً") } }
+        )
+    }
 
     ToolScaffold("الإعدادات", onNavigateBack) {
         Column(
@@ -103,6 +131,36 @@ fun SettingsScreen(
                 }
             }
 
+            SectionTitle("الودجت")
+            SettingsCard {
+                Text(
+                    "أضف ودجت «الصلاة القادمة» إلى شاشتك الرئيسية: اضغط مطولاً على مساحة فارغة، اختر الأدوات (Widgets)، ثم «الأعمال اليومية».",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            SectionTitle("البيانات والنسخ الاحتياطي")
+            SettingsCard {
+                Text(
+                    "صدّر المفضلة وأماكن القراءة وسجل الأعمال والمسبحة والقضاء وإعدادات الصلاة والتنبيهات إلى ملف، ثم استوردها على جهاز آخر. " +
+                        "لا تُرسَل البيانات إلى أي خادم، ولا تشمل النسخة ملفات الأصوات.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                OutlinedButton(
+                    onClick = { exportLauncher.launch("daily-deeds-backup-${LocalDate.now()}.json") },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("تصدير نسخة احتياطية") }
+                OutlinedButton(onClick = { importLauncher.launch(arrayOf("*/*")) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("استيراد نسخة احتياطية")
+                }
+                backup?.let {
+                    Text(
+                        it.message, style = MaterialTheme.typography.bodySmall,
+                        color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
             SectionTitle("حول التطبيق")
             SettingsCard {
                 Text(
@@ -117,6 +175,12 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+private fun restartApp(context: Context) {
+    val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)?.component ?: return
+    context.startActivity(Intent.makeRestartActivityTask(launch))
+    Runtime.getRuntime().exit(0)
 }
 
 @Composable

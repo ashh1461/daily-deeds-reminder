@@ -18,5 +18,11 @@ The app's own exported components are the launcher activity and the boot receive
 The merged release manifest also contains AndroidX's `ProfileInstallReceiver` (exported, but protected by the system-only `android.permission.DUMP`).
 Backups are disabled (`allowBackup=false`).
 
+## Backup import
+`BackupCodec.parse` treats a backup file as untrusted: at most 2 MB, only keys on an allow-list, each value must have the type the key has in the app, and the place (latitude, longitude, time zone, name) is validated as a whole and dropped if any part is invalid. `PreferencesManager.getPlace` validates the stored place again when it is read, so a bad value cannot crash prayer calculation. Tests cover malformed JSON, wrong types, unknown keys and hostile places.
+
+## Widget
+`PrayerWidgetProvider` is not exported; the refresh alarm is an explicit broadcast to it, and no new permission is needed.
+
 ## Dependencies
 Last OSV scan (2026-10-08): 93 resolved packages, 0 advisories.

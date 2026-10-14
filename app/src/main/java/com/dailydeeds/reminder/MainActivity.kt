@@ -3,6 +3,12 @@ package com.dailydeeds.reminder
 import com.dailydeeds.reminder.ui.screens.PrayerSettingsScreen
 import com.dailydeeds.reminder.ui.screens.VoicePacksScreen
 import com.dailydeeds.reminder.viewmodel.VoiceViewModel
+import com.dailydeeds.reminder.viewmodel.WorshipViewModel
+import com.dailydeeds.reminder.ui.screens.AyatScreen
+import com.dailydeeds.reminder.ui.screens.KhumsScreen
+import com.dailydeeds.reminder.ui.screens.QadaScreen
+import com.dailydeeds.reminder.ui.screens.RamadanScreen
+import com.dailydeeds.reminder.ui.screens.TasbihScreen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -146,7 +152,8 @@ fun AppNavigation(
     mafatihViewModel: MafatihViewModel = viewModel(),
     sahifaViewModel: SahifaViewModel = viewModel(),
     searchViewModel: SearchViewModel = viewModel(),
-    voiceViewModel: VoiceViewModel = viewModel()
+    voiceViewModel: VoiceViewModel = viewModel(),
+    worshipViewModel: WorshipViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -304,6 +311,11 @@ fun AppNavigation(
                 PrayerSettingsScreen(toolsViewModel, voiceViewModel, onNavigateBack = { back() }, onOpenVoices = { go("prayer/voices") })
             }
             composable("prayer/voices") { VoicePacksScreen(voiceViewModel, onNavigateBack = { back() }) }
+            composable("tasbih") { TasbihScreen(worshipViewModel, onNavigateBack = { back() }) }
+            composable("qada") { QadaScreen(worshipViewModel, onNavigateBack = { back() }) }
+            composable("ramadan") { RamadanScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
+            composable("ayat") { AyatScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
+            composable("khums") { KhumsScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
             composable("qibla") { QiblaScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("favorites") {
                 FavoritesScreen(
@@ -318,6 +330,7 @@ fun AppNavigation(
                 SettingsScreen(
                     viewModel = mainViewModel,
                     tools = toolsViewModel,
+                    worship = worshipViewModel,
                     onNavigateBack = { back() },
                     onOpenRoute = { go(it) }
                 )

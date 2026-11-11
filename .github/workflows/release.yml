@@ -31,7 +31,7 @@ jobs:
             echo "::notice title=Signed release skipped::Add the RELEASE_KEYSTORE_B64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS and RELEASE_KEY_PASSWORD repository secrets (see docs/DISTRIBUTION.md) to build a signed release on tag pushes."
           fi
       - if: steps.signing.outputs.available == 'true'
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - if: steps.signing.outputs.available == 'true'
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:

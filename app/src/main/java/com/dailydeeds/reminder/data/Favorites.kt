@@ -58,4 +58,8 @@ object FavoritesList {
 
     fun toggle(items: List<FavoriteKey>, key: FavoriteKey): List<FavoriteKey> =
         if (key in items) items - key else listOf(key) + items
+
+    /** Removes every key in [keys] and keeps the order of the rest. */
+    fun removeAll(items: List<FavoriteKey>, keys: Set<FavoriteKey>): List<FavoriteKey> =
+        items.filterNot { it in keys }
 }

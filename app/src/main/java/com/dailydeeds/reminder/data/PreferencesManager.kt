@@ -36,6 +36,8 @@ class PreferencesManager(context: Context) {
         const val KEY_COMPLETED_DAYS_STREAK = "pref_completed_days_streak"
         private const val KEY_FAVORITES = "pref_favorites"
         private const val KEY_LAST_SURAH = "pref_last_surah"
+        private const val KEY_LAST_PAGE = "pref_last_page"
+        private const val KEY_QURAN_PAGES_MODE = "pref_quran_pages_mode"
         private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
         private const val KEY_LAST_SAHIFA = "pref_last_sahifa"
         private const val KEY_THEME_MODE = "pref_theme_mode"
@@ -206,8 +208,26 @@ class PreferencesManager(context: Context) {
         return updated
     }
 
+    fun removeFavorites(keys: Set<FavoriteKey>): List<FavoriteKey> {
+        val updated = FavoritesList.removeAll(getFavorites(), keys)
+        setFavorites(updated)
+        return updated
+    }
+
+    /** Replaces the whole list; used to undo a delete. */
+    fun setFavorites(items: List<FavoriteKey>) =
+        prefs.edit().putString(KEY_FAVORITES, FavoritesList.serialize(items)).apply()
+
     fun getLastSurah(): Int = prefs.getInt(KEY_LAST_SURAH, 0)
     fun setLastSurah(surah: Int) = prefs.edit().putInt(KEY_LAST_SURAH, surah).apply()
+
+    /** Last mushaf page read (1..604), 0 when none. */
+    fun getLastQuranPage(): Int = prefs.getInt(KEY_LAST_PAGE, 0)
+    fun setLastQuranPage(page: Int) = prefs.edit().putInt(KEY_LAST_PAGE, page).apply()
+
+    /** The Quran tab opens the mushaf page by page (default) or as a scrolling list of ayahs. */
+    fun getQuranPagesMode(): Boolean = prefs.getBoolean(KEY_QURAN_PAGES_MODE, true)
+    fun setQuranPagesMode(pages: Boolean) = prefs.edit().putBoolean(KEY_QURAN_PAGES_MODE, pages).apply()
 
     fun getLastMafatihId(): String? = prefs.getString(KEY_LAST_MAFATIH, null)
     fun setLastMafatihId(id: String) = prefs.edit().putString(KEY_LAST_MAFATIH, id).apply()

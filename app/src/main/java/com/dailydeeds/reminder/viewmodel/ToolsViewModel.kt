@@ -77,6 +77,38 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _favorites.value = prefs.toggleFavorite(key)
     }
 
+    /** Deletes several favorites at once, from the favorites screen. */
+    fun removeFavorites(keys: Set<FavoriteKey>) {
+        if (keys.isEmpty()) return
+        _favorites.value = prefs.removeFavorites(keys)
+    }
+
+    /** Puts back a list saved before a delete (the undo of the favorites screen). */
+    fun restoreFavorites(items: List<FavoriteKey>) {
+        prefs.setFavorites(items)
+        _favorites.value = prefs.getFavorites()
+    }
+
+    private val _quranPagesMode = MutableStateFlow(prefs.getQuranPagesMode())
+    val quranPagesMode: StateFlow<Boolean> = _quranPagesMode.asStateFlow()
+
+    fun setQuranPagesMode(pages: Boolean) {
+        prefs.setQuranPagesMode(pages)
+        _quranPagesMode.value = pages
+    }
+
+    private val _lastQuranPage = MutableStateFlow(prefs.getLastQuranPage())
+    val lastQuranPage: StateFlow<Int> = _lastQuranPage.asStateFlow()
+
+    /** Called when a mushaf page settles; also keeps the "resume" surah in step. */
+    fun recordQuranPage(page: Int, surah: Int) {
+        if (page != _lastQuranPage.value) {
+            prefs.setLastQuranPage(page)
+            _lastQuranPage.value = page
+        }
+        recordSurah(surah)
+    }
+
     fun setPlace(place: Place) {
         prefs.setPlace(place)
         _place.value = place

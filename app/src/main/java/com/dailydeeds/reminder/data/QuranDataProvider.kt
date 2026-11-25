@@ -133,6 +133,9 @@ object QuranDataProvider {
     fun getAyah(surahNumber: Int, ayahNumber: Int): Ayah? =
         ayahsBySurah[surahNumber]?.getOrNull(ayahNumber - 1)
 
+    /** Every ayah in mushaf order; used to lay out the 604 pages. */
+    fun allAyahs(): List<Ayah> = ayahsBySurah.values.flatten()
+
     private fun loadAyahs(): Map<Int, List<Ayah>> {
         val stream = QuranDataProvider::class.java.classLoader?.getResourceAsStream(RESOURCE_PATH)
             ?: error("Missing bundled Quran resource: $RESOURCE_PATH")

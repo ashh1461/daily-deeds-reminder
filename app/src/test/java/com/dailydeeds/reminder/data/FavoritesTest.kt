@@ -51,4 +51,17 @@ class FavoritesTest {
         assertFalse(a in list)
         assertTrue(FavoritesList.parse(null).isEmpty())
     }
+
+    @Test
+    fun removeAllDeletesSeveralAndKeepsTheOrderOfTheRest() {
+        val a = FavoriteKey.Ayah(2, 255)
+        val b = FavoriteKey.Mafatih("bk_1")
+        val c = FavoriteKey.Sahifa("sj_2")
+        val d = FavoriteKey.Weekday(DayContentKind.DUA, DayOfWeek.MONDAY)
+        val list = listOf(a, b, c, d)
+        assertEquals(listOf(a, d), FavoritesList.removeAll(list, setOf(b, c)))
+        assertEquals(list, FavoritesList.removeAll(list, emptySet()))
+        assertEquals(list, FavoritesList.removeAll(list, setOf(FavoriteKey.Ayah(9, 9))))
+        assertTrue(FavoritesList.removeAll(list, list.toSet()).isEmpty())
+    }
 }

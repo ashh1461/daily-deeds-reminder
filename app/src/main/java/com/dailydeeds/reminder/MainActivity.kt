@@ -65,7 +65,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.PreferencesManager
+import com.dailydeeds.reminder.data.QuranPages
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.notification.AlarmScheduler
@@ -79,6 +81,7 @@ import com.dailydeeds.reminder.ui.screens.MafatihReaderScreen
 import com.dailydeeds.reminder.ui.screens.MafatihScreen
 import com.dailydeeds.reminder.ui.screens.PrayerTimesScreen
 import com.dailydeeds.reminder.ui.screens.QiblaScreen
+import com.dailydeeds.reminder.ui.screens.QuranMushafScreen
 import com.dailydeeds.reminder.ui.screens.QuranReaderScreen
 import com.dailydeeds.reminder.ui.screens.QuranScreen
 import com.dailydeeds.reminder.ui.screens.ReaderCounterScreen
@@ -214,6 +217,22 @@ fun AppNavigation(
     }
     fun openWeekday(kind: DayContentKind) = go(if (kind == DayContentKind.DUA) "duas" else "ziyarat")
 
+    // The Quran opens as mushaf pages or as a scrolling list of ayahs, as chosen on the Quran tab.
+    val pagesMode by toolsViewModel.quranPagesMode.collectAsState()
+    val lastPage by toolsViewModel.lastQuranPage.collectAsState()
+    fun openSurah(surah: Int) {
+        if (pagesMode) go("quran/page/${QuranPages.firstPageOfSurah(surah)}")
+        else { quranViewModel.selectSurah(surah); go("quran/reader/$surah") }
+    }
+    fun openAyah(surah: Int, ayah: Int) {
+        if (pagesMode) go("quran/page/${QuranPages.pageOf(surah, ayah)}?s=$surah&a=$ayah")
+        else { quranViewModel.selectSurah(surah); go("quran/reader/$surah?a=$ayah") }
+    }
+    fun resumeSurah(surah: Int) {
+        val page = toolsViewModel.lastQuranPage.value
+        if (pagesMode && page > 0 && QuranPages.page(page).showsSurah(surah)) go("quran/page/$page") else openSurah(surah)
+    }
+
     Scaffold(
         topBar = {
             if (currentTab != null) {
@@ -271,14 +290,21 @@ fun AppNavigation(
                     tools = toolsViewModel,
                     onOpenDeed = { go("deed/$it") },
                     onOpenRoute = { go(it) },
-                    onResumeSurah = { go("quran/reader/$it") },
+                    onResumeSurah = { resumeSurah(it) },
                     onResumeMafatih = { openReader(it) },
                     onResumeSahifa = { openReader(it) }
                 )
             }
             composable("worship") { WorshipHubScreen(onOpenRoute = { go(it) }) }
             composable("quran") {
-                QuranScreen(viewModel = quranViewModel, onNavigateToSurah = { go("quran/reader/$it") })
+                QuranScreen(
+                    viewModel = quranViewModel,
+                    pagesMode = pagesMode,
+                    lastPage = lastPage,
+                    onPagesModeChange = { toolsViewModel.setQuranPagesMode(it) },
+                    onNavigateToSurah = { openSurah(it) },
+                    onOpenPage = { go("quran/page/$it") }
+                )
             }
             composable("mafatih") {
                 MafatihScreen(
@@ -294,8 +320,11 @@ fun AppNavigation(
 
             // ---- readers
             composable(
-                route = "quran/reader/{surahNumber}",
-                arguments = listOf(navArgument("surahNumber") { type = NavType.IntType })
+                route = "quran/reader/{surahNumber}?a={a}",
+                arguments = listOf(
+                    navArgument("surahNumber") { type = NavType.IntType },
+                    navArgument("a") { type = NavType.IntType; defaultValue = 0 }
+                )
             ) { entry ->
                 val surahNumber = entry.arguments?.getInt("surahNumber") ?: 1
                 quranViewModel.selectSurah(surahNumber)
@@ -304,6 +333,26 @@ fun AppNavigation(
                     viewModel = quranViewModel,
                     tools = toolsViewModel,
                     onOpenMizan = { s, a -> go("mizan/ayah/$s/$a") },
+                    onNavigateBack = { back() },
+                    initialAyah = entry.arguments?.getInt("a") ?: 0
+                )
+            }
+            composable(
+                route = "quran/page/{page}?s={s}&a={a}",
+                arguments = listOf(
+                    navArgument("page") { type = NavType.IntType },
+                    navArgument("s") { type = NavType.IntType; defaultValue = 0 },
+                    navArgument("a") { type = NavType.IntType; defaultValue = 0 }
+                )
+            ) { entry ->
+                val s = entry.arguments?.getInt("s") ?: 0
+                val a = entry.arguments?.getInt("a") ?: 0
+                QuranMushafScreen(
+                    initialPage = entry.arguments?.getInt("page") ?: 1,
+                    highlight = if (s > 0 && a > 0) FavoriteKey.Ayah(s, a) else null,
+                    viewModel = quranViewModel,
+                    tools = toolsViewModel,
+                    onOpenMizan = { surah, ayah -> go("mizan/ayah/$surah/$ayah") },
                     onNavigateBack = { back() }
                 )
             }
@@ -337,9 +386,8 @@ fun AppNavigation(
             composable("search") {
                 GlobalSearchScreen(
                     viewModel = searchViewModel,
-                    onNavigateToQuran = { surahNum, _ ->
-                        quranViewModel.selectSurah(surahNum)
-                        go("quran/reader/$surahNum")
+                    onNavigateToQuran = { surahNum, ayahNum ->
+                        if (ayahNum != null && ayahNum > 0) openAyah(surahNum, ayahNum) else openSurah(surahNum)
                     },
                     onNavigateToMafatih = { openReader(it) },
                     onNavigateToWeekday = { openWeekday(it) },
@@ -439,7 +487,7 @@ fun AppNavigation(
                 FavoritesScreen(
                     viewModel = toolsViewModel,
                     onNavigateBack = { back() },
-                    onOpenSurah = { go("quran/reader/$it") },
+                    onOpenAyah = { s, a -> openAyah(s, a) },
                     onOpenMafatih = { openReader(it) },
                     onOpenWeekday = { openWeekday(it) }
                 )

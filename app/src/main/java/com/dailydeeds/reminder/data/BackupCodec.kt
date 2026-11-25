@@ -21,7 +21,8 @@ object BackupCodec {
 
     private val ALLOWED_KEYS = listOf(
         Regex("^pref_favorites$"),
-        Regex("^pref_last_(surah|mafatih|sahifa)$"),
+        Regex("^pref_last_(surah|mafatih|sahifa|page)$"),
+        Regex("^pref_quran_pages_mode$"),
         Regex("^pref_(theme_mode|haptics_enabled|hijri_offset|occasion_reminder|adhan_global|prayer_settings|prayer_reminder_enabled)$"),
         Regex("^pref_place_(name|lat|lng|zone)$"),
         Regex("^pref_alarm_cfg_[1-4]$"),

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Mosque
@@ -42,6 +43,7 @@ private val hubEntries = listOf(
     HubEntry("إعدادات الأذان", "الصوت، التنبيه قبل الصلاة، طريقة الحساب", Icons.Default.AccessTime, "prayer/settings"),
     HubEntry("اتجاه القبلة", "بوصلة القبلة من مدينتك", Icons.Default.Explore, "qibla"),
     HubEntry("التقويم والمناسبات", "التاريخ الهجري ومناسبات أهل البيت (ع)", Icons.Default.CalendarMonth, "calendar"),
+    HubEntry("أعمال الأشهر القمرية", "أعمال كل شهر هجري كاملة من مفاتيح الجنان، والشهر الحالي أولاً", Icons.Default.DateRange, "lunar_months"),
     HubEntry("المسبحة", "تسبيح الزهراء (ع) وعدّاد حر", Icons.Default.TouchApp, "tasbih"),
     HubEntry("القضاء", "تتبّع الصلوات والصيام الفائت", Icons.Default.Checklist, "qada"),
     HubEntry("رمضان والإمساك", "جدول الإمساك والإفطار وليالي القدر مع PDF", Icons.Default.NightsStay, "ramadan"),

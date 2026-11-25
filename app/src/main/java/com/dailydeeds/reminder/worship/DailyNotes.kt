@@ -44,7 +44,7 @@ object DailyNotes {
             if (occasions.isNotEmpty()) {
                 notes += DailyNote(
                     ID_OCCASION, "مناسبة اليوم: ${ShiaCalendar.toHijri(today, dayOffset)}",
-                    occasions.joinToString("\n") { it.title }
+                    occasions.joinToString("\n") { it.displayTitle }
                 )
             }
         }

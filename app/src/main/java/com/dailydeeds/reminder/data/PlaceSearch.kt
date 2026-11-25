@@ -56,6 +56,48 @@ object PlaceSearch {
         return (starts + contains).take(limit).map { it.toPlace() }
     }
 
+    /** A bundled city near some coordinates: its display name, time zone and distance. */
+    data class Nearest(val name: String, val zoneId: String, val km: Double)
+
+    /** The bundled city closest to the coordinates, or null when none lies within [maxKm] (open sea, remote areas). */
+    fun nearest(latitude: Double, longitude: Double, maxKm: Double = NEAREST_MAX_KM): Nearest? {
+        var best: City? = null
+        var bestKm = Double.MAX_VALUE
+        for (c in cities) {
+            val km = distanceKm(latitude, longitude, c.lat, c.lon)
+            if (km < bestKm) {
+                bestKm = km
+                best = c
+            }
+        }
+        val city = best ?: return null
+        if (bestKm > maxKm) return null
+        return Nearest(city.arabic.ifEmpty { city.name }, city.zone, bestKm)
+    }
+
+    /**
+     * A place for raw coordinates (typed, or from the phone's location). Its time zone comes from the nearest city,
+     * so coordinates in another country get that country's clock, and it is labelled «[label] (قرب …)». With no
+     * city nearby it keeps [fallbackZone].
+     */
+    fun placeAt(latitude: Double, longitude: Double, label: String, fallbackZone: String): Place {
+        val near = nearest(latitude, longitude) ?: return Place(label, latitude, longitude, fallbackZone)
+        return Place("$label (قرب ${near.name})", latitude, longitude, near.zoneId)
+    }
+
+    /** Great-circle distance in kilometres (haversine). */
+    internal fun distanceKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2).let { it * it } +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2).let { it * it }
+        return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a.coerceIn(0.0, 1.0)))
+    }
+
+    private const val EARTH_RADIUS_KM = 6371.0
+    /** Beyond this, a city's time zone is no longer a safe guess for the coordinates. */
+    private const val NEAREST_MAX_KM = 500.0
+
     private fun latin(s: String): String =
         Normalizer.normalize(s.lowercase(), Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z0-9 ]"), " ").trim()
 

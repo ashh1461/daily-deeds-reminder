@@ -152,7 +152,7 @@ fun QuranMushafScreen(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize().padding(padding),
-                beyondBoundsPageCount = 1,
+                beyondViewportPageCount = 1,
                 key = { it }
             ) { index ->
                 val page = remember(index) { QuranPages.page(index + 1) }

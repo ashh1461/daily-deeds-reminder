@@ -23,7 +23,12 @@ data class PrayerTimesResult(
     /** Legal midnight: halfway between sunset and the next day's Fajr. */
     val midnight: LocalTime?,
     /** Start of the fast: [PrayerParams.imsakMinutes] before Fajr. */
-    val imsak: LocalTime? = null
+    val imsak: LocalTime? = null,
+    /**
+     * Prayers whose time was estimated by the high-latitude rule, because the sun does not reach their angle that
+     * day (summer above about 48°). Empty wherever every time is computed normally.
+     */
+    val estimated: Set<Prayer> = emptySet()
 )
 
 /**
@@ -68,8 +73,8 @@ object PrayerTimes {
         params: PrayerParams = PrayerParams.LEVA
     ): PrayerTimesResult {
         val tzHours = zone.rules.getOffset(LocalDateTime.of(date, LocalTime.NOON)).totalSeconds / 3600.0
-        val today = raw(date, latitude, longitude, params)
-        val tomorrow = raw(date.plusDays(1), latitude, longitude, params)
+        val today = adjustHighLatitude(raw(date, latitude, longitude, params), params)
+        val tomorrow = adjustHighLatitude(raw(date.plusDays(1), latitude, longitude, params), params)
 
         fun toTime(hours: Double?): LocalTime? {
             if (hours == null || hours.isNaN()) return null
@@ -91,14 +96,35 @@ object PrayerTimes {
             fajr = toTime(today.fajr), sunrise = toTime(today.sunrise), dhuhr = toTime(today.dhuhr),
             sunset = toTime(today.sunset), maghrib = toTime(today.maghrib), isha = toTime(today.isha),
             midnight = toTime(midnight),
-            imsak = toTime(today.fajr?.minus(params.imsakMinutes / 60.0))
+            imsak = toTime(today.fajr?.minus(params.imsakMinutes / 60.0)),
+            estimated = today.estimated
         )
     }
 
     private class Raw(
         val fajr: Double?, val sunrise: Double?, val dhuhr: Double,
-        val sunset: Double?, val maghrib: Double?, val isha: Double?
+        val sunset: Double?, val maghrib: Double?, val isha: Double?,
+        val estimated: Set<Prayer> = emptySet()
     )
+
+    /**
+     * High-latitude rule ("angle-based", as in PrayTimes.org): when the sun never sinks to a prayer's angle, that
+     * prayer is placed a portion of the night (angle / 60) after sunset or before sunrise. It only fills a time that
+     * cannot be computed; a day with no sunset or no sunrise (polar day or night) has no night to divide, so its
+     * times stay null.
+     */
+    private fun adjustHighLatitude(r: Raw, params: PrayerParams): Raw {
+        val sunrise = r.sunrise ?: return r
+        val sunset = r.sunset ?: return r
+        if (r.fajr != null && r.maghrib != null && r.isha != null) return r
+        val night = fixHour(sunrise - sunset)
+        fun portion(angle: Double) = angle / 60.0 * night
+        val estimated = mutableSetOf<Prayer>()
+        val fajr = r.fajr ?: (sunrise - portion(params.fajrAngle)).also { estimated += Prayer.FAJR }
+        val maghrib = r.maghrib ?: (sunset + portion(params.maghribAngle)).also { estimated += Prayer.MAGHRIB }
+        val isha = r.isha ?: (sunset + portion(params.ishaAngle)).also { estimated += Prayer.ISHA }
+        return Raw(fajr, sunrise, r.dhuhr, sunset, maghrib, isha, estimated)
+    }
 
     private fun raw(date: LocalDate, lat: Double, lng: Double, params: PrayerParams): Raw {
         val jd = julian(date.year, date.monthValue, date.dayOfMonth) - lng / (15.0 * 24.0)

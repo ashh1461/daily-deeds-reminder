@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
@@ -73,8 +72,11 @@ fun DailyReminderTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.statusBarColor = colorScheme.background.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+                // The app draws edge to edge (enableEdgeToEdge in MainActivity), so the bars are transparent; only
+                // their icon colour follows the theme chosen in the app, which can differ from the system's.
+                val controller = WindowCompat.getInsetsController(window, view)
+                controller.isAppearanceLightStatusBars = !darkTheme
+                controller.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }

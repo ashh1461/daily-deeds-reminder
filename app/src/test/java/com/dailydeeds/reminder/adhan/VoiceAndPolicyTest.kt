@@ -104,7 +104,12 @@ class VoiceAndPolicyTest {
         // Only the launcher activity is exported. The boot receiver is not: the system's boot/time broadcasts
         // reach it anyway, and another app must not be able to trigger rescheduling.
         assertEquals(1, Regex("android:exported=\"true\"").findAll(xml).count())
-        assertTrue(Regex("BootReceiver\"\\s+android:exported=\"false\"").containsMatchIn(xml))
+        assertTrue(Regex("BootReceiver\"[^>]*android:exported=\"false\"").containsMatchIn(xml))
+        // Prayer alarms run before the first unlock after a restart (1.8.2): these four must stay direct-boot aware.
+        for (component in listOf("service.AdhanService", "receiver.PrayerAlarmReceiver", "receiver.AdhanActionReceiver", "receiver.BootReceiver")) {
+            assertTrue(component, Regex("\\.$component\"[^>]*android:directBootAware=\"true\"").containsMatchIn(xml))
+        }
+        assertTrue(xml.contains("android.intent.action.LOCKED_BOOT_COMPLETED"))
     }
 
     @Test

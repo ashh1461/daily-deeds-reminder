@@ -13,7 +13,9 @@ class VoiceStore(private val context: Context) {
     data class Installed(val id: String, val nameAr: String, val own: Boolean, val file: File)
 
     private val dir: File get() = File(context.filesDir, "voices").also { it.mkdirs() }
-    private val index = context.getSharedPreferences("voice_store", Context.MODE_PRIVATE)
+    // Lazy: the adhan service builds a VoiceStore only to look for a file, and before the first unlock after a
+    // restart this credential-protected index cannot be opened (the file is then missing and the bundled adhan plays).
+    private val index by lazy { context.getSharedPreferences("voice_store", Context.MODE_PRIVATE) }
 
     private fun audioFile(id: String) = File(dir, "$id.audio")
 

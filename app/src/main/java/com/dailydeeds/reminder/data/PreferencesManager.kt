@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
 import com.dailydeeds.reminder.adhan.AdhanMode
+import com.dailydeeds.reminder.adhan.PendingSnoozes
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.calendar.ShiaCalendar
@@ -20,8 +21,8 @@ import java.time.ZoneId
 
 class PreferencesManager(context: Context) {
 
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("daily_deeds_prefs", Context.MODE_PRIVATE)
+    /** Device-protected since 1.8.2, so prayer alarms can be restored before the first unlock ([PrefsStorage]). */
+    private val prefs: SharedPreferences = PrefsStorage.open(context)
 
     companion object {
         const val KEY_LAST_ACTIVE_DATE = "pref_last_active_date"
@@ -56,6 +57,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_IMSAK_ALARM = "worship_imsak_enabled"
         private const val KEY_KHUMS_REMINDER = "worship_khums_enabled"
         private const val KEY_ECLIPSE_REMINDER = "worship_eclipse_enabled"
+        private const val KEY_LAST_HANDLED_ALARM = "alarm_last_handled"
+        private const val KEY_PENDING_SNOOZES = "alarm_pending_snoozes"
 
         /** Days of per-day deed state kept before old keys are pruned. */
         const val RETENTION_DAYS = 90L
@@ -234,6 +237,15 @@ class PreferencesManager(context: Context) {
         if (prefs.contains(key)) ReaderFonts.fromStored(prefs.getInt(key, 0), range) else range.defaultSp
 
     fun setReaderFontSp(key: String, sp: Float) = prefs.edit().putInt(key, ReaderFonts.toStored(sp)).apply()
+
+    /** The latest planned prayer alarm handled (epoch ms), so a clock moved back does not play it again. Not backed up. */
+    fun getLastHandledAlarm(): Long = prefs.getLong(KEY_LAST_HANDLED_ALARM, 0L)
+    fun setLastHandledAlarm(at: Long) = prefs.edit().putLong(KEY_LAST_HANDLED_ALARM, at).apply()
+
+    /** Snoozes waiting to play ([PendingSnoozes]), restored after a reboot. Not backed up. */
+    fun getPendingSnoozes(): Map<Int, Long> = PendingSnoozes.decode(prefs.getString(KEY_PENDING_SNOOZES, null))
+    fun setPendingSnoozes(snoozes: Map<Int, Long>) =
+        prefs.edit().putString(KEY_PENDING_SNOOZES, PendingSnoozes.encode(snoozes)).apply()
 
     /** Whether each mushaf page picks the largest text size that fits the screen (the default). */
     fun getMushafFit(): Boolean = prefs.getBoolean(ReaderFonts.KEY_MUSHAF_FIT, true)

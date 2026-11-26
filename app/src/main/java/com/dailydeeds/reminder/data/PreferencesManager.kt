@@ -229,6 +229,16 @@ class PreferencesManager(context: Context) {
     fun getQuranPagesMode(): Boolean = prefs.getBoolean(KEY_QURAN_PAGES_MODE, true)
     fun setQuranPagesMode(pages: Boolean) = prefs.edit().putBoolean(KEY_QURAN_PAGES_MODE, pages).apply()
 
+    /** A reader's saved text size ([ReaderFonts]); the reader's default until it is first changed. */
+    fun getReaderFontSp(key: String, range: ReaderFonts.Range): Float =
+        if (prefs.contains(key)) ReaderFonts.fromStored(prefs.getInt(key, 0), range) else range.defaultSp
+
+    fun setReaderFontSp(key: String, sp: Float) = prefs.edit().putInt(key, ReaderFonts.toStored(sp)).apply()
+
+    /** Whether each mushaf page picks the largest text size that fits the screen (the default). */
+    fun getMushafFit(): Boolean = prefs.getBoolean(ReaderFonts.KEY_MUSHAF_FIT, true)
+    fun setMushafFit(fit: Boolean) = prefs.edit().putBoolean(ReaderFonts.KEY_MUSHAF_FIT, fit).apply()
+
     fun getLastMafatihId(): String? = prefs.getString(KEY_LAST_MAFATIH, null)
     fun setLastMafatihId(id: String) = prefs.edit().putString(KEY_LAST_MAFATIH, id).apply()
 

@@ -7,6 +7,7 @@ import com.dailydeeds.reminder.adhan.AdhanMode
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.adhan.PrayerSettings
 import com.dailydeeds.reminder.data.FavoriteKey
+import com.dailydeeds.reminder.data.FavoritesList
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.notification.ReligiousAlarms
@@ -83,9 +84,12 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _favorites.value = prefs.removeFavorites(keys)
     }
 
-    /** Puts back a list saved before a delete (the undo of the favorites screen). */
-    fun restoreFavorites(items: List<FavoriteKey>) {
-        prefs.setFavorites(items)
+    /**
+     * The undo of the favorites screen: puts back what [snapshot] (saved before the delete) has and the list now
+     * lacks. A star added elsewhere since the delete is kept.
+     */
+    fun restoreFavorites(snapshot: List<FavoriteKey>) {
+        prefs.setFavorites(FavoritesList.restoreRemoved(snapshot, prefs.getFavorites()))
         _favorites.value = prefs.getFavorites()
     }
 

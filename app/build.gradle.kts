@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.ashh1461.wird"
         minSdk = 26
         targetSdk = 34
-        versionCode = 18
-        versionName = "1.8.1.5"
+        versionCode = 19
+        versionName = "1.8.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

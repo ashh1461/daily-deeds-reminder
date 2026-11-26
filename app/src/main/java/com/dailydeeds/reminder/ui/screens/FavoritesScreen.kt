@@ -47,6 +47,7 @@ import com.dailydeeds.reminder.data.QuranRepository
 import com.dailydeeds.reminder.data.WeekdayRepository
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
+import java.time.DayOfWeek
 
 private data class FavoriteRow(val key: FavoriteKey, val title: String, val subtitle: String)
 
@@ -86,7 +87,7 @@ fun FavoritesScreen(
     onNavigateBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit,
     onOpenMafatih: (String) -> Unit,
-    onOpenWeekday: (DayContentKind) -> Unit
+    onOpenWeekday: (DayContentKind, DayOfWeek) -> Unit
 ) {
     val favorites by viewModel.favorites.collectAsState()
     val quran = remember { QuranRepository() }
@@ -122,7 +123,7 @@ fun FavoritesScreen(
         is FavoriteKey.Ayah -> onOpenAyah(key.surah, key.ayah)
         is FavoriteKey.Mafatih -> onOpenMafatih(key.itemId)
         is FavoriteKey.Sahifa -> onOpenMafatih(key.itemId)
-        is FavoriteKey.Weekday -> onOpenWeekday(key.kind)
+        is FavoriteKey.Weekday -> onOpenWeekday(key.kind, key.day)
     }
 
     BackHandler(enabled = selecting) { endSelection() }
@@ -136,7 +137,7 @@ fun FavoritesScreen(
             undoSnapshot?.let { snapshot ->
                 item(key = "undo") {
                     UndoBar(
-                        removed = (snapshot.size - favorites.size).coerceAtLeast(1),
+                        removed = FavoritesList.removedSince(snapshot, favorites).coerceAtLeast(1),
                         onUndo = { viewModel.restoreFavorites(snapshot); undoSnapshot = null },
                         onDismiss = { undoSnapshot = null }
                     )

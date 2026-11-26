@@ -18,5 +18,7 @@ data class SearchResultItem(
     val ayahNumber: Int? = null,
     val mafatihItemId: String? = null,
     val weekdayKind: DayContentKind? = null,
+    /** The day of a weekday du'a or ziyarah, so the result opens on that day's text. */
+    val weekdayDay: java.time.DayOfWeek? = null,
     val deedId: Int? = null
 )

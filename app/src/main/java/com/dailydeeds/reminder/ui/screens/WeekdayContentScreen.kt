@@ -70,9 +70,15 @@ import java.time.LocalDate
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeekdayContentScreen(kind: DayContentKind, tools: ToolsViewModel, onNavigateBack: (() -> Unit)? = null) {
+fun WeekdayContentScreen(
+    kind: DayContentKind,
+    tools: ToolsViewModel,
+    onNavigateBack: (() -> Unit)? = null,
+    initialDay: DayOfWeek? = null
+) {
     val today = remember(kind) { LocalDate.now().dayOfWeek }
-    var selectedName by rememberSaveable(kind.name) { mutableStateOf(today.name) }
+    // Opened from a favourite or a search result, the screen starts on that item's day rather than today.
+    var selectedName by rememberSaveable(kind.name, initialDay?.name) { mutableStateOf((initialDay ?: today).name) }
     var fontSize by rememberSaveable(kind.name + "_font") { mutableIntStateOf(21) }
     val selectedDay = DayOfWeek.valueOf(selectedName)
     val content = WeekdayRepository.get(kind, selectedDay)

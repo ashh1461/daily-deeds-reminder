@@ -165,6 +165,13 @@ Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4)
   - The ayah deep link from search and favourites.
   - The Quran as 604 mushaf pages, resuming at the last page.
   - Deleting and bulk-deleting favourites from the list.
+- **v1.8.1.6** (branch `fix/v1.8.1.6`, not yet released): all eight items of the 7.5 row.
+  - The backup regression (the Int/Boolean reader keys now pass the type check).
+  - The weekday favourite or search result opening on its own day (`duas?day=…`).
+  - One mushaf minimum for fit and zoom, and the favourites undo that keeps stars added since.
+  - The bulk qada undo (one batch id per "add days").
+  - Reader sizes and fit mode saved and backed up (`pref_font_*`, `pref_mushaf_fit`), and the basmala line height scaled with its size.
+  - The privacy-policy wording for «موقعي».
 - **Settled by you:** saved places are not wanted for now (1.2 item 7).
 
 ### 7.2 Still open from sections 2 and 3

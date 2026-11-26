@@ -62,4 +62,19 @@ object FavoritesList {
     /** Removes every key in [keys] and keeps the order of the rest. */
     fun removeAll(items: List<FavoriteKey>, keys: Set<FavoriteKey>): List<FavoriteKey> =
         items.filterNot { it in keys }
+
+    /**
+     * The undo of a delete: puts back what [snapshot] (the list before the delete) has and [current] lacks, without
+     * dropping a favorite added elsewhere in the meantime. Those newer ones stay first, as the list is newest first.
+     */
+    fun restoreRemoved(snapshot: List<FavoriteKey>, current: List<FavoriteKey>): List<FavoriteKey> {
+        val before = snapshot.toSet()
+        return (current.filterNot { it in before } + snapshot).distinct()
+    }
+
+    /** How many items of [snapshot] are missing from [current], i.e. how many an undo would put back. */
+    fun removedSince(snapshot: List<FavoriteKey>, current: List<FavoriteKey>): Int {
+        val now = current.toSet()
+        return snapshot.count { it !in now }
+    }
 }

@@ -89,6 +89,8 @@ import com.dailydeeds.reminder.ui.screens.SahifaScreen
 import com.dailydeeds.reminder.ui.screens.SettingsScreen
 import com.dailydeeds.reminder.ui.screens.TodayScreen
 import com.dailydeeds.reminder.ui.screens.WeekdayContentScreen
+import com.dailydeeds.reminder.ui.screens.WeekdayRoute
+import java.time.DayOfWeek
 import com.dailydeeds.reminder.ui.screens.WorshipHubScreen
 import com.dailydeeds.reminder.ui.theme.DailyReminderTheme
 import com.dailydeeds.reminder.viewmodel.MafatihViewModel
@@ -215,7 +217,7 @@ fun AppNavigation(
         mafatihViewModel.selectItem(itemId)
         go("mafatih/reader/$itemId")
     }
-    fun openWeekday(kind: DayContentKind) = go(if (kind == DayContentKind.DUA) "duas" else "ziyarat")
+    fun openWeekday(kind: DayContentKind, day: DayOfWeek? = null) = go(WeekdayRoute.of(kind, day))
 
     // The Quran opens as mushaf pages or as a scrolling list of ayahs, as chosen on the Quran tab.
     val pagesMode by toolsViewModel.quranPagesMode.collectAsState()
@@ -390,7 +392,7 @@ fun AppNavigation(
                         if (ayahNum != null && ayahNum > 0) openAyah(surahNum, ayahNum) else openSurah(surahNum)
                     },
                     onNavigateToMafatih = { openReader(it) },
-                    onNavigateToWeekday = { openWeekday(it) },
+                    onNavigateToWeekday = { kind, day -> openWeekday(kind, day) },
                     onNavigateToDeed = { go("deed/$it") },
                     onSearchMizan = { query ->
                         mizan().search(query)
@@ -459,8 +461,21 @@ fun AppNavigation(
                     onNavigateBack = { back() }
                 )
             }
-            composable("duas") { WeekdayContentScreen(DayContentKind.DUA, toolsViewModel, onNavigateBack = { back() }) }
-            composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { back() }) }
+            DayContentKind.values().forEach { kind ->
+                composable(
+                    route = WeekdayRoute.pattern(kind),
+                    arguments = listOf(
+                        navArgument(WeekdayRoute.DAY_ARG) { type = NavType.StringType; nullable = true; defaultValue = null }
+                    )
+                ) { entry ->
+                    WeekdayContentScreen(
+                        kind,
+                        toolsViewModel,
+                        onNavigateBack = { back() },
+                        initialDay = WeekdayRoute.parseDay(entry.arguments?.getString(WeekdayRoute.DAY_ARG))
+                    )
+                }
+            }
             composable("calendar") { CalendarScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("lunar_months") {
                 LunarMonthsScreen(toolsViewModel, onNavigateBack = { back() }, onOpenItem = { openReader(it) })
@@ -489,7 +504,7 @@ fun AppNavigation(
                     onNavigateBack = { back() },
                     onOpenAyah = { s, a -> openAyah(s, a) },
                     onOpenMafatih = { openReader(it) },
-                    onOpenWeekday = { openWeekday(it) }
+                    onOpenWeekday = { kind, day -> openWeekday(kind, day) }
                 )
             }
             composable("settings") {

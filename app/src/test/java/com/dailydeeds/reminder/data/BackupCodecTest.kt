@@ -29,6 +29,12 @@ class BackupCodecTest {
     private fun sample(): Map<String, Any> = mapOf(
         "pref_favorites" to "quran:2,mafatih:kumayl",
         "pref_last_surah" to 18,
+        "pref_last_page" to 302,
+        "pref_quran_pages_mode" to false,
+        "pref_font_quran" to 280,
+        "pref_font_mafatih" to 240,
+        "pref_font_mushaf" to 175,
+        "pref_mushaf_fit" to false,
         "pref_theme_mode" to "dark",
         "pref_haptics_enabled" to false,
         "pref_morning_hour" to 6,
@@ -93,6 +99,31 @@ class BackupCodecTest {
         val r = ok(text)
         assertEquals(setOf("pref_theme_mode", "pref_morning_hour"), r.entries.keys)
         assertEquals(5, r.skipped)
+    }
+
+    /** Regression from 1.8.1.5: Int and Boolean reader keys fell through to "must be a String" and were dropped. */
+    @Test
+    fun readerKeysKeepTheirIntAndBooleanTypesAndRejectOthers() {
+        fun entry(t: String, v: Any) = JSONObject().put("t", t).put("v", v)
+        val text = JSONObject()
+            .put("app", "daily-deeds-backup").put("version", 1)
+            .put(
+                "prefs", JSONObject()
+                    .put("pref_last_page", entry("i", 41))
+                    .put("pref_quran_pages_mode", entry("b", true))
+                    .put("pref_font_mushaf", entry("i", 225))
+                    .put("pref_mushaf_fit", entry("b", false))
+                    .put("pref_font_quran", entry("s", "28"))
+                    .put("pref_font_mafatih", entry("b", true))
+            ).toString()
+        val r = ok(text)
+        assertEquals(41, r.entries["pref_last_page"])
+        assertEquals(true, r.entries["pref_quran_pages_mode"])
+        assertEquals(225, r.entries["pref_font_mushaf"])
+        assertEquals(false, r.entries["pref_mushaf_fit"])
+        assertFalse("pref_font_quran" in r.entries)
+        assertFalse("pref_font_mafatih" in r.entries)
+        assertEquals(2, r.skipped)
     }
 
     @Test

@@ -60,14 +60,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -204,18 +205,15 @@ private val appTabs = listOf(
 @Composable
 fun AppNavigation(
     mainViewModel: MainViewModel,
-    toolsViewModel: ToolsViewModel,
-    quranViewModel: QuranViewModel = viewModel(),
-    mafatihViewModel: MafatihViewModel = viewModel(),
-    sahifaViewModel: SahifaViewModel = viewModel(),
-    searchViewModel: SearchViewModel = viewModel(),
-    voiceViewModel: VoiceViewModel = viewModel(),
-    worshipViewModel: WorshipViewModel = viewModel()
+    toolsViewModel: ToolsViewModel
 ) {
     // MizanViewModel copies the 24 MB book the first time it is created, so it is fetched only when a Mizan screen
     // or a Mizan search needs it, not at cold start. It stays activity-scoped so all Mizan screens share it.
     val activityOwner = checkNotNull(LocalViewModelStoreOwner.current)
     fun mizan(): MizanViewModel = ViewModelProvider(activityOwner)[MizanViewModel::class.java]
+    // The other screen view models are also created on first use (the Today tab needs none of them), so a cold start
+    // neither loads the Quran, Mafatih and Sahifa data nor builds the search index.
+    val vms = remember(activityOwner) { LazyViewModels(activityOwner) }
 
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -225,7 +223,7 @@ fun AppNavigation(
     fun go(route: String) = navController.navigate(route)
     fun back() { navController.popBackStack() }
     fun openReader(itemId: String) {
-        mafatihViewModel.selectItem(itemId)
+        vms.mafatih.selectItem(itemId)
         go("mafatih/reader/$itemId")
     }
     fun openWeekday(kind: DayContentKind, day: DayOfWeek? = null) = go(WeekdayRoute.of(kind, day))
@@ -235,11 +233,11 @@ fun AppNavigation(
     val lastPage by toolsViewModel.lastQuranPage.collectAsState()
     fun openSurah(surah: Int) {
         if (pagesMode) go("quran/page/${QuranPages.firstPageOfSurah(surah)}")
-        else { quranViewModel.selectSurah(surah); go("quran/reader/$surah") }
+        else { vms.quran.selectSurah(surah); go("quran/reader/$surah") }
     }
     fun openAyah(surah: Int, ayah: Int) {
         if (pagesMode) go("quran/page/${QuranPages.pageOf(surah, ayah)}?s=$surah&a=$ayah")
-        else { quranViewModel.selectSurah(surah); go("quran/reader/$surah?a=$ayah") }
+        else { vms.quran.selectSurah(surah); go("quran/reader/$surah?a=$ayah") }
     }
     fun resumeSurah(surah: Int) {
         val page = toolsViewModel.lastQuranPage.value
@@ -326,7 +324,7 @@ fun AppNavigation(
             composable("worship") { WorshipHubScreen(onOpenRoute = { go(it) }) }
             composable("quran") {
                 QuranScreen(
-                    viewModel = quranViewModel,
+                    viewModel = vms.quran,
                     pagesMode = pagesMode,
                     lastPage = lastPage,
                     onPagesModeChange = { toolsViewModel.setQuranPagesMode(it) },
@@ -336,14 +334,14 @@ fun AppNavigation(
             }
             composable("mafatih") {
                 MafatihScreen(
-                    viewModel = mafatihViewModel,
+                    viewModel = vms.mafatih,
                     onNavigateToItem = { go("mafatih/reader/$it") },
                     onNavigateToDuas = { go("duas") },
                     onNavigateToZiyarat = { go("ziyarat") }
                 )
             }
             composable("sahifa") {
-                SahifaScreen(viewModel = sahifaViewModel, onOpenItem = { openReader(it) })
+                SahifaScreen(viewModel = vms.sahifa, onOpenItem = { openReader(it) })
             }
 
             // ---- readers
@@ -355,10 +353,10 @@ fun AppNavigation(
                 )
             ) { entry ->
                 val surahNumber = entry.arguments?.getInt("surahNumber") ?: 1
-                quranViewModel.selectSurah(surahNumber)
+                vms.quran.selectSurah(surahNumber)
                 QuranReaderScreen(
                     surahNumber = surahNumber,
-                    viewModel = quranViewModel,
+                    viewModel = vms.quran,
                     tools = toolsViewModel,
                     onOpenMizan = { s, a -> go("mizan/ayah/$s/$a") },
                     onNavigateBack = { back() },
@@ -378,7 +376,7 @@ fun AppNavigation(
                 QuranMushafScreen(
                     initialPage = entry.arguments?.getInt("page") ?: 1,
                     highlight = if (s > 0 && a > 0) FavoriteKey.Ayah(s, a) else null,
-                    viewModel = quranViewModel,
+                    viewModel = vms.quran,
                     tools = toolsViewModel,
                     onOpenMizan = { surah, ayah -> go("mizan/ayah/$surah/$ayah") },
                     onNavigateBack = { back() }
@@ -391,10 +389,10 @@ fun AppNavigation(
                 val itemId = entry.arguments?.getString("itemId") ?: ""
                 // Selected while composing so that the first frame already shows this item (the reader screens do not
                 // check the id). A no-op when the item is already selected, so a rotation keeps the counter.
-                mafatihViewModel.selectItem(itemId)
+                vms.mafatih.selectItem(itemId)
                 MafatihReaderScreen(
                     itemId = itemId,
-                    viewModel = mafatihViewModel,
+                    viewModel = vms.mafatih,
                     tools = toolsViewModel,
                     onNavigateBack = { back() }
                 )
@@ -413,7 +411,7 @@ fun AppNavigation(
             // ---- pushed screens
             composable("search") {
                 GlobalSearchScreen(
-                    viewModel = searchViewModel,
+                    viewModel = vms.search,
                     onNavigateToQuran = { surahNum, ayahNum ->
                         if (ayahNum != null && ayahNum > 0) openAyah(surahNum, ayahNum) else openSurah(surahNum)
                     },
@@ -515,14 +513,14 @@ fun AppNavigation(
                 )
             }
             composable("prayer/settings") {
-                PrayerSettingsScreen(toolsViewModel, voiceViewModel, onNavigateBack = { back() }, onOpenVoices = { go("prayer/voices") })
+                PrayerSettingsScreen(toolsViewModel, vms.voice, onNavigateBack = { back() }, onOpenVoices = { go("prayer/voices") })
             }
-            composable("prayer/voices") { VoicePacksScreen(voiceViewModel, onNavigateBack = { back() }) }
-            composable("tasbih") { TasbihScreen(worshipViewModel, onNavigateBack = { back() }) }
-            composable("qada") { QadaScreen(worshipViewModel, onNavigateBack = { back() }) }
-            composable("ramadan") { RamadanScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
-            composable("ayat") { AyatScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
-            composable("khums") { KhumsScreen(toolsViewModel, worshipViewModel, onNavigateBack = { back() }) }
+            composable("prayer/voices") { VoicePacksScreen(vms.voice, onNavigateBack = { back() }) }
+            composable("tasbih") { TasbihScreen(vms.worship, onNavigateBack = { back() }) }
+            composable("qada") { QadaScreen(vms.worship, onNavigateBack = { back() }) }
+            composable("ramadan") { RamadanScreen(toolsViewModel, vms.worship, onNavigateBack = { back() }) }
+            composable("ayat") { AyatScreen(toolsViewModel, vms.worship, onNavigateBack = { back() }) }
+            composable("khums") { KhumsScreen(toolsViewModel, vms.worship, onNavigateBack = { back() }) }
             composable("qibla") { QiblaScreen(toolsViewModel, onNavigateBack = { back() }) }
             composable("favorites") {
                 FavoritesScreen(
@@ -537,7 +535,7 @@ fun AppNavigation(
                 SettingsScreen(
                     viewModel = mainViewModel,
                     tools = toolsViewModel,
-                    worship = worshipViewModel,
+                    worship = vms.worship,
                     onNavigateBack = { back() },
                     onOpenRoute = { go(it) }
                 )
@@ -545,6 +543,17 @@ fun AppNavigation(
         }
       }
     }
+}
+
+/** Activity-scoped view models, each created the first time a screen asks for it. */
+private class LazyViewModels(owner: ViewModelStoreOwner) {
+    private val provider = ViewModelProvider(owner)
+    val quran: QuranViewModel by lazy { provider[QuranViewModel::class.java] }
+    val mafatih: MafatihViewModel by lazy { provider[MafatihViewModel::class.java] }
+    val sahifa: SahifaViewModel by lazy { provider[SahifaViewModel::class.java] }
+    val search: SearchViewModel by lazy { provider[SearchViewModel::class.java] }
+    val voice: VoiceViewModel by lazy { provider[VoiceViewModel::class.java] }
+    val worship: WorshipViewModel by lazy { provider[WorshipViewModel::class.java] }
 }
 
 /** Shown on every screen while an adhan plays, so it can always be stopped from inside the app. */

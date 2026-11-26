@@ -30,6 +30,7 @@ import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import com.dailydeeds.reminder.worship.Khums
+import com.dailydeeds.reminder.worship.KhumsDraft
 import com.dailydeeds.reminder.worship.KhumsInput
 import com.dailydeeds.reminder.worship.KhumsYear
 import java.math.BigDecimal
@@ -53,10 +54,13 @@ fun KhumsScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack
     val reminder by worship.khumsReminder.collectAsState()
     val today = remember { LocalDate.now() }
 
-    var gains by rememberSaveable { mutableStateOf("") }
-    var expenses by rememberSaveable { mutableStateOf("") }
-    var deductions by rememberSaveable { mutableStateOf("") }
-    var paid by rememberSaveable { mutableStateOf("") }
+    // The figures are kept as a draft, so leaving the screen (or the app) does not lose them.
+    val saved = remember { worship.khumsDraft.value }
+    var gains by rememberSaveable { mutableStateOf(saved.gains) }
+    var expenses by rememberSaveable { mutableStateOf(saved.expenses) }
+    var deductions by rememberSaveable { mutableStateOf(saved.deductions) }
+    var paid by rememberSaveable { mutableStateOf(saved.paid) }
+    fun saveDraft() = worship.setKhumsDraft(KhumsDraft(gains, expenses, deductions, paid))
 
     fun amount(text: String): BigDecimal? = if (text.isBlank()) BigDecimal.ZERO else Khums.parseAmount(text)
     val parsed = listOf(gains, expenses, deductions, paid).map(::amount)
@@ -71,10 +75,15 @@ fun KhumsScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack
         ) {
             WorshipCard {
                 WorshipHeading("حساب فاضل السنة")
-                AmountField("إجمالي الأرباح والمكاسب خلال السنة", gains) { gains = it }
-                AmountField("مصاريف المعيشة (المؤونة) خلال السنة", expenses) { expenses = it }
-                AmountField("ديون وما يُستثنى منها", deductions) { deductions = it }
-                AmountField("خمس دفعتَه سابقاً عن هذه السنة", paid) { paid = it }
+                AmountField("إجمالي الأرباح والمكاسب خلال السنة", gains) { gains = it; saveDraft() }
+                AmountField("مصاريف المعيشة (المؤونة) خلال السنة", expenses) { expenses = it; saveDraft() }
+                AmountField("ديون وما يُستثنى منها", deductions) { deductions = it; saveDraft() }
+                AmountField("خمس دفعتَه سابقاً عن هذه السنة", paid) { paid = it; saveDraft() }
+                if (listOf(gains, expenses, deductions, paid).any { it.isNotBlank() }) {
+                    TextButton(onClick = { gains = ""; expenses = ""; deductions = ""; paid = ""; saveDraft() }) {
+                        Text("مسح الأرقام")
+                    }
+                }
                 if (result == null) {
                     Text("أدخل أرقاماً صحيحة فقط.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 } else {

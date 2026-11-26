@@ -2,6 +2,8 @@ package com.dailydeeds.reminder.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.dailydeeds.reminder.data.DataReloads
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.data.QuranRepository
 import com.dailydeeds.reminder.data.ReaderFonts
@@ -10,6 +12,8 @@ import com.dailydeeds.reminder.model.Surah
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 /** The Quran list, the ayah reader and the mushaf pages. Text sizes and fit mode are kept between launches. */
 class QuranViewModel @JvmOverloads constructor(
@@ -80,5 +84,17 @@ class QuranViewModel @JvmOverloads constructor(
         setMushafFit(false)
         _mushafFontSp.value = sp
         prefs.setReaderFontSp(ReaderFonts.KEY_MUSHAF, sp)
+    }
+
+    init {
+        // A backup import replaces the sizes and fit mode; read them again so the next zoom does not undo it.
+        val seen = DataReloads.imports.value
+        viewModelScope.launch {
+            DataReloads.imports.filter { it != seen }.collect {
+                _fontSizeSp.value = prefs.getReaderFontSp(ReaderFonts.KEY_QURAN, ReaderFonts.QURAN)
+                _mushafFontSp.value = prefs.getReaderFontSp(ReaderFonts.KEY_MUSHAF, ReaderFonts.MUSHAF)
+                _mushafFit.value = prefs.getMushafFit()
+            }
+        }
     }
 }

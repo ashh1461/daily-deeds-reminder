@@ -5,7 +5,27 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.rememberUpdatedState
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
+import android.os.Build
+import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.dailydeeds.reminder.ui.components.KeepScreenOn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +35,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -97,6 +116,9 @@ fun QuranMushafScreen(
     var tapped by remember { mutableStateOf<Ayah?>(null) }
     var showGoTo by rememberSaveable { mutableStateOf(false) }
     val current = remember(pagerState.currentPage) { QuranPages.page(pagerState.currentPage + 1) }
+    // The page that was opened scrolls to its highlighted ayah once, not again each time it is swiped back into view.
+    var highlightShown by rememberSaveable { mutableStateOf(false) }
+    KeepScreenOn()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { index ->
@@ -158,6 +180,8 @@ fun QuranMushafScreen(
                 val page = remember(index) { QuranPages.page(index + 1) }
                 MushafPage(
                     page, fontSizeSp, fit, favoriteSet, highlight,
+                    scrollToHighlight = !highlightShown,
+                    onHighlightShown = { highlightShown = true },
                     onFitted = { fittedSizes[page.number] = it },
                     onAyahTap = { tapped = it }
                 )
@@ -192,32 +216,74 @@ private fun MushafPage(
     fit: Boolean,
     favorites: Set<FavoriteKey>,
     highlight: FavoriteKey.Ayah?,
+    scrollToHighlight: Boolean,
+    onHighlightShown: () -> Unit,
     onFitted: (Float) -> Unit,
     onAyahTap: (Ayah) -> Unit
 ) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        val measurer = rememberTextMeasurer()
         val density = LocalDensity.current
+        val fontFamilyResolver = LocalFontFamilyResolver.current
+        val layoutDirection = LocalLayoutDirection.current
         val bodyStyle = MaterialTheme.typography.bodyLarge
         val titleStyle = MaterialTheme.typography.titleLarge
         val footerStyle = MaterialTheme.typography.labelLarge
         val maxW = constraints.maxWidth
         val maxH = constraints.maxHeight
-        val fitted = if (!fit) null else remember(page.number, favorites, maxW, maxH, density, bodyStyle, titleStyle) {
-            fitMushafFontSize(page, favorites, measurer, density, bodyStyle, titleStyle, footerStyle, maxW, maxH)
+        // Fitting measures the page about nine times, so it runs off the main thread, outside composition, and its
+        // result is cached by (page, size, that page's favourites): swiping back or starring elsewhere costs nothing.
+        val key = remember(page.number, favorites, maxW, maxH, density) {
+            mushafFitKey(page, favorites, maxW, maxH, density.density, density.fontScale)
         }
-        fitted?.let { LaunchedEffect(page.number, it) { onFitted(it) } }
-        val size = fitted ?: fontSizeSp
+        // Kept per page and screen size, not per key: when a star on this page changes the key, the page keeps its
+        // current size (and its scroll position) until the new fit is ready, instead of going blank.
+        var fitted by remember(page.number, maxW, maxH, density) { mutableStateOf(mushafFits.get(key)) }
+        if (fit) {
+            LaunchedEffect(key) {
+                fitted = mushafFits.get(key) ?: withContext(Dispatchers.Default) {
+                    val measurer = TextMeasurer(fontFamilyResolver, density, layoutDirection, cacheSize = 0)
+                    fitMushafFontSize(page, key.favorites, measurer, density, bodyStyle, titleStyle, footerStyle, maxW, maxH)
+                }.also { mushafFits.put(key, it) }
+            }
+        }
+        val fittedSize = if (fit) fitted else null
+        fittedSize?.let { LaunchedEffect(page.number, it) { onFitted(it) } }
+        val scrollState = rememberScrollState()
+        // Only a page's first fit leaves it blank for that moment, rather than jumping from one size to another.
+        if (fit && fittedSize == null) {
+            Box(Modifier.fillMaxSize())
+            return@BoxWithConstraints
+        }
+        val size = fittedSize ?: fontSizeSp
+
+        val highlightOnPage = highlight != null && page.segments.any { seg ->
+            seg.surah.number == highlight.surah && seg.ayahs.any { it.ayahNumber == highlight.ayah }
+        }
+        // Where the highlighted ayah's line starts inside the page, once its run has been laid out.
+        var highlightY by remember(page.number, size) { mutableStateOf<Float?>(null) }
+        if (scrollToHighlight && highlightOnPage) {
+            LaunchedEffect(highlightY) {
+                val y = highlightY ?: return@LaunchedEffect
+                val margin = with(density) { (MushafLayout.Spacing * 4).toPx() }
+                scrollState.animateScrollTo((y - margin).toInt().coerceAtLeast(0))
+                onHighlightShown()
+            }
+        }
+        val topPadding = with(density) { MushafLayout.VerticalPadding.toPx() }
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(horizontal = MushafLayout.HorizontalPadding, vertical = MushafLayout.VerticalPadding),
             verticalArrangement = Arrangement.spacedBy(MushafLayout.Spacing)
         ) {
             page.segments.forEach { segment ->
                 if (segment.startsSurah) SurahTitle(segment.surah.number, segment.surah.nameArabic, size)
-                AyahRun(segment.ayahs, size, favorites, highlight, onAyahTap)
+                val runHighlight = highlight?.takeIf { it.surah == segment.surah.number }
+                AyahRun(
+                    segment.ayahs, size, favorites, runHighlight, onAyahTap,
+                    onHighlightLaidOut = if (runHighlight == null) null else { top -> highlightY = topPadding + top }
+                )
             }
             Text(
                 ArabicDigits.format(page.number),
@@ -249,49 +315,85 @@ private fun SurahTitle(number: Int, name: String, fontSizeSp: Float) {
     }
 }
 
-/** One surah's ayahs on the page as continuous justified text, each closed by its number. */
+/**
+ * One surah's ayahs on the page as continuous justified text, each closed by its number. Each ayah is a link, so a tap
+ * or TalkBack's link navigation opens its actions, and each also has a TalkBack custom action.
+ */
 @Composable
 private fun AyahRun(
     ayahs: List<Ayah>,
     fontSizeSp: Float,
     favorites: Set<FavoriteKey>,
     highlight: FavoriteKey.Ayah?,
-    onAyahTap: (Ayah) -> Unit
+    onAyahTap: (Ayah) -> Unit,
+    onHighlightLaidOut: ((Float) -> Unit)? = null
 ) {
     val marker = MaterialTheme.colorScheme.primary
     val favoriteMarker = MaterialTheme.colorScheme.tertiary
     val highlightBackground = MaterialTheme.colorScheme.primaryContainer
+    val currentTap by rememberUpdatedState(onAyahTap)
     val text = remember(ayahs, favorites, highlight, marker, favoriteMarker, highlightBackground) {
-        ayahText(ayahs, favorites, highlight, marker, favoriteMarker, highlightBackground)
+        ayahText(ayahs, favorites, highlight, marker, favoriteMarker, highlightBackground) { currentTap(it) }
     }
-    ClickableText(
+    val actions = remember(ayahs) {
+        ayahs.map { ayah ->
+            CustomAccessibilityAction("الآية ${ArabicDigits.format(ayah.ayahNumber)}: المفضلة والتفسير") {
+                currentTap(ayah)
+                true
+            }
+        }
+    }
+    val highlightStart = remember(text, highlight) {
+        highlight?.let { h -> text.getStringAnnotations(AYAH_TAG, 0, text.length).firstOrNull { it.item == h.ayah.toString() }?.start }
+    }
+    var runTop by remember { mutableStateOf<Float?>(null) }
+    var lineTop by remember { mutableStateOf<Float?>(null) }
+    if (onHighlightLaidOut != null) {
+        val top = runTop
+        val line = lineTop
+        if (top != null && line != null) LaunchedEffect(top, line) { onHighlightLaidOut(top + line) }
+    }
+    Text(
         text = text,
         style = MushafLayout.ayahStyle(MaterialTheme.typography.bodyLarge, fontSizeSp, MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.fillMaxWidth()
-    ) { offset ->
-        val id = text.getStringAnnotations(AYAH_TAG, offset, offset).firstOrNull()?.item?.toIntOrNull()
-        ayahs.firstOrNull { it.ayahNumber == id }?.let(onAyahTap)
-    }
+        onTextLayout = { layout ->
+            lineTop = highlightStart?.let { layout.getLineTop(layout.getLineForOffset(it)) }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned { runTop = it.positionInParent().y }
+            .semantics { customActions = actions }
+    )
 }
 
+/**
+ * The run's text. Each ayah carries an [AYAH_TAG] annotation with its number; with [onTap] it is also a link to its
+ * actions (fitting measures the text without links).
+ */
 internal fun ayahText(
     ayahs: List<Ayah>,
     favorites: Set<FavoriteKey>,
     highlight: FavoriteKey.Ayah?,
     marker: Color,
     favoriteMarker: Color,
-    highlightBackground: Color
+    highlightBackground: Color,
+    onTap: ((Ayah) -> Unit)? = null
 ): AnnotatedString = buildAnnotatedString {
     ayahs.forEachIndexed { i, ayah ->
         val start = length
-        val highlighted = highlight?.surah == ayah.surahNumber && highlight.ayah == ayah.ayahNumber
-        if (highlighted) withStyle(SpanStyle(background = highlightBackground)) { append(ayah.textArabic) }
-        else append(ayah.textArabic)
-        val favorite = FavoriteKey.Ayah(ayah.surahNumber, ayah.ayahNumber) in favorites
-        append(' ')
-        withStyle(SpanStyle(color = if (favorite) favoriteMarker else marker, fontWeight = FontWeight.Bold)) {
-            if (favorite) append("★")
-            append("﴿${ArabicDigits.format(ayah.ayahNumber)}﴾")
+        val write: AnnotatedString.Builder.() -> Unit = {
+            val highlighted = highlight?.surah == ayah.surahNumber && highlight.ayah == ayah.ayahNumber
+            if (highlighted) withStyle(SpanStyle(background = highlightBackground)) { append(ayah.textArabic) }
+            else append(ayah.textArabic)
+            val favorite = FavoriteKey.Ayah(ayah.surahNumber, ayah.ayahNumber) in favorites
+            append(' ')
+            withStyle(SpanStyle(color = if (favorite) favoriteMarker else marker, fontWeight = FontWeight.Bold)) {
+                if (favorite) append("★")
+                append("﴿${ArabicDigits.format(ayah.ayahNumber)}﴾")
+            }
+        }
+        if (onTap == null) write() else {
+            withLink(LinkAnnotation.Clickable(tag = "$AYAH_TAG:${ayah.ayahNumber}") { onTap(ayah) }) { write() }
         }
         addStringAnnotation(AYAH_TAG, ayah.ayahNumber.toString(), start, length)
         if (i < ayahs.lastIndex) append(' ')
@@ -309,10 +411,31 @@ private fun AyahActionsDialog(
     val surahName = remember(ayah.surahNumber, ayah.page) {
         QuranPages.page(ayah.page).segments.firstOrNull { it.surah.number == ayah.surahNumber }?.surah?.nameArabic.orEmpty()
     }
+    val context = LocalContext.current
+    val shareText = remember(ayah, surahName) { ayahShareText(ayah, surahName) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("سورة $surahName - الآية ${ArabicDigits.format(ayah.ayahNumber)}") },
-        text = { Text(ayah.textArabic, maxLines = 6, overflow = TextOverflow.Ellipsis) },
+        text = {
+            Column {
+                // The whole ayah, scrolling when it is long, instead of cutting it at six lines.
+                Text(ayah.textArabic, modifier = Modifier.heightIn(max = 320.dp).verticalScroll(rememberScrollState()))
+                Row {
+                    TextButton(onClick = {
+                        context.getSystemService(ClipboardManager::class.java)
+                            ?.setPrimaryClip(ClipData.newPlainText("آية", shareText))
+                        // Android 13 and later confirm a copy on their own.
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                            Toast.makeText(context, "نُسخت الآية", Toast.LENGTH_SHORT).show()
+                        }
+                    }) { Text("نسخ") }
+                    TextButton(onClick = {
+                        val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareText)
+                        context.startActivity(Intent.createChooser(send, "مشاركة الآية"))
+                    }) { Text("مشاركة") }
+                }
+            }
+        },
         confirmButton = {
             TextButton(onClick = { onToggleFavorite(); onDismiss() }) {
                 Text(if (isFavorite) "إزالة من المفضلة" else "إضافة إلى المفضلة")
@@ -326,6 +449,10 @@ private fun AyahActionsDialog(
         }
     )
 }
+
+/** The ayah with its number and its place, as copied or shared. */
+internal fun ayahShareText(ayah: Ayah, surahName: String): String =
+    "${ayah.textArabic} ﴿${ArabicDigits.format(ayah.ayahNumber)}﴾\n(سورة $surahName، الآية ${ArabicDigits.format(ayah.ayahNumber)})"
 
 /** Jump by page number (1-604) or juz (1-30); Arabic-Indic digits are accepted. */
 @Composable

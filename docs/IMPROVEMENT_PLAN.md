@@ -165,19 +165,31 @@ Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4)
   - The ayah deep link from search and favourites.
   - The Quran as 604 mushaf pages, resuming at the last page.
   - Deleting and bulk-deleting favourites from the list.
-- **v1.8.1.6** (branch `fix/v1.8.1.6`, not yet released): all eight items of the 7.5 row.
+- **v1.8.1.6** (branch `fix/v1.8.1.6`, published as a pre-release, PR #30 open): all eight items of the 7.5 row.
   - The backup regression (the Int/Boolean reader keys now pass the type check).
   - The weekday favourite or search result opening on its own day (`duas?day=…`).
   - One mushaf minimum for fit and zoom, and the favourites undo that keeps stars added since.
   - The bulk qada undo (one batch id per "add days").
   - Reader sizes and fit mode saved and backed up (`pref_font_*`, `pref_mushaf_fit`), and the basmala line height scaled with its size.
   - The privacy-policy wording for «موقعي».
-- **v1.8.2** (branch `feature/v1.8.2`, stacked on `fix/v1.8.1.6`, not yet released): the 7.5 row.
+- **v1.8.2** (branch `feature/v1.8.2`, stacked on `fix/v1.8.1.6`, published as a pre-release, PR #31 open): the 7.5 row.
   - targetSdk/compileSdk 36 and edge to edge; AGP 8.13.2, Gradle 8.13, Kotlin 2.2.21, Compose BOM 2025.08.00 (stays on AGP 8, so Dependabot #5–#9 are replaced, not merged).
   - Direct-boot restore: settings moved to device-protected storage (your choice, 2026-11-26); `LOCKED_BOOT_COMPLETED`.
   - The high-latitude rule (angle-based, fills only missing times, marked «تقديري»).
   - Snooze across reboots, the "last fired" guard (3 h window), pausing on short interruptions, no service on silent, `setAlarmClock`, the dark start window.
   - `androidTest`: one instrumented test for the settings move (compiled, not run here).
+- **v1.8.3** (branch `feature/v1.8.3`, stacked on `feature/v1.8.2`, not yet released): the 7.5 row, plus two 7.4 features you chose.
+  - Mushaf accessibility: each ayah is a `LinkAnnotation` link and a TalkBack custom action.
+  - The fit cache: fitting runs off the main thread, cached by (page, size, text scale, that page's favourites).
+  - Scrolling the page to the highlighted ayah, once.
+  - The Qibla in landscape (`remapCoordinateSystem` by display rotation).
+  - The cold-start work: screen view models created on first use; the search index built when search first opens.
+  - The Mafatih `LazyColumn` (blocks of lines of about 1,200 characters).
+  - Reloading after a backup import (`DataReloads`): tasbih, qada, khums, eclipse and Imsak switches, reader sizes and fit mode.
+  - The mirrored back arrows and the Ramadan TalkBack labels.
+  - The `own_` prefix reserved for imported voices, with unique ids.
+  - Tasbih and khums safety: a confirmation before clearing, the same target no longer clears; the khums draft (`worship_khums_draft`).
+  - From 7.4: the strong tasbih vibration at 34, 67 and 100 (and at the free target), the screen kept on in the tasbih and the readers; copying and sharing an ayah, and the whole ayah in its dialog.
 - **Settled by you:** saved places are not wanted for now (1.2 item 7). Settings in device-protected storage for direct boot (2026-11-26).
 
 ### 7.2 Still open from sections 2 and 3

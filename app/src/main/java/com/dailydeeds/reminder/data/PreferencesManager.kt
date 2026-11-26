@@ -13,6 +13,7 @@ import com.dailydeeds.reminder.model.PlacePresets
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.model.ReminderType
+import com.dailydeeds.reminder.worship.KhumsDraft
 import com.dailydeeds.reminder.worship.KhumsYear
 import com.dailydeeds.reminder.worship.QadaState
 import com.dailydeeds.reminder.worship.TasbihState
@@ -54,6 +55,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_TASBIH = "worship_tasbih"
         private const val KEY_QADA = "worship_qada"
         private const val KEY_KHUMS_YEAR = "worship_khums_year"
+        private const val KEY_KHUMS_DRAFT = "worship_khums_draft"
         private const val KEY_IMSAK_ALARM = "worship_imsak_enabled"
         private const val KEY_KHUMS_REMINDER = "worship_khums_enabled"
         private const val KEY_ECLIPSE_REMINDER = "worship_eclipse_enabled"
@@ -316,6 +318,12 @@ class PreferencesManager(context: Context) {
     fun setKhumsYear(year: KhumsYear?) {
         if (year == null) prefs.edit().remove(KEY_KHUMS_YEAR).apply()
         else prefs.edit().putString(KEY_KHUMS_YEAR, year.encode()).apply()
+    }
+
+    fun getKhumsDraft(): KhumsDraft = KhumsDraft.decode(prefs.getString(KEY_KHUMS_DRAFT, null))
+    fun setKhumsDraft(draft: KhumsDraft) {
+        if (draft.isEmpty) prefs.edit().remove(KEY_KHUMS_DRAFT).apply()
+        else prefs.edit().putString(KEY_KHUMS_DRAFT, draft.encode()).apply()
     }
 
     fun isImsakAlarmEnabled(): Boolean = prefs.getBoolean(KEY_IMSAK_ALARM, false)

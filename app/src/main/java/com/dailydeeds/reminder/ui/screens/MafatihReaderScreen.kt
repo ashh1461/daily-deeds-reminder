@@ -7,7 +7,6 @@ import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +15,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.runtime.remember
+import com.dailydeeds.reminder.ui.components.KeepScreenOn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
@@ -66,6 +67,9 @@ fun MafatihReaderScreen(
     LaunchedEffect(currentItem.id) {
         if (currentItem.fromMafatihBook) tools.recordMafatih(currentItem.id) else tools.recordSahifa(currentItem.id)
     }
+    KeepScreenOn()
+    // Sections run to 21.8k characters, so they are drawn in blocks of lines and only the blocks on screen are laid out.
+    val lines = remember(currentItem.id) { readerBlocks(currentItem.arabicText) }
 
     Scaffold(
         topBar = {
@@ -86,7 +90,7 @@ fun MafatihReaderScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "رجوع")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
                     }
                 },
                 actions = {
@@ -157,38 +161,73 @@ fun MafatihReaderScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        val panel = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
+        val textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = fontSizeSp.sp, lineHeight = (fontSizeSp * 1.7f).sp)
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.End
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(18.dp)
-            ) {
+            item { Spacer(modifier = Modifier.height(12.dp)) }
+            // One rounded panel as before: the first line rounds the top corners, the last the bottom ones.
+            itemsIndexed(lines) { index, line ->
+                val shape = readerLineShape(index, lines.lastIndex)
                 Text(
-                    text = currentItem.arabicText,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = fontSizeSp.sp,
-                        lineHeight = (fontSizeSp * 1.7f).sp
-                    ),
+                    text = line,
+                    style = textStyle,
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = panel, shape = shape)
+                        .padding(
+                            start = 18.dp,
+                            end = 18.dp,
+                            top = if (index == 0) 18.dp else 0.dp,
+                            bottom = if (index == lines.lastIndex) 18.dp else 0.dp
+                        )
                 )
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
 }
+
+/** The section's lines, split at its line breaks; joined with "\n" they give back the exact text. */
+internal fun readerLines(text: String): List<String> = text.split('\n')
+
+/** About this many characters per block: small enough to lay out quickly, large enough for TalkBack to read on. */
+internal const val READER_BLOCK_CHARS = 1_200
+
+/**
+ * Consecutive lines grouped into blocks of about [READER_BLOCK_CHARS] characters, never splitting a line. Joined with
+ * "\n" they give back the exact text.
+ */
+internal fun readerBlocks(text: String): List<String> {
+    val blocks = ArrayList<String>()
+    val current = StringBuilder()
+    var started = false
+    for (line in readerLines(text)) {
+        if (started && current.length >= READER_BLOCK_CHARS) {
+            blocks += current.toString()
+            current.setLength(0)
+            started = false
+        }
+        if (started) current.append('\n')
+        current.append(line)
+        started = true
+    }
+    blocks += current.toString()
+    return blocks
+}
+
+private val PanelCorner = 16.dp
+
+private fun readerLineShape(index: Int, lastIndex: Int): RoundedCornerShape = RoundedCornerShape(
+    topStart = if (index == 0) PanelCorner else 0.dp,
+    topEnd = if (index == 0) PanelCorner else 0.dp,
+    bottomStart = if (index == lastIndex) PanelCorner else 0.dp,
+    bottomEnd = if (index == lastIndex) PanelCorner else 0.dp
+)

@@ -1,17 +1,17 @@
 # Graph Report - Daily Reminder  (2026-11-26)
 
 ## Corpus Check
-- 209 files · ~3,055,529 words
+- 209 files · ~3,055,759 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 27 file(s) not represented in the graph (top: .xml 13, .ttf 5, (none) 3)
 
 ## Summary
-- 2202 nodes · 5963 edges · 131 communities (81 shown, 50 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 224 edges (avg confidence: 0.89)
+- 2202 nodes · 5966 edges · 133 communities (86 shown, 47 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 227 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0652c27e`
+- Built from commit: `7d90c220`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -36,6 +36,7 @@
 - ShiaCalendar
 - build_mizan.py
 - Repository Soul & Core Identity
+- assertequals
 - steps
 - ReaderCounterScreen
 - FavoritesScreen
@@ -56,24 +57,25 @@
 - Wird 1.8.1.5: the Quran page by page, and deleting favourites from the list (pre-release)
 - AppNavigation
 - VoiceAndPolicyTest
-- TimetablePdf.kt
+- SearchResultType
 - Distribution: signing, verification, Google Play and Play Protect
 - Daily Deeds Reminder 1.2.1
-- ToolsViewModel
+- .prepare
+- AdhanService.kt
 - QuranViewModel
 - localdate
 - Daily Deeds Reminder 1.4.0
-- AdhanService
+- .shutdown
 - QuranRepository
 - Google Play listing: draft answers (not submitted)
 - QuranMushafScreen.kt
-- BackupCodecTest
+- PrayerContext
 - Theme.kt
 - Wird 1.8.0 (formerly Daily Deeds Reminder)
 - AlarmScheduler.kt
-- AdhanMode
+- ToolsViewModel
 - THIRD_PARTY_NOTICES.md
-- PrayerContext
+- ReligiousAlarms.kt
 - QadaState
 - WorshipViewModel
 - .parse
@@ -85,12 +87,12 @@
 - Daily Deeds Reminder 1.5.0
 - MainViewModel
 - WorshipHubScreen.kt
-- PrayerTimesScreen
+- MizanHeader
 - VoiceStore
 - .next
 - VoiceViewModel
 - Test
-- PrayerAlarmReceiver.kt
+- BackupCodec
 - KhumsScreen
 - TasbihState
 - Daily Deeds Reminder 1.6.0
@@ -99,7 +101,7 @@
 - BroadcastReceiver
 - SearchRepositoryTest
 - manifest.json
-- ReligiousAlarms.kt
+- AdhanActionReceiver.kt
 - KhumsTest
 - Deed
 - DeedCategory
@@ -110,34 +112,36 @@
 - DeedCard.kt
 - .search
 - Validation
-- AdhanGlobalSettings
+- ReminderTimeCalculatorTest
 - DeedCategory
-- ReminderType
+- SettingsScreen
 - Licence of the bundled text datasets
 - ArabicNormalizer
 - .contains
 - MushafFit.kt
-- Test
+- WeekdayRoute
 - MainActivity
-- PrayerSettingsScreen
+- MizanData.kt
 - Wird 1.8.1.3: switch the adhan for all prayers at once (pre-release)
 - BundledVoices
 - Wird 1.8.1.1: reliability fixes (pre-release)
 - ArabicNormalizerTest
 - CoordinateRoundingTest.kt
 - PlacePickerCard
-- NightOccasionsTest
-- ArabicDigitsTest
+- MizanData
+- SearchViewModel
 - OccasionKind
-- QuranDataProvider
+- AdhanMode
 - Adhan voice packs
 - merge_stack.sh
-- .armHardwareStop
+- MizanFormat
 - QuranDataIntegrityTest
 - Wird 1.8.1.2: two bundled adhan recordings (pre-release)
 - NoEmptySourceFilesTest.kt
 - Wird 1.8.1.6: small fixes, including a backup regression from 1.8.1.5 (pre-release)
 - VoicePacksScreen
+- LunarMonthsScreen
+- ReminderTimeCalculator.kt
 
 ## God Nodes (most connected - your core abstractions)
 1. `PreferencesManager` - 107 edges
@@ -146,7 +150,7 @@
 4. `AppNavigation()` - 43 edges
 5. `WorshipViewModel` - 43 edges
 6. `Place` - 40 edges
-7. `Ongoing log` - 37 edges
+7. `Ongoing log` - 40 edges
 8. `FavoriteKey` - 36 edges
 9. `PrayerContext` - 35 edges
 10. `MafatihItem` - 33 edges
@@ -156,21 +160,17 @@
   docs/SECURITY.md → app/src/test/java/com/dailydeeds/reminder/adhan/VoiceAndPolicyTest.kt
 - `Rights gate` --references--> `VoiceAndPolicyTest`  [INFERRED]
   docs/voices/README.md → app/src/test/java/com/dailydeeds/reminder/adhan/VoiceAndPolicyTest.kt
-- `v1.2.1 corrective release (2026-10-07)` --references--> `QuranDataIntegrityTest`  [INFERRED]
-  progress.md → app/src/test/java/com/dailydeeds/reminder/data/QuranDataIntegrityTest.kt
 - `1.1 The adhan does not stop when you pull down the notification panel` --references--> `MainActivity`  [INFERRED]
   docs/IMPROVEMENT_PLAN.md → app/src/main/java/com/dailydeeds/reminder/MainActivity.kt
 - `Completed` --references--> `MainActivity`  [INFERRED]
+  progress.md → app/src/main/java/com/dailydeeds/reminder/MainActivity.kt
+- `Ongoing log` --references--> `MainActivity`  [INFERRED]
   progress.md → app/src/main/java/com/dailydeeds/reminder/MainActivity.kt
 
 ## Import Cycles
 - None detected.
 
-## Communities (131 total, 50 thin omitted)
-
-### Community 0 - "MizanDataTest"
-Cohesion: 0.05
-Nodes (16): MizanData, MizanStore, MizanFormat, MizanIndexBuilder, MizanEntry, MizanHeader, MizanHit, MizanKind (+8 more)
+## Communities (133 total, 47 thin omitted)
 
 ### Community 2 - "Daily Deeds Reminder v1.1.0 release notes"
 Cohesion: 0.08
@@ -185,20 +185,20 @@ Cohesion: 0.09
 Nodes (8): PrayerParams, PrayerTimes, Raw, Qibla, PrayerMethodsTest, Ref, PrayerTimesTest, Ref
 
 ### Community 6 - "DayContentKind"
-Cohesion: 0.05
-Nodes (23): Entry, SearchRepository, WeekdayRepository, DayContent, DayContentKind, DUA, ZIYARAT, SearchResultItem (+15 more)
+Cohesion: 0.16
+Nodes (8): WeekdayRepository, DayContent, DayContentKind, DUA, ZIYARAT, DaySelectorRow(), WeekdayContentScreen(), WeekdayRepositoryTest
 
 ### Community 7 - "Prayer"
 Cohesion: 0.24
 Nodes (3): AlarmText, PrayerAlarmText, PrayerAlarmTextTest
 
 ### Community 8 - "FavoriteKey"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (7): Ayah, FavoriteKey, FavoritesList, Mafatih, Sahifa, Weekday, FavoritesTest
 
 ### Community 9 - "Ongoing log"
-Cohesion: 0.16
-Nodes (10): MafatihReaderScreen(), QuranReaderScreen(), QuranModeBar(), QuranScreen(), Completed, Ongoing log, Progress, Remaining (+2 more)
+Cohesion: 0.15
+Nodes (8): GlobalSearchScreen(), SearchResultCard(), MafatihReaderScreen(), QuranReaderScreen(), Completed, Progress, Remaining, Verification limits
 
 ### Community 10 - "Daily Deeds Reminder 1.2.2"
 Cohesion: 0.33
@@ -221,12 +221,12 @@ Cohesion: 0.50
 Nodes (3): Agent Directives & Operational Rules, Core Mandatory Workflow, Quality & Verification Standards
 
 ### Community 17 - "LunarMonthsScreen"
-Cohesion: 0.20
-Nodes (8): DeedRow(), LunarMonthsData, LunarMonthsScreen(), MonthsList(), section(), LunarMonthDeeds, Section, LunarMonthDeedsTest
+Cohesion: 0.28
+Nodes (3): LunarMonthDeeds, Section, LunarMonthDeedsTest
 
 ### Community 18 - "ShiaCalendar"
-Cohesion: 0.28
-Nodes (4): Occasion, ShiaCalendar, Upcoming, ShiaCalendarTest
+Cohesion: 0.19
+Nodes (5): Occasion, ShiaCalendar, Upcoming, NightOccasionsTest, ShiaCalendarTest
 
 ### Community 19 - "build_mizan.py"
 Cohesion: 0.06
@@ -241,8 +241,8 @@ Cohesion: 0.10
 Nodes (20): runs-on, steps, jobs, build, name, on, pull_request, push (+12 more)
 
 ### Community 24 - "ReaderCounterScreen"
-Cohesion: 0.13
-Nodes (7): CounterOrb(), CounterStageRow(), ReaderCounterContent(), ReaderCounterScreen(), ReaderReadingContent(), ReaderTextCard(), ReaderTopBar()
+Cohesion: 0.20
+Nodes (4): ReaderCounterScreen(), ReaderReadingContent(), ReaderTextCard(), ReaderTopBar()
 
 ### Community 25 - "FavoritesScreen"
 Cohesion: 0.22
@@ -253,8 +253,8 @@ Cohesion: 0.18
 Nodes (10): Blessed nights on the right evening, Changing the place («another area»), Compatibility notes, New section: «أعمال الأشهر القمرية», Not verified (needs a person with a phone), Occasions added (dates from Mafatih al-Jinan), Other adhan fixes, Stopping the adhan (+2 more)
 
 ### Community 29 - "PrayerAlarmConfig"
-Cohesion: 0.17
-Nodes (8): PrayerAlarmConfig, AdhanVoiceChoice, Prayer, DHUHR, FAJR, ISHA, MAGHRIB, AdhanVoiceChoiceTest
+Cohesion: 0.13
+Nodes (14): PrayerAlarmConfig, AdhanVoiceChoice, Heading(), PrayerSettingsScreen(), SettingsBox(), Stepper(), SwitchRow(), VoiceMenu() (+6 more)
 
 ### Community 31 - "CoordinateInput"
 Cohesion: 0.24
@@ -269,8 +269,8 @@ Cohesion: 0.10
 Nodes (20): Astro, Ecliptic, Equatorial, Eclipse, EclipseKind, LUNAR, SOLAR, Eclipses (+12 more)
 
 ### Community 35 - ".next"
-Cohesion: 0.20
-Nodes (4): Place, PlacePresets, PrayerInstant, PrayerScheduleTest
+Cohesion: 0.18
+Nodes (5): Place, PrayerTimesScreen(), PrayerInstant, PrayerSchedule, PrayerScheduleTest
 
 ### Community 36 - "ReaderFonts"
 Cohesion: 0.16
@@ -297,8 +297,12 @@ Cohesion: 0.29
 Nodes (6): Compatibility, Deleting favourites from the list, Not verified (needs a person with a phone), The Quran as mushaf pages, Verification, Wird 1.8.1.5: the Quran page by page, and deleting favourites from the list (pre-release)
 
 ### Community 42 - "AppNavigation"
-Cohesion: 0.22
-Nodes (13): AppNavigation(), CalendarScreen(), GlobalSearchScreen(), SearchResultCard(), MizanAyahScreen(), MizanCard(), MizanHomeContent(), MizanHomeScreen() (+5 more)
+Cohesion: 0.28
+Nodes (11): AppNavigation(), CalendarScreen(), MizanAyahScreen(), MizanCard(), MizanHomeContent(), MizanHomeScreen(), MizanReaderScreen(), MizanSurahScreen() (+3 more)
+
+### Community 45 - "SearchResultType"
+Cohesion: 0.19
+Nodes (10): Entry, SearchRepository, SearchResultItem, SearchResultType, ALL, DEEDS, MAFATIH, QURAN (+2 more)
 
 ### Community 46 - "Distribution: signing, verification, Google Play and Play Protect"
 Cohesion: 0.20
@@ -308,53 +312,61 @@ Nodes (9): Distribution: signing, verification, Google Play and Play Protect, Go
 Cohesion: 0.33
 Nodes (5): Daily Deeds Reminder 1.2.1, Fixed, Improved, Known limits, Verification
 
+### Community 53 - "localdate"
+Cohesion: 0.13
+Nodes (3): PlacePresets, TimeFormat, KhumsResult
+
 ### Community 54 - "Daily Deeds Reminder 1.4.0"
 Cohesion: 0.33
 Nodes (5): Content, Daily Deeds Reminder 1.4.0, Look and feel, Notes and limits, Verification
 
-### Community 55 - "AdhanService"
-Cohesion: 0.17
-Nodes (4): AdhanPlayingBanner(), AdhanService, 1.1 The adhan does not stop when you pull down the notification panel, Adhan and alarm reliability
-
 ### Community 56 - "QuranRepository"
-Cohesion: 0.21
-Nodes (6): QuranRepository, Ayah, RevelationType, MADANI, MAKKI, Surah
+Cohesion: 0.16
+Nodes (7): QuranDataProvider, QuranRepository, Ayah, RevelationType, MADANI, MAKKI, Surah
 
 ### Community 57 - "Google Play listing: draft answers (not submitted)"
 Cohesion: 0.18
 Nodes (10): Content rating and audience, Content rights (read before submitting), Data safety form, Full description (English), Google Play listing: draft answers (not submitted), Graphics (in `branding/play/`), Permission declarations and justifications, Release checklist (+2 more)
 
+### Community 59 - "PrayerContext"
+Cohesion: 0.14
+Nodes (5): PrayerContext, WidgetModel, BackupCodecTest, ImsakPlannerTest, WidgetModelTest
+
 ### Community 61 - "Wird 1.8.0 (formerly Daily Deeds Reminder)"
 Cohesion: 0.22
 Nodes (8): Application id changed: move your data, Google Play preparation (nothing published), Known limits, Name and logo, Release signing and verification, Verification, Why Google warned on every install, Wird 1.8.0 (formerly Daily Deeds Reminder)
 
-### Community 63 - "AdhanMode"
-Cohesion: 0.11
-Nodes (12): AdhanMode, ADHAN, NOTIFICATION, OFF, SILENT, CalcMethod, CUSTOM, LEVA (+4 more)
+### Community 62 - "AlarmScheduler.kt"
+Cohesion: 0.13
+Nodes (9): ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY, AlarmScheduler (+1 more)
 
-### Community 65 - "PrayerContext"
-Cohesion: 0.15
-Nodes (11): AdhanPlanner, AlarmKind, IMSAK, MAIN, PRE, PlannedAlarm, PrayerContext, PrayerSchedule (+3 more)
+### Community 63 - "ToolsViewModel"
+Cohesion: 0.05
+Nodes (16): AdhanGlobalSettings, CalcMethod, CUSTOM, LEVA, TEHRAN, PrayerSettings, VoiceIds, rememberNow() (+8 more)
+
+### Community 65 - "ReligiousAlarms.kt"
+Cohesion: 0.16
+Nodes (8): AdhanPlanner, AlarmKind, IMSAK, MAIN, PRE, PlannedAlarm, scheduleAll(), PrayerAlarmReceiver
 
 ### Community 66 - "QadaState"
-Cohesion: 0.15
-Nodes (12): AddTo, Bulk, QadaDialog, QadaEntry, QadaKind, ASR, DHUHR, FAJR (+4 more)
+Cohesion: 0.12
+Nodes (13): AddTo, Bulk, QadaDialog, QadaEntry, QadaKind, ASR, DHUHR, FAJR (+5 more)
 
 ### Community 68 - ".parse"
 Cohesion: 0.22
 Nodes (5): ParseResult, RemoteVoice, VoiceManifest, VoiceUrlPolicy, fetchManifest()
 
 ### Community 69 - "PrayerTimesScreen"
-Cohesion: 0.16
-Nodes (11): buildRows(), Entry, Header, ItemRow(), ListRow, mafatihRows(), SearchField(), MafatihScreen() (+3 more)
+Cohesion: 0.20
+Nodes (10): buildRows(), Entry, Header, ItemRow(), ListRow, mafatihRows(), SearchField(), MafatihScreen() (+2 more)
 
 ### Community 70 - "Test"
-Cohesion: 0.08
-Nodes (14): BackupCodec, Error, Import, Ok, PrayerWidgetProvider, WidgetUpdater, Backup import, Components (+6 more)
+Cohesion: 0.06
+Nodes (11): PrayerWidgetProvider, WidgetUpdater, TimetablePdf, Backup import, Components, Dependencies, Network, Permissions (checked by `VoiceAndPolicyTest`) (+3 more)
 
 ### Community 71 - "MizanViewModel"
-Cohesion: 0.23
-Nodes (6): Failed, Loading, MizanSearchState, MizanState, MizanViewModel, Ready
+Cohesion: 0.22
+Nodes (7): MizanHit, Failed, Loading, MizanSearchState, MizanState, MizanViewModel, Ready
 
 ### Community 72 - "Daily Deeds Reminder 1.3.0"
 Cohesion: 0.33
@@ -372,9 +384,9 @@ Nodes (5): Daily Deeds Reminder 1.5.0, New structure, Search, settings and fixes
 Cohesion: 0.07
 Nodes (4): canScheduleExactAlarms(), PermissionHealthCard(), HubEntry, WorshipHubScreen()
 
-### Community 77 - "PrayerTimesScreen"
-Cohesion: 0.25
-Nodes (7): rememberNow(), PrayerTimesScreen(), PrayerStrip(), ResumeTiles(), TodayHero(), TodayWeekdayTiles(), TodayScreen()
+### Community 77 - "MizanHeader"
+Cohesion: 0.23
+Nodes (9): MizanEntry, MizanHeader, MizanKind, FRONT, INDEX, SECTION, MizanParagraph, entryTitle() (+1 more)
 
 ### Community 80 - "VoiceViewModel"
 Cohesion: 0.14
@@ -384,13 +396,17 @@ Nodes (6): Failed, Idle, Loaded, Loading, RemoteVoicesState, VoiceViewModel
 Cohesion: 0.23
 Nodes (5): HijriDay, PrayerTimesResult, Timetable, TimetableRow, TimetableTest
 
+### Community 82 - "BackupCodec"
+Cohesion: 0.24
+Nodes (4): BackupCodec, Error, Import, Ok
+
 ### Community 83 - "KhumsScreen"
 Cohesion: 0.15
-Nodes (18): AyatScreen(), EclipseCard(), AmountField(), KhumsScreen(), money(), NumberDialog(), QadaScreen(), Cell() (+10 more)
+Nodes (19): AyatScreen(), EclipseCard(), AmountField(), KhumsScreen(), money(), NumberDialog(), QadaScreen(), Cell() (+11 more)
 
 ### Community 84 - "TasbihState"
 Cohesion: 0.13
-Nodes (5): ZahraPanel(), Stage, TasbihState, ZahraStages, TasbihTest
+Nodes (4): Stage, TasbihState, ZahraStages, TasbihTest
 
 ### Community 85 - "Daily Deeds Reminder 1.6.0"
 Cohesion: 0.25
@@ -401,16 +417,20 @@ Cohesion: 0.21
 Nodes (5): BundledVoicesTest, Bundled adhan recordings, Processing, Result files, Where they come from
 
 ### Community 88 - "BroadcastReceiver"
-Cohesion: 0.17
-Nodes (5): AdhanActionReceiver, BootReceiver, OccasionAlarmReceiver, BroadcastReceiver, DailyNotes
+Cohesion: 0.23
+Nodes (5): BootReceiver, OccasionAlarmReceiver, BroadcastReceiver, DailyNotes, Adhan and alarm reliability
+
+### Community 91 - "AdhanActionReceiver.kt"
+Cohesion: 0.23
+Nodes (3): AdhanPlayingBanner(), AdhanActionReceiver, 1.1 The adhan does not stop when you pull down the notification panel
 
 ### Community 92 - "KhumsTest"
 Cohesion: 0.42
 Nodes (3): Khums, KhumsInput, KhumsTest
 
 ### Community 93 - "Deed"
-Cohesion: 0.19
-Nodes (8): DeedsRepository, Deed, DeedType, COUNTER, MULTI_STAGE_COUNTER, READING, TasbeehStage, DeedsRepositoryTest
+Cohesion: 0.14
+Nodes (11): DeedsRepository, Deed, DeedType, COUNTER, MULTI_STAGE_COUNTER, READING, TasbeehStage, CounterOrb() (+3 more)
 
 ### Community 95 - "Daily Deeds Reminder 1.7.0"
 Cohesion: 0.17
@@ -421,8 +441,8 @@ Cohesion: 0.50
 Nodes (3): English, Privacy policy / سياسة الخصوصية: Wird / ورد, العربية
 
 ### Community 97 - "QuranMushafScreen"
-Cohesion: 0.30
-Nodes (6): AyahActionsDialog(), AyahRun(), ayahText(), GoToPageDialog(), MushafPage(), QuranMushafScreen()
+Cohesion: 0.16
+Nodes (10): AyahActionsDialog(), AyahRun(), ayahText(), GoToPageDialog(), MushafPage(), QuranMushafScreen(), QuranModeBar(), QuranScreen() (+2 more)
 
 ### Community 98 - "KhumsYear"
 Cohesion: 0.18
@@ -444,17 +464,13 @@ Nodes (5): ColorSchemeContrastTest, Daily Deeds Reminder 1.2.0, Distribution, Ke
 Cohesion: 0.18
 Nodes (10): DeedCategory, AFTER_PRAYER, ALL, ANYTIME, BEDTIME, MORNING_EVENING, NIGHT, QURAN (+2 more)
 
-### Community 105 - "ReminderType"
-Cohesion: 0.17
-Nodes (12): ReminderSettings, ReminderType, BEDTIME, EVENING, MORNING, NIGHT, THURSDAY, ReminderSettingCard() (+4 more)
+### Community 105 - "SettingsScreen"
+Cohesion: 0.48
+Nodes (5): ReminderSettingCard(), restartApp(), SectionTitle(), SettingsCard(), SettingsScreen()
 
 ### Community 106 - "Licence of the bundled text datasets"
 Cohesion: 0.40
 Nodes (4): Copyright of the original works, Licence of the bundled text datasets, Other texts, Texts from the OpenITI corpus (CC BY-NC-SA 4.0)
-
-### Community 112 - "PrayerSettingsScreen"
-Cohesion: 0.36
-Nodes (8): Heading(), PrayerSettingsScreen(), SettingsBox(), Stepper(), SwitchRow(), VoiceMenu(), 1.2 You can't set the prayer times to another area, 1. Your two notes
 
 ### Community 113 - "Wird 1.8.1.3: switch the adhan for all prayers at once (pre-release)"
 Cohesion: 0.29
@@ -469,12 +485,16 @@ Cohesion: 0.22
 Nodes (8): App, Install, Known and unchanged, Not verified on a device (no physical phone available), Prayer alarms, Security and hardening, Verification, Wird 1.8.1.1: reliability fixes (pre-release)
 
 ### Community 118 - "PlacePickerCard"
-Cohesion: 0.32
-Nodes (4): PlacePickerCard(), CitySearchDialog(), CoordinateField(), CoordinatesDialog()
+Cohesion: 0.24
+Nodes (6): PlacePickerCard(), CitySearchDialog(), CoordinateField(), CoordinatesDialog(), 1.2 You can't set the prayer times to another area, 1. Your two notes
 
 ### Community 121 - "OccasionKind"
 Cohesion: 0.33
 Nodes (6): OccasionKind, BIRTH, EID, EVENT, MARTYRDOM, NIGHT
+
+### Community 122 - "AdhanMode"
+Cohesion: 0.33
+Nodes (5): AdhanMode, ADHAN, NOTIFICATION, OFF, SILENT
 
 ### Community 123 - "Adhan voice packs"
 Cohesion: 0.50
@@ -492,25 +512,29 @@ Nodes (5): Compatibility, Fixes, Not verified (needs a person with a phone), Ver
 Cohesion: 0.83
 Nodes (3): Box2(), Title(), VoicePacksScreen()
 
+### Community 131 - "LunarMonthsScreen"
+Cohesion: 0.60
+Nodes (5): DeedRow(), LunarMonthsData, LunarMonthsScreen(), MonthsList(), section()
+
 ## Knowledge Gaps
 - **90 isolated node(s):** `OFF`, `SILENT`, `NOTIFICATION`, `ADHAN`, `LEVA` (+85 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 576 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **50 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `PreferencesManager` connect `PreferencesManager` to `MainActivity.kt`, `FavoriteKey`, `WeekdayContentScreen.kt`, `PrayerAlarmConfig`, `.next`, `ReaderFonts`, `ToolsViewModel`, `AdhanService.kt`, `QuranViewModel`, `AdhanService`, `BackupCodecTest`, `AlarmScheduler.kt`, `AdhanMode`, `QadaState`, `WorshipViewModel`, `Test`, `MainViewModel`, `PrayerAlarmReceiver.kt`, `KhumsScreen`, `TasbihState`, `MafatihViewModel`, `BroadcastReceiver`, `ReligiousAlarms.kt`, `Deed`, `KhumsYear`, `AdhanGlobalSettings`, `ReminderType`, `MainActivity`?**
-  _High betweenness centrality (0.103) - this node is a cross-community bridge._
+- **Why does `PreferencesManager` connect `PreferencesManager` to `MainActivity.kt`, `FavoriteKey`, `WeekdayContentScreen.kt`, `PrayerAlarmConfig`, `.next`, `ReaderFonts`, `AdhanService.kt`, `QuranViewModel`, `localdate`, `.shutdown`, `PrayerContext`, `AlarmScheduler.kt`, `ToolsViewModel`, `ReligiousAlarms.kt`, `QadaState`, `WorshipViewModel`, `Test`, `MainViewModel`, `BackupCodec`, `KhumsScreen`, `TasbihState`, `MafatihViewModel`, `BroadcastReceiver`, `AdhanActionReceiver.kt`, `Deed`, `KhumsYear`, `MainActivity`?**
+  _High betweenness centrality (0.102) - this node is a cross-community bridge._
 - **What connects `OFF`, `SILENT`, `NOTIFICATION` to the rest of the system?**
   _90 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `MizanDataTest` be split into smaller, more focused modules?**
-  _Cohesion score 0.0532724505327245 - nodes in this community are weakly interconnected._
-- **Why does `Ongoing log` connect `Ongoing log` to `DayContentKind`, `Prayer`, `FavoriteKey`, `MafatihRepository`, `LunarMonthsScreen`, `PrayerAlarmConfig`, `CoordinateInput`, `QuranPages`, `AppNavigation`, `QuranViewModel`, `AdhanService`, `QuranRepository`, `BackupCodecTest`, `PrayerTimesScreen`, `Test`, `MizanViewModel`, `BundledVoicesTest`, `MafatihViewModel`, `BroadcastReceiver`, `QuranMushafScreen`, `ArabicNormalizer`, `MainActivity`, `BundledVoices`, `PlacePickerCard`, `ArabicDigitsTest`, `QuranDataProvider`, `QuranDataIntegrityTest`?**
-  _High betweenness centrality (0.062) - this node is a cross-community bridge._
 - **Should `MainActivity.kt` be split into smaller, more focused modules?**
   _Cohesion score 0.08695652173913043 - nodes in this community are weakly interconnected._
-- **Why does `ToolsViewModel` connect `ToolsViewModel` to `MainActivity.kt`, `PreferencesManager`, `DayContentKind`, `FavoriteKey`, `Ongoing log`, `WeekdayContentScreen.kt`, `LunarMonthsScreen`, `FavoritesScreen`, `PrayerAlarmConfig`, `.next`, `SensorEventListener`, `AppNavigation`, `WeekdayContentScreen.kt`, `QuranMushafScreen.kt`, `AdhanMode`, `PrayerContext`, `WorshipHubScreen.kt`, `PrayerTimesScreen`, `KhumsScreen`, `QuranMushafScreen`, `DeedCard.kt`, `AdhanGlobalSettings`, `QuranScreen.kt`, `ReminderType`, `MainActivity`, `PrayerSettingsScreen`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Why does `Ongoing log` connect `QuranMushafScreen` to `LunarMonthsScreen`, `Prayer`, `FavoriteKey`, `Ongoing log`, `MafatihRepository`, `LunarMonthsScreen`, `assertequals`, `PrayerAlarmConfig`, `CoordinateInput`, `QuranPages`, `SearchResultType`, `AdhanService.kt`, `QuranViewModel`, `QuranRepository`, `PrayerContext`, `PrayerTimesScreen`, `MizanViewModel`, `BackupCodec`, `BundledVoicesTest`, `MafatihViewModel`, `BroadcastReceiver`, `MushafFit.kt`, `WeekdayRoute`, `MainActivity`, `BundledVoices`, `PlacePickerCard`, `SearchViewModel`, `QuranDataIntegrityTest`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
 - **Should `Daily Deeds Reminder v1.1.0 release notes` be split into smaller, more focused modules?**
   _Cohesion score 0.08374384236453201 - nodes in this community are weakly interconnected._
+- **Why does `ToolsViewModel` connect `ToolsViewModel` to `MainActivity.kt`, `LunarMonthsScreen`, `PreferencesManager`, `DayContentKind`, `FavoriteKey`, `Ongoing log`, `WeekdayContentScreen.kt`, `FavoritesScreen`, `PrayerAlarmConfig`, `.next`, `SensorEventListener`, `AppNavigation`, `WeekdayContentScreen.kt`, `QuranMushafScreen.kt`, `PrayerContext`, `WorshipHubScreen.kt`, `KhumsScreen`, `QuranMushafScreen`, `DeedCard.kt`, `QuranScreen.kt`, `SettingsScreen`, `MainActivity`?**
+  _High betweenness centrality (0.057) - this node is a cross-community bridge._
+- **Should `PreferencesManager` be split into smaller, more focused modules?**
+  _Cohesion score 0.0420899854862119 - nodes in this community are weakly interconnected._

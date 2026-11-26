@@ -21,12 +21,17 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -111,6 +116,8 @@ class MainActivity : ComponentActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15+ draws every app edge to edge when it targets SDK 35+; doing it on all versions keeps one layout.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         NotificationHelper.createNotificationChannel(this)
@@ -276,9 +283,17 @@ fun AppNavigation(
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        // Edge to edge: on a tab, the top and bottom bars take the status and navigation bars, so the content only
+        // keeps clear of side cutouts. A pushed screen brings its own Scaffold (which pads the navigation bar), so here
+        // only the status bar is taken, which keeps the adhan banner below it. Consuming the padding stops the nested
+        // Scaffolds and top bars from adding the same insets twice.
+        contentWindowInsets = if (currentTab != null) {
+            WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+        } else {
+            WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+        }
     ) { innerPadding ->
-      Column(Modifier.padding(innerPadding)) {
+      Column(Modifier.padding(innerPadding).consumeWindowInsets(innerPadding)) {
         AdhanPlayingBanner()
         NavHost(
             navController = navController,

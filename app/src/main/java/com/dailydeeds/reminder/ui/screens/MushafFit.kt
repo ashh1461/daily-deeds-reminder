@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.QuranPages
+import com.dailydeeds.reminder.data.ReaderFonts
 import com.dailydeeds.reminder.util.ArabicDigits
 import kotlin.math.floor
 
@@ -25,7 +26,8 @@ internal object MushafLayout {
     /** OrnamentDivider (14 dp) plus its 6 dp padding above and below. */
     val DividerBlock = 26.dp
     const val LINE_HEIGHT = 1.9f
-    const val FIT_MIN_SP = 12f
+    /** The zoom buttons share this minimum, so «تصغير الخط» from a fitted page never enlarges it. */
+    const val FIT_MIN_SP = ReaderFonts.MUSHAF_MIN_SP
     const val FIT_MAX_SP = 30f
     /** Leaves a sliver so rounding never tips a page into scrolling. */
     const val FIT_SAFETY = 0.98f
@@ -35,6 +37,12 @@ internal object MushafLayout {
         lineHeight = (sp * LINE_HEIGHT).sp,
         textAlign = TextAlign.Justify,
         color = color
+    )
+
+    /** The basmala under a surah title, measured and drawn with the same style so fitting stays exact. */
+    fun basmalaStyle(base: TextStyle, sp: Float): TextStyle = base.copy(
+        fontSize = sp.sp,
+        lineHeight = ReaderFonts.basmalaLineHeightSp(sp).sp
     )
 }
 
@@ -72,7 +80,7 @@ internal fun fitMushafFontSize(
         banners.forEach { seg ->
             if (seg.surah.number != 1 && seg.surah.number != 9) {
                 h += MushafLayout.DividerBlock.toPx() + measurer.measure(
-                    MUSHAF_BASMALA, titleStyle.copy(fontSize = sp.sp), constraints = Constraints(maxWidth = bannerInner)
+                    MUSHAF_BASMALA, MushafLayout.basmalaStyle(titleStyle, sp), constraints = Constraints(maxWidth = bannerInner)
                 ).size.height
             }
         }

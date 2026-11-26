@@ -64,4 +64,30 @@ class FavoritesTest {
         assertEquals(list, FavoritesList.removeAll(list, setOf(FavoriteKey.Ayah(9, 9))))
         assertTrue(FavoritesList.removeAll(list, list.toSet()).isEmpty())
     }
+
+    /** Fix 4: the undo puts back the deleted items and keeps a star added elsewhere after the delete. */
+    @Test
+    fun undoKeepsAStarAddedAfterTheDelete() {
+        val a = FavoriteKey.Ayah(2, 255)
+        val b = FavoriteKey.Mafatih("bk_1")
+        val c = FavoriteKey.Sahifa("sj_2")
+        val added = FavoriteKey.Ayah(36, 1)
+        val snapshot = listOf(a, b, c)
+        val afterDelete = FavoritesList.removeAll(snapshot, setOf(b, c))
+        val afterStarElsewhere = FavoritesList.toggle(afterDelete, added)
+
+        val restored = FavoritesList.restoreRemoved(snapshot, afterStarElsewhere)
+
+        assertEquals(listOf(added, a, b, c), restored)
+        assertEquals(2, FavoritesList.removedSince(snapshot, afterStarElsewhere))
+    }
+
+    @Test
+    fun undoWithNothingMissingChangesNothing() {
+        val a = FavoriteKey.Ayah(1, 1)
+        val b = FavoriteKey.Mafatih("x")
+        assertEquals(listOf(a, b), FavoritesList.restoreRemoved(listOf(a, b), listOf(a, b)))
+        assertEquals(0, FavoritesList.removedSince(listOf(a, b), listOf(a, b)))
+        assertEquals(listOf(a, b), FavoritesList.restoreRemoved(listOf(a, b), emptyList()))
+    }
 }

@@ -46,7 +46,7 @@ fun GlobalSearchScreen(
     viewModel: SearchViewModel,
     onNavigateToQuran: (surahNumber: Int, ayahNumber: Int?) -> Unit,
     onNavigateToMafatih: (itemId: String) -> Unit,
-    onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind) -> Unit,
+    onNavigateToWeekday: (com.dailydeeds.reminder.model.DayContentKind, java.time.DayOfWeek?) -> Unit,
     onNavigateToDeed: (Int) -> Unit,
     onSearchMizan: (String) -> Unit,
     onNavigateBack: () -> Unit
@@ -139,7 +139,7 @@ fun GlobalSearchScreen(
                                     }
                                 }
                                 SearchResultType.DEEDS -> item.deedId?.let(onNavigateToDeed)
-                                SearchResultType.WEEKDAY -> item.weekdayKind?.let(onNavigateToWeekday)
+                                SearchResultType.WEEKDAY -> item.weekdayKind?.let { onNavigateToWeekday(it, item.weekdayDay) }
                                 SearchResultType.ALL -> {}
                             }
                         }

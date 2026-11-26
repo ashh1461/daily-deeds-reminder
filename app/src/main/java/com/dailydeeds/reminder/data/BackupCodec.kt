@@ -22,7 +22,8 @@ object BackupCodec {
     private val ALLOWED_KEYS = listOf(
         Regex("^pref_favorites$"),
         Regex("^pref_last_(surah|mafatih|sahifa|page)$"),
-        Regex("^pref_quran_pages_mode$"),
+        Regex("^pref_(quran_pages_mode|mushaf_fit)$"),
+        Regex("^pref_font_(quran|mafatih|mushaf)$"),
         Regex("^pref_(theme_mode|haptics_enabled|hijri_offset|occasion_reminder|adhan_global|prayer_settings|prayer_reminder_enabled)$"),
         Regex("^pref_place_(name|lat|lng|zone)$"),
         Regex("^pref_alarm_cfg_[1-4]$"),
@@ -100,14 +101,19 @@ object BackupCodec {
         return if (typeMatchesKey(key, value)) value else null
     }
 
-    /** Each key keeps the type it has in [PreferencesManager]; a wrong type would crash on read. */
+    /**
+     * Each key keeps the type it has in [PreferencesManager]; a wrong type would crash on read. Every key added to
+     * [ALLOWED_KEYS] that is not a String needs its own case here, or a restore silently drops it.
+     */
     private fun typeMatchesKey(key: String, value: Any): Boolean = when {
         key == "pref_place_lat" || key == "pref_place_lng" -> value is Long
         key.startsWith("pref_place_") -> value is String
         key == "pref_hijri_offset" -> value is Int
         key.endsWith("_hour") || key.endsWith("_minute") -> value is Int
         key.endsWith("_enabled") || key == "pref_occasion_reminder" -> value is Boolean
-        key.startsWith("pref_last_surah") -> value is Int
+        key == "pref_quran_pages_mode" || key == "pref_mushaf_fit" -> value is Boolean
+        key == "pref_last_surah" || key == "pref_last_page" -> value is Int
+        key.startsWith("pref_font_") -> value is Int
         key.startsWith("deed_") -> if (key.contains("_completed_")) value is Boolean else value is Int
         else -> value is String
     }

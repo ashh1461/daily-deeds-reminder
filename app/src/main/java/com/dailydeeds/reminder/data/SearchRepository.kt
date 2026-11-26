@@ -123,7 +123,8 @@ class SearchRepository(
             type = SearchResultType.WEEKDAY,
             title = content.title,
             snippet = createSnippet(content.text, q),
-            weekdayKind = content.kind
+            weekdayKind = content.kind,
+            weekdayDay = content.day
         )
     }
 

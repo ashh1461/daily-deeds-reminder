@@ -48,6 +48,18 @@ class SearchRepositoryTest {
         assertTrue(results.any { it.weekdayKind == com.dailydeeds.reminder.model.DayContentKind.DUA })
     }
 
+    /** Fix 2: a weekday result carries its day, so it opens on that day's text rather than today's. */
+    @Test
+    fun weekdayResultsCarryTheirDay() {
+        val results = searchRepository.search("دعاء يوم الجمعة", SearchResultType.WEEKDAY)
+        assertTrue(results.isNotEmpty())
+        results.forEach { item ->
+            val day = requireNotNull(item.weekdayDay) { item.id }
+            assertTrue(item.id, item.id.endsWith("_${day.name}"))
+        }
+        assertTrue(results.any { it.weekdayDay == java.time.DayOfWeek.FRIDAY })
+    }
+
     @Test
     fun testSearchFindsAyahInSurahThatWasPreviouslyPlaceholder() {
         val results = searchRepository.search("ذلك الكتاب لا ريب فيه", SearchResultType.QURAN)

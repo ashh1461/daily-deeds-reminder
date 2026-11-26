@@ -119,6 +119,49 @@ class QadaTest {
         assertEquals(0, partial.owed(QadaKind.ISHA))
         assertEquals(1, partial.history.size)
     }
+
+    /** Fix 5: undoing "add days of prayers" reverts all five prayers, not only the last. */
+    @Test
+    fun undoingABulkAddRevertsAllFivePrayers() {
+        val before = QadaState().add(QadaKind.FAJR, 2, 1).markMade(QadaKind.FAJR, 1, 2)
+        val after = before.addDaysOfPrayers(10, 3)
+        assertEquals(11, after.owed(QadaKind.FAJR))
+        assertEquals(10, after.owed(QadaKind.ISHA))
+
+        val undone = after.undoLast()
+
+        assertEquals(before.owed, undone.owed.filterValues { it > 0 })
+        QadaKind.PRAYERS.forEach { assertEquals(it.id, before.owed(it), undone.owed(it)) }
+        assertEquals(before.history, undone.history)
+        // The next undo reverts the single entry before the batch, as before.
+        assertEquals(2, undone.undoLast().owed(QadaKind.FAJR))
+    }
+
+    @Test
+    fun twoBulkAddsAreUndoneOneBatchAtATime() {
+        val once = QadaState().addDaysOfPrayers(5, 1)
+        val twice = once.addDaysOfPrayers(7, 2)
+        assertEquals(12, twice.owed(QadaKind.ASR))
+        assertEquals(5, twice.undoLast().owed(QadaKind.ASR))
+        assertEquals(0, twice.undoLast().undoLast().owed(QadaKind.ASR))
+        assertTrue(twice.undoLast().undoLast().history.isEmpty())
+    }
+
+    @Test
+    fun batchIdsSurviveEncodingAndOldHistoryStillDecodes() {
+        val s = QadaState().add(QadaKind.FAST, 3, 19000).addDaysOfPrayers(4, 19001)
+        val back = QadaState.decode(s.encode())
+        assertEquals(s, back)
+        assertEquals(3, back.undoLast().owed(QadaKind.FAST))
+        assertEquals(0, back.undoLast().totalPrayers)
+
+        // History written by 1.8.1.5 and earlier: three fields, each entry undone on its own.
+        val old = QadaState.decode("fajr=4,dhuhr=4|19000:fajr:4;19000:dhuhr:4")
+        assertEquals(4, old.undoLast().owed(QadaKind.FAJR))
+        assertEquals(0, old.undoLast().owed(QadaKind.DHUHR))
+        // A bad batch field drops that entry only.
+        assertEquals(1, QadaState.decode("fajr=1|1:fajr:1:x;2:fajr:1:0;3:fajr:1:2").history.size)
+    }
 }
 
 class KhumsTest {

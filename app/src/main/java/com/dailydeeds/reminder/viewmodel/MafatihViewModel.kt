@@ -1,8 +1,11 @@
 package com.dailydeeds.reminder.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.data.MafatihRepository
+import com.dailydeeds.reminder.data.PreferencesManager
+import com.dailydeeds.reminder.data.ReaderFonts
 import com.dailydeeds.reminder.model.MafatihCategoryType
 import com.dailydeeds.reminder.model.MafatihItem
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +17,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MafatihViewModel(
+class MafatihViewModel @JvmOverloads constructor(
+    app: Application,
     private val repository: MafatihRepository = MafatihRepository()
-) : ViewModel() {
+) : AndroidViewModel(app) {
+
+    private val prefs = PreferencesManager(app)
 
     val categories: List<MafatihCategoryType> = repository.getCategories()
 
@@ -35,7 +41,7 @@ class MafatihViewModel(
     private val _counter = MutableStateFlow(0)
     val counter: StateFlow<Int> = _counter.asStateFlow()
 
-    private val _fontSizeSp = MutableStateFlow(22f)
+    private val _fontSizeSp = MutableStateFlow(prefs.getReaderFontSp(ReaderFonts.KEY_MAFATIH, ReaderFonts.MAFATIH))
     val fontSizeSp: StateFlow<Float> = _fontSizeSp.asStateFlow()
 
     private var searchJob: Job? = null
@@ -90,16 +96,15 @@ class MafatihViewModel(
         _counter.value = 0
     }
 
-    fun increaseFontSize() {
-        if (_fontSizeSp.value < 36f) {
-            _fontSizeSp.value += 2f
-        }
-    }
+    fun increaseFontSize() = setFont(ReaderFonts.MAFATIH.larger(_fontSizeSp.value))
 
-    fun decreaseFontSize() {
-        if (_fontSizeSp.value > 16f) {
-            _fontSizeSp.value -= 2f
-        }
+    fun decreaseFontSize() = setFont(ReaderFonts.MAFATIH.smaller(_fontSizeSp.value))
+
+    /** The size is kept between launches. */
+    private fun setFont(sp: Float) {
+        if (sp == _fontSizeSp.value) return
+        _fontSizeSp.value = sp
+        prefs.setReaderFontSp(ReaderFonts.KEY_MAFATIH, sp)
     }
 
     private companion object {

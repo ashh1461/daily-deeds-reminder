@@ -58,7 +58,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.QuranPages
 import com.dailydeeds.reminder.model.Ayah
@@ -241,7 +240,7 @@ private fun SurahTitle(number: Int, name: String, fontSizeSp: Float) {
                 OrnamentDivider(Modifier.padding(vertical = 6.dp), color = GoldBright)
                 Text(
                     MUSHAF_BASMALA,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = fontSizeSp.sp),
+                    style = MushafLayout.basmalaStyle(MaterialTheme.typography.titleLarge, fontSizeSp),
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )

@@ -70,20 +70,26 @@ data class AdhanGlobalSettings(
     val vibrate: Boolean = true,
     val snoozeMinutes: Int = 5,
     /** Time limit of a playing adhan, in seconds. A bundled adhan always plays to its end (AdhanService); only a restored backup can change this. */
-    val maxSeconds: Int = 300
+    val maxSeconds: Int = 300,
+    /** The power button (screen off) or either volume key stops a playing adhan. */
+    val hardwareStop: Boolean = true
 ) {
     init {
         require(snoozeMinutes in 1..30 && maxSeconds in 30..900)
     }
 
-    fun encode(): String = "$followRinger,$vibrate,$snoozeMinutes,$maxSeconds"
+    fun encode(): String = "$followRinger,$vibrate,$snoozeMinutes,$maxSeconds,$hardwareStop"
 
     companion object {
+        /** Accepts the 4-field form written before v1.8.1.4 (no hardware-stop flag: it defaults to on). */
         fun decode(raw: String?): AdhanGlobalSettings? {
             val p = raw?.split(',') ?: return null
-            if (p.size != 4) return null
+            if (p.size != 4 && p.size != 5) return null
             return try {
-                AdhanGlobalSettings(p[0].toBooleanStrict(), p[1].toBooleanStrict(), p[2].toInt(), p[3].toInt())
+                AdhanGlobalSettings(
+                    p[0].toBooleanStrict(), p[1].toBooleanStrict(), p[2].toInt(), p[3].toInt(),
+                    if (p.size == 5) p[4].toBooleanStrict() else true
+                )
             } catch (_: IllegalArgumentException) {
                 null
             }

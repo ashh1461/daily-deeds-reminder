@@ -57,6 +57,7 @@ fun PrayerSettingsScreen(
     onNavigateBack: () -> Unit,
     onOpenVoices: () -> Unit
 ) {
+    val place by tools.place.collectAsState()
     val settings by tools.prayerSettings.collectAsState()
     val configs by tools.alarmConfigs.collectAsState()
     val global by tools.adhanGlobal.collectAsState()
@@ -69,6 +70,9 @@ fun PrayerSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             PermissionHealthCard()
+
+            Heading("المكان")
+            PlacePickerCard(place, onPick = tools::setPlace)
 
             Heading("طريقة الحساب")
             SettingsBox {
@@ -190,6 +194,12 @@ fun PrayerSettingsScreen(
             SettingsBox {
                 SwitchRow("الاهتزاز مع الأذان", global.vibrate) { tools.setAdhanGlobal(global.copy(vibrate = it)) }
                 SwitchRow("عدم تشغيل الصوت في الوضع الصامت", global.followRinger) { tools.setAdhanGlobal(global.copy(followRinger = it)) }
+                SwitchRow("إيقاف الأذان بزر التشغيل أو الصوت", global.hardwareStop) { tools.setAdhanGlobal(global.copy(hardwareStop = it)) }
+                Text(
+                    "إطفاء الشاشة أثناء الأذان يوقفه أيضاً. ويمكن إيقافه دائماً بلمس إشعاره أو سحبه جانباً.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Stepper("مدة التأجيل", "${global.snoozeMinutes} د",
                     { tools.setAdhanGlobal(global.copy(snoozeMinutes = (global.snoozeMinutes - 1).coerceAtLeast(1))) },
                     { tools.setAdhanGlobal(global.copy(snoozeMinutes = (global.snoozeMinutes + 1).coerceAtMost(30))) })

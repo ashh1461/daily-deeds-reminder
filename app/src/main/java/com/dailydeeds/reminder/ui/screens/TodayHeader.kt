@@ -73,7 +73,7 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
             Text("$today", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             OrnamentDivider(Modifier.padding(vertical = 8.dp), color = GoldBright)
             occasions.firstOrNull()?.let {
-                Text(it.title, style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
+                Text(it.displayTitle, style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
             }
             if (next != null) {
                 Text(

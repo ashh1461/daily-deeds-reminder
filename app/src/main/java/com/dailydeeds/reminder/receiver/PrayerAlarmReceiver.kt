@@ -68,7 +68,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             config.mode == AdhanMode.SILENT -> show(
                 context, id, PrayerAlarmText.silent(prayer, scheduledAt, now, snooze), NotificationHelper.CHANNEL_PRAYER_SILENT
             )
-            (config.mode == AdhanMode.ADHAN || snooze) && !late -> {
+            // A snooze follows the prayer's current mode: switched to a plain reminder since, it no longer plays the
+            // adhan. With no visible notification (denied, or the adhan channel blocked) nothing could stop the
+            // audio, so the reminder notification is used instead.
+            config.mode == AdhanMode.ADHAN && !late && NotificationHelper.canShowAdhanNotification(context) -> {
                 try {
                     AdhanService.play(context, prayer, config.voiceId)
                 } catch (e: Exception) {

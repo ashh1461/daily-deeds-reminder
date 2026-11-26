@@ -72,7 +72,7 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
             items(upcoming, key = { "${it.date}_${it.occasion.title}" }) { u ->
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(u.occasion.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text(u.occasion.displayTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                         Text(
                             "${u.hijri} • ${u.date} • " + when (u.daysAway) {
                                 0 -> "اليوم"

@@ -31,7 +31,7 @@ data class WidgetModel(
                 nextPrayer = next?.prayer?.nameArabic ?: "—",
                 nextTime = next?.time?.format(CLOCK) ?: "--:--",
                 validUntil = next?.time,
-                occasion = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull()?.title
+                occasion = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull()?.displayTitle
             )
         }
     }

@@ -66,6 +66,18 @@ object NotificationHelper {
         )
     }
 
+    /**
+     * Whether the playing-adhan notification (and so its Stop button) can be seen. When notifications are denied or
+     * the «الأذان» channel is blocked, a playing adhan would have no visible way to stop it.
+     */
+    fun canShowAdhanNotification(context: Context): Boolean {
+        val compat = NotificationManagerCompat.from(context)
+        if (!compat.areNotificationsEnabled()) return false
+        createChannels(context)
+        val channel = compat.getNotificationChannel(CHANNEL_PRAYER_ADHAN) ?: return true
+        return channel.importance != NotificationManager.IMPORTANCE_NONE
+    }
+
     /** Kept for existing callers. */
     fun createNotificationChannel(context: Context) = createChannels(context)
 

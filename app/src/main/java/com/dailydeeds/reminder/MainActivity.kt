@@ -24,9 +24,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import com.dailydeeds.reminder.service.AdhanService
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Book
@@ -65,6 +72,7 @@ import com.dailydeeds.reminder.notification.AlarmScheduler
 import com.dailydeeds.reminder.notification.NotificationHelper
 import com.dailydeeds.reminder.ui.components.AppTopBar
 import com.dailydeeds.reminder.ui.screens.CalendarScreen
+import com.dailydeeds.reminder.ui.screens.LunarMonthsScreen
 import com.dailydeeds.reminder.ui.screens.FavoritesScreen
 import com.dailydeeds.reminder.ui.screens.GlobalSearchScreen
 import com.dailydeeds.reminder.ui.screens.MafatihReaderScreen
@@ -102,7 +110,10 @@ class MainActivity : ComponentActivity() {
 
         NotificationHelper.createNotificationChannel(this)
         // Only on a fresh start: a recreated activity (rotation, theme change) keeps the category the user picked.
-        if (savedInstanceState == null) applyReminderCategory(intent)
+        if (savedInstanceState == null) {
+            applyReminderCategory(intent)
+            stopAdhanIfAsked(intent)
+        }
 
         // Alarms are always scheduled; the permission prompt is shown once, not on every launch. If it was
         // declined, the permission-health card in Settings and the worship hub explains how to enable it.
@@ -139,6 +150,16 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         applyReminderCategory(intent)
+        stopAdhanIfAsked(intent)
+    }
+
+    /** A tap on the playing-adhan notification opens the app with this extra: the tap also silences the adhan. */
+    private fun stopAdhanIfAsked(intent: Intent) {
+        if (intent.getBooleanExtra(AdhanService.EXTRA_STOP_ADHAN, false)) {
+            AdhanService.stop(this)
+            // Handled once: a later recreation from this intent must not stop a newer adhan.
+            intent.removeExtra(AdhanService.EXTRA_STOP_ADHAN)
+        }
     }
 
     override fun onResume() {
@@ -236,10 +257,12 @@ fun AppNavigation(
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
+      Column(Modifier.padding(innerPadding)) {
+        AdhanPlayingBanner()
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.weight(1f)
         ) {
             // ---- tabs
             composable("home") {
@@ -391,6 +414,9 @@ fun AppNavigation(
             composable("duas") { WeekdayContentScreen(DayContentKind.DUA, toolsViewModel, onNavigateBack = { back() }) }
             composable("ziyarat") { WeekdayContentScreen(DayContentKind.ZIYARAT, toolsViewModel, onNavigateBack = { back() }) }
             composable("calendar") { CalendarScreen(toolsViewModel, onNavigateBack = { back() }) }
+            composable("lunar_months") {
+                LunarMonthsScreen(toolsViewModel, onNavigateBack = { back() }, onOpenItem = { openReader(it) })
+            }
             composable("prayer") {
                 PrayerTimesScreen(
                     toolsViewModel,
@@ -427,6 +453,29 @@ fun AppNavigation(
                     onOpenRoute = { go(it) }
                 )
             }
+        }
+      }
+    }
+}
+
+/** Shown on every screen while an adhan plays, so it can always be stopped from inside the app. */
+@Composable
+private fun AdhanPlayingBanner() {
+    val playing by AdhanService.playing.collectAsState()
+    if (!playing) return
+    val context = LocalContext.current
+    Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "يُشغَّل الأذان الآن",
+                Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                fontWeight = FontWeight.SemiBold
+            )
+            Button(onClick = { AdhanService.stop(context) }) { Text("إيقاف الأذان") }
         }
     }
 }

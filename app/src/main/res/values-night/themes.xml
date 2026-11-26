@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ...and a dark one in dark mode, so a cold start no longer flashes white. -->
+    <style name="Theme.Wird" parent="@android:style/Theme.Material.NoActionBar" />
+</resources>

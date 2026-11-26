@@ -91,7 +91,8 @@ fun PrayerTimesScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(label, style = MaterialTheme.typography.titleSmall)
+                            val estimated = prayer != null && prayer in times.estimated
+                            Text(if (estimated) "$label (تقديري)" else label, style = MaterialTheme.typography.titleSmall)
                             if (prayer != null) {
                                 val mode = configs[prayer]?.mode ?: AdhanMode.OFF
                                 Text(
@@ -103,6 +104,16 @@ fun PrayerTimesScreen(
                         }
                         Text(time?.format(TIME_FORMAT) ?: "—", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     }
+                }
+            }
+            if (times.estimated.isNotEmpty()) {
+                item {
+                    Text(
+                        "في هذا الموقع لا تبلغ الشمس زاوية بعض الأوقات في هذا الفصل، فقُدّرت «تقديري» بجزء من الليل " +
+                            "(طريقة الزاوية). راجع مرجعك في أوقات البلاد ذات العرض العالي.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
             item {

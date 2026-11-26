@@ -59,6 +59,8 @@ class AdhanService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val timeout = Runnable { shutdown() }
     private var prayerForSnooze: Prayer? = null
+    /** A short interruption (a notification sound, a call) holds the audio; the adhan waits and resumes after it. */
+    private var focusLostBriefly = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -180,7 +182,8 @@ class AdhanService : Service() {
             }
             mp.setOnPreparedListener {
                 started = true
-                it.start()
+                // Prepared during a short interruption: wait for the focus to come back (the listener starts it).
+                if (!focusLostBriefly) it.start()
             }
             mp.prepareAsync()
             handler.postDelayed(timeout, timeoutSeconds * 1000L)
@@ -222,10 +225,24 @@ class AdhanService : Service() {
         val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
             .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
             .setOnAudioFocusChangeListener { change ->
-                // A call or another app took over: stop rather than play on top of it (the adhan runs about 5 minutes).
-                if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                    if (!test) postReminder()
-                    shutdown()
+                when (change) {
+                    // Another app took the audio for good: stop rather than play on top of it.
+                    AudioManager.AUDIOFOCUS_LOSS -> {
+                        if (!test) postReminder()
+                        shutdown()
+                    }
+                    // A short interruption (a call, a navigation prompt): pause, and resume when it ends. The time
+                    // limit keeps running, so a long call still ends the adhan.
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                        focusLostBriefly = true
+                        player?.let { if (it.isPlaying) it.pause() }
+                    }
+                    AudioManager.AUDIOFOCUS_GAIN -> {
+                        if (focusLostBriefly) {
+                            focusLostBriefly = false
+                            runCatching { player?.start() }
+                        }
+                    }
                 }
             }
             .build()
@@ -304,17 +321,11 @@ class AdhanService : Service() {
         mediaSession = null
     }
 
-    private fun vibrate() {
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        }
-        vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 400, 200, 400), -1))
-    }
+    private fun vibrate() = vibratePattern(this)
 
     private fun releasePlayback() {
+        // The focus request is abandoned below, so no GAIN will clear this; a later playback must start normally.
+        focusLostBriefly = false
         handler.removeCallbacks(timeout)
         disarmHardwareStop()
         player?.let {
@@ -375,6 +386,33 @@ class AdhanService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, AdhanService::class.java))
+        }
+
+        /**
+         * True when the phone is on silent or vibrate and the user chose to respect it: the receiver then shows the
+         * prayer notification (and vibrates, if chosen) without starting this service at all.
+         */
+        fun silencedByRinger(context: Context): Boolean {
+            val settings = PreferencesManager(context).getAdhanGlobal()
+            val audio = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return false
+            return settings.followRinger && audio.ringerMode != AudioManager.RINGER_MODE_NORMAL
+        }
+
+        /** The vibration the adhan uses, also on vibrate mode when the adhan itself is silenced. */
+        fun vibrateIfChosenOnVibrateMode(context: Context) {
+            val settings = PreferencesManager(context).getAdhanGlobal()
+            val audio = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return
+            if (settings.vibrate && audio.ringerMode == AudioManager.RINGER_MODE_VIBRATE) vibratePattern(context)
+        }
+
+        fun vibratePattern(context: Context) {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            }
+            vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 400, 200, 400), -1))
         }
     }
 }

@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.dailydeeds.reminder.adhan.AdhanMode
+import com.dailydeeds.reminder.adhan.AlarmGuard
+import com.dailydeeds.reminder.data.PrefsStorage
 import com.dailydeeds.reminder.adhan.AlarmKind
 import com.dailydeeds.reminder.adhan.AlarmText
 import com.dailydeeds.reminder.adhan.PlannedAlarm
@@ -20,6 +22,8 @@ import java.time.ZoneId
 class PrayerAlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        // Before the first unlock the settings may not be readable yet; the unlock broadcast reschedules everything.
+        if (!PrefsStorage.isReadable(context)) return
         val prayer = Prayer.fromId(intent.getIntExtra(ReligiousAlarms.EXTRA_PRAYER_ID, -1))
         var last: PlannedAlarm? = null
         if (prayer != null) {
@@ -27,18 +31,24 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 .getOrDefault(AlarmKind.MAIN)
             val scheduledAt = intent.getLongExtra(ReligiousAlarms.EXTRA_SCHEDULED_AT, 0L)
             val snooze = intent.getBooleanExtra(ReligiousAlarms.EXTRA_SNOOZE, false)
-            handle(context, prayer, kind, scheduledAt, snooze)
+            if (snooze) ReligiousAlarms.snoozeHandled(context, prayer)
+            val prefs = PreferencesManager(context)
+            // The clock moved back after this alarm fired, and the plan produced it again: do not play it twice.
+            val repeat = AlarmGuard.isRepeat(scheduledAt, prefs.getLastHandledAlarm(), snooze)
+            if (!repeat) handle(context, prayer, kind, scheduledAt, snooze)
             // An alarm due at the same instant (a 10-minute Fajr pre-alarm and Imsak) is handled now, not set for
             // a time that has already come; the next one is then planned strictly after the last handled.
             // A snooze is not part of the plan.
             if (!snooze && scheduledAt > 0) {
                 val at = Instant.ofEpochMilli(scheduledAt).atZone(ZoneId.systemDefault())
-                val fired = PlannedAlarm(prayer, kind, at, at)
-                last = fired
-                for (tied in ReligiousAlarms.dueWith(context, fired)) {
-                    handle(context, tied.prayer, tied.kind, tied.triggerAt.toInstant().toEpochMilli(), snooze = false)
-                    last = tied
+                var handled = PlannedAlarm(prayer, kind, at, at)
+                for (tied in ReligiousAlarms.dueWith(context, handled)) {
+                    if (!repeat) handle(context, tied.prayer, tied.kind, tied.triggerAt.toInstant().toEpochMilli(), snooze = false)
+                    handled = tied
                 }
+                last = handled
+                val handledAt = handled.triggerAt.toInstant().toEpochMilli()
+                if (handledAt > prefs.getLastHandledAlarm()) prefs.setLastHandledAlarm(handledAt)
             }
         }
         ReligiousAlarms.schedulePrayer(context, last)
@@ -71,6 +81,12 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             // A snooze follows the prayer's current mode: switched to a plain reminder since, it no longer plays the
             // adhan. With no visible notification (denied, or the adhan channel blocked) nothing could stop the
             // audio, so the reminder notification is used instead.
+            // On silent or vibrate, when the user chose to respect it, the adhan service is not started at all (it
+            // would only flash its notification): the prayer notification is shown, with the vibration if chosen.
+            config.mode == AdhanMode.ADHAN && !late && AdhanService.silencedByRinger(context) -> {
+                AdhanService.vibrateIfChosenOnVibrateMode(context)
+                show(context, id, PrayerAlarmText.reminder(prayer, scheduledAt, now, snooze), NotificationHelper.CHANNEL_PRAYER_REMINDER)
+            }
             config.mode == AdhanMode.ADHAN && !late && NotificationHelper.canShowAdhanNotification(context) -> {
                 try {
                     AdhanService.play(context, prayer, config.voiceId)

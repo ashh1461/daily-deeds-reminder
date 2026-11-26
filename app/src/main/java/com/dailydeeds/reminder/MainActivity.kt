@@ -30,8 +30,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -293,7 +297,14 @@ fun AppNavigation(
             WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
         }
     ) { innerPadding ->
-      Column(Modifier.padding(innerPadding).consumeWindowInsets(innerPadding)) {
+      // The window no longer shrinks for the keyboard when drawing edge to edge, so the content takes its height. The
+      // navigation bar part is left out: a tab's bottom bar or a pushed screen's own Scaffold already pads it.
+      Column(
+          Modifier
+              .padding(innerPadding)
+              .consumeWindowInsets(innerPadding)
+              .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
+      ) {
         AdhanPlayingBanner()
         NavHost(
             navController = navController,

@@ -72,6 +72,46 @@ class PrayerTimesTest {
     fun polarSummerReturnsNullInsteadOfGarbage() {
         val t = PrayerTimes.compute(LocalDate.of(2026, 6, 21), 69.65, 18.96, ZoneId.of("Europe/Oslo"))
         assertNull(t.isha)
+        assertNull(t.fajr)
+    }
+
+    /** London at midsummer: the sun only sinks about 15° below the horizon, short of the 16° Fajr angle. */
+    @Test
+    fun highLatitudeFillsAMissingFajrFromAPortionOfTheNight() {
+        val t = PrayerTimes.compute(LocalDate.of(2026, 6, 21), 51.5074, -0.1278, ZoneId.of("Europe/London"))
+        assertEquals(setOf(Prayer.FAJR), t.estimated)
+        val fajr = minutes(t.fajr)
+        val sunrise = minutes(t.sunrise)
+        val sunset = minutes(t.sunset)
+        val night = (24 * 60 + sunrise) - sunset
+        // 16/60 of the night before sunrise, within the rounding of the times.
+        assertTrue("fajr=${t.fajr} sunrise=${t.sunrise}", abs((sunrise - fajr) - night * 16 / 60) <= 2)
+        assertNotNull(t.imsak)
+        assertEquals(fajr - 10, minutes(t.imsak))
+        assertNotNull(t.midnight)
+        // Isha (14°) is still reached, so it is computed, not estimated.
+        assertNotNull(t.isha)
+    }
+
+    /** Oslo at midsummer: Maghrib (4°) is reached, Isha (14°) is not. */
+    @Test
+    fun highLatitudeFillsAMissingIshaAfterSunset() {
+        val t = PrayerTimes.compute(LocalDate.of(2026, 6, 21), 59.9139, 10.7522, ZoneId.of("Europe/Oslo"))
+        assertTrue(Prayer.ISHA in t.estimated)
+        assertTrue(Prayer.MAGHRIB !in t.estimated)
+        val sunset = minutes(t.sunset)
+        val isha = minutes(t.isha).let { if (it < sunset) it + 24 * 60 else it }
+        assertTrue(isha > minutes(t.maghrib))
+        val night = (24 * 60 + minutes(t.sunrise)) - sunset
+        assertTrue("isha=${t.isha}", abs((isha - sunset) - night * 14 / 60) <= 2)
+    }
+
+    @Test
+    fun normalLatitudesAreNotEstimated() {
+        val t = PrayerTimes.compute(LocalDate.of(2026, 6, 21), 33.8938, 35.5018, ZoneId.of("Asia/Beirut"))
+        assertTrue(t.estimated.isEmpty())
+        val winter = PrayerTimes.compute(LocalDate.of(2026, 12, 21), 51.5074, -0.1278, ZoneId.of("Europe/London"))
+        assertTrue(winter.estimated.isEmpty())
     }
 
     @Test

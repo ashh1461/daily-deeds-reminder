@@ -5,8 +5,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.dailydeeds.reminder.MainActivity
+import com.dailydeeds.reminder.adhan.AdhanMode
 import com.dailydeeds.reminder.adhan.AdhanPlanner
 import com.dailydeeds.reminder.adhan.AlarmKind
+import com.dailydeeds.reminder.adhan.PendingSnoozes
+import com.dailydeeds.reminder.data.PrefsStorage
 import com.dailydeeds.reminder.adhan.PlannedAlarm
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.calendar.ShiaCalendar
@@ -36,6 +40,8 @@ object ReligiousAlarms {
     private const val OCCASION_REQUEST_CODE = 3001
     /** Plus the prayer id, so that one prayer's snooze can be cancelled without touching another's. */
     private const val SNOOZE_REQUEST_CODE = 3010
+    /** The app screen the system opens from its "next alarm" entry. */
+    private const val SHOW_REQUEST_CODE = 3100
     const val OCCASION_HOUR = 8
     private const val RAMADAN = 9
 
@@ -53,7 +59,8 @@ object ReligiousAlarms {
         val planned = withSavedConfig(context) { place, calc, configs, imsakOn ->
             AdhanPlanner.next(ZonedDateTime.now(), place, calc, configs, after, imsakOn)
         }
-        WidgetUpdater.refresh(context)
+        // The widget is not direct-boot aware: before the first unlock only the alarm is set.
+        if (PrefsStorage.isUnlocked(context)) WidgetUpdater.refresh(context)
         if (planned == null) {
             cancel(context, PRAYER_REQUEST_CODE, PrayerAlarmReceiver::class.java)
             return
@@ -62,7 +69,10 @@ object ReligiousAlarms {
             .putExtra(EXTRA_PRAYER_ID, planned.prayer.id)
             .putExtra(EXTRA_KIND, planned.kind.name)
             .putExtra(EXTRA_SCHEDULED_AT, planned.triggerAt.toInstant().toEpochMilli())
-        set(context, PRAYER_REQUEST_CODE, planned.triggerAt.toInstant().toEpochMilli(), intent)
+        // An adhan is an alarm clock to the system: it shows in the status bar and is the least likely to be deferred.
+        val adhan = planned.kind == AlarmKind.MAIN &&
+            PreferencesManager(context).getAlarmConfig(planned.prayer).mode == AdhanMode.ADHAN
+        set(context, PRAYER_REQUEST_CODE, planned.triggerAt.toInstant().toEpochMilli(), intent, alarmClock = adhan)
     }
 
     /** The other alarms due at the same instant as [fired], for the receiver to handle in the same run. */
@@ -85,20 +95,44 @@ object ReligiousAlarms {
         return plan(prefs.getPlace(), calc, configs, imsakFor)
     }
 
-    /** One-off "play the adhan again in [minutes]" alarm. */
+    /** One-off "play the adhan again in [minutes]" alarm; it is saved so that a reboot does not lose it. */
     fun scheduleSnooze(context: Context, prayer: Prayer, minutes: Int) {
         val at = System.currentTimeMillis() + minutes * 60_000L
+        val prefs = PreferencesManager(context)
+        prefs.setPendingSnoozes(prefs.getPendingSnoozes() + (prayer.id to at))
+        setSnooze(context, prayer, at)
+    }
+
+    private fun setSnooze(context: Context, prayer: Prayer, at: Long) {
         val intent = Intent(context, PrayerAlarmReceiver::class.java)
             .putExtra(EXTRA_PRAYER_ID, prayer.id)
             .putExtra(EXTRA_KIND, AlarmKind.MAIN.name)
             .putExtra(EXTRA_SCHEDULED_AT, at)
             .putExtra(EXTRA_SNOOZE, true)
-        set(context, SNOOZE_REQUEST_CODE + prayer.id, at, intent)
+        set(context, SNOOZE_REQUEST_CODE + prayer.id, at, intent, alarmClock = true)
     }
 
     /** Drops a pending snooze of [prayer], e.g. once its alarm is switched off. */
-    fun cancelSnooze(context: Context, prayer: Prayer) =
+    fun cancelSnooze(context: Context, prayer: Prayer) {
+        snoozeHandled(context, prayer)
         cancel(context, SNOOZE_REQUEST_CODE + prayer.id, PrayerAlarmReceiver::class.java)
+    }
+
+    /** The snooze of [prayer] fired or was dropped: it no longer needs restoring after a reboot. */
+    fun snoozeHandled(context: Context, prayer: Prayer) {
+        val prefs = PreferencesManager(context)
+        val pending = prefs.getPendingSnoozes()
+        if (prayer.id in pending) prefs.setPendingSnoozes(pending - prayer.id)
+    }
+
+    /** After a reboot: sets again the snoozes still to come; those whose time passed while the phone was off are dropped. */
+    fun restoreSnoozes(context: Context) {
+        val prefs = PreferencesManager(context)
+        val pending = prefs.getPendingSnoozes()
+        val due = PendingSnoozes.stillDue(pending, System.currentTimeMillis())
+        if (due != pending) prefs.setPendingSnoozes(due)
+        due.forEach { (id, at) -> Prayer.fromId(id)?.let { setSnooze(context, it, at) } }
+    }
 
     fun scheduleOccasion(context: Context) {
         val prefs = PreferencesManager(context)
@@ -122,13 +156,20 @@ object ReligiousAlarms {
         lunarEclipse = prefs.isEclipseReminderEnabled()
     )
 
-    private fun set(context: Context, requestCode: Int, triggerAt: Long, intent: Intent) {
+    private fun set(context: Context, requestCode: Int, triggerAt: Long, intent: Intent, alarmClock: Boolean = false) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
         val pending = PendingIntent.getBroadcast(
             context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
+            val exactAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
+            if (exactAllowed && alarmClock) {
+                val show = PendingIntent.getActivity(
+                    context, SHOW_REQUEST_CODE, Intent(context, MainActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAt, show), pending)
+            } else if (exactAllowed) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pending)
             } else {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pending)

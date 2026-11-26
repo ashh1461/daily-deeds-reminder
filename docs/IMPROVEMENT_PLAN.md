@@ -172,7 +172,13 @@ Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4)
   - The bulk qada undo (one batch id per "add days").
   - Reader sizes and fit mode saved and backed up (`pref_font_*`, `pref_mushaf_fit`), and the basmala line height scaled with its size.
   - The privacy-policy wording for «موقعي».
-- **Settled by you:** saved places are not wanted for now (1.2 item 7).
+- **v1.8.2** (branch `feature/v1.8.2`, stacked on `fix/v1.8.1.6`, not yet released): the 7.5 row.
+  - targetSdk/compileSdk 36 and edge to edge; AGP 8.13.2, Gradle 8.13, Kotlin 2.2.21, Compose BOM 2025.08.00 (stays on AGP 8, so Dependabot #5–#9 are replaced, not merged).
+  - Direct-boot restore: settings moved to device-protected storage (your choice, 2026-11-26); `LOCKED_BOOT_COMPLETED`.
+  - The high-latitude rule (angle-based, fills only missing times, marked «تقديري»).
+  - Snooze across reboots, the "last fired" guard (3 h window), pausing on short interruptions, no service on silent, `setAlarmClock`, the dark start window.
+  - `androidTest`: one instrumented test for the settings move (compiled, not run here).
+- **Settled by you:** saved places are not wanted for now (1.2 item 7). Settings in device-protected storage for direct boot (2026-11-26).
 
 ### 7.2 Still open from sections 2 and 3
 Re-checked in the code on 2026-11-26; none of these has changed.

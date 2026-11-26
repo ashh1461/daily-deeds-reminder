@@ -1,8 +1,6 @@
 package com.dailydeeds.reminder.ui.screens
 
 import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.text.format.DateFormat
@@ -16,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -25,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,22 +53,11 @@ fun SettingsScreen(
     val themeMode by tools.themeMode.collectAsState()
     val place by tools.place.collectAsState()
     val backup by worship.backup.collectAsState()
-    val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri != null) worship.exportBackup(uri)
     }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) worship.importBackup(uri)
-    }
-
-    if (backup?.restartNeeded == true) {
-        AlertDialog(
-            onDismissRequest = { worship.clearBackupStatus() },
-            title = { Text("تم الاستيراد") },
-            text = { Text("أعد تشغيل التطبيق لتظهر البيانات المستوردة.") },
-            confirmButton = { Button(onClick = { restartApp(context) }) { Text("إعادة التشغيل الآن") } },
-            dismissButton = { TextButton(onClick = { worship.clearBackupStatus() }) { Text("لاحقاً") } }
-        )
     }
 
     ToolScaffold("الإعدادات", onNavigateBack) {
@@ -187,12 +171,6 @@ fun SettingsScreen(
             }
         }
     }
-}
-
-private fun restartApp(context: Context) {
-    val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)?.component ?: return
-    context.startActivity(Intent.makeRestartActivityTask(launch))
-    Runtime.getRuntime().exit(0)
 }
 
 @Composable

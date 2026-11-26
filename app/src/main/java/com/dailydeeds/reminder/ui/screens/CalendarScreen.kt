@@ -31,6 +31,7 @@ import java.time.LocalDate
 fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
     val offset by viewModel.hijriOffset.collectAsState()
     val reminder by viewModel.occasionReminder.collectAsState()
+    val eveReminder by viewModel.blessedEveReminder.collectAsState()
     val today = remember { LocalDate.now() }
     val hijri = remember(offset) { ShiaCalendar.toHijri(today, offset) }
     val upcoming = remember(offset) { ShiaCalendar.upcoming(today, 120, offset) }
@@ -66,6 +67,19 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("تذكير صباحي بمناسبة اليوم", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                     Switch(checked = reminder, onCheckedChange = viewModel::setOccasionReminder)
+                }
+            }
+            item {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("تذكير مسائي قبل الليالي المباركة", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "ليلة الجمعة كل خميس، وليلة النصف من شعبان وليالي القدر، قبل المغرب بساعة.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(checked = eveReminder, onCheckedChange = viewModel::setBlessedEveReminder)
                 }
             }
             item { Text("المناسبات القادمة", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }

@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Outcome of a backup export or import, shown once on the settings screen. */
-data class BackupStatus(val message: String, val ok: Boolean, val restartNeeded: Boolean = false)
+data class BackupStatus(val message: String, val ok: Boolean)
 
 /** State of the tasbih, make-up prayers, khums and Ramadan features plus backup of the user's data. */
 class WorshipViewModel(app: Application) : AndroidViewModel(app) {
@@ -64,6 +64,7 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
     fun addQada(kind: QadaKind, count: Int) = updateQada { it.add(kind, count, today()) }
     fun markQada(kind: QadaKind, count: Int = 1) = updateQada { it.markMade(kind, count, today()) }
     fun addQadaDays(days: Int) = updateQada { it.addDaysOfPrayers(days, today()) }
+    fun markQadaFullDay() = updateQada { it.markFullDay(today()) }
     fun undoQada() = updateQada { it.undoLast() }
 
     // --- Khums, eclipse reminder, Imsak alarm ----------------------------------------------------
@@ -150,7 +151,9 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
                             DataReloads.backupImported()
                             AlarmScheduler.scheduleAllReminders(getApplication())
                             val skipped = if (result.skipped > 0) " (تم تجاهل ${result.skipped} عنصر غير صالح)" else ""
-                            BackupStatus("تم استيراد ${result.entries.size} عنصر$skipped. أعد تشغيل التطبيق لتطبيق البيانات.", true, restartNeeded = true)
+                            // Every screen reads the imported values again (DataReloads) and the alarms are set
+                            // from them above, so no restart is needed any more.
+                            BackupStatus("تم استيراد ${result.entries.size} عنصر$skipped.", true)
                         }
                     }
                 }.getOrElse { BackupStatus("تعذّر قراءة النسخة الاحتياطية", false) }

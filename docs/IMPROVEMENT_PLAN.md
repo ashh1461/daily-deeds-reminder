@@ -190,6 +190,15 @@ Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4)
   - The `own_` prefix reserved for imported voices, with unique ids.
   - Tasbih and khums safety: a confirmation before clearing, the same target no longer clears; the khums draft (`worship_khums_draft`).
   - From 7.4: the strong tasbih vibration at 34, 67 and 100 (and at the free target), the screen kept on in the tasbih and the readers; copying and sharing an ayah, and the whole ayah in its dialog.
+- **v1.8.4** (published as a pre-release; its PR merged into `master`): the rest of 7.4, the 7.2 IDEA row (section 3) apart from saved places, and the end of the backup-import work.
+  - The Today resume tile names the mushaf page in pages mode («صفحة N») and the last ayah in the list («الآية N»).
+  - The ayah list reopens at the last ayah, not only at the surah (section 3).
+  - Qada «قضيتُ يوماً كاملاً»: one of each of the five prayers made up in one tap, undone as one batch.
+  - The widget preview in the widget picker (`previewLayout` on Android 12+, `previewImage` before).
+  - Reloading after a backup import now covers the Tools and Main view models (favourites, place, Hijri offset, alarms, adhan and prayer settings, occasion and eve reminders, theme, last positions, pages mode, daily deeds, reminders, haptics); the restart request is gone.
+  - A notification tap opens the Today tab.
+  - An opt-in evening reminder before blessed nights: ليلة الجمعة every Thursday, mid-Sha'ban and the Laylat al-Qadr nights, an hour before Maghrib.
+  - An opt-in fade-in of the adhan (10 s, off by default).
 - **Settled by you:** saved places are not wanted for now (1.2 item 7). Settings in device-protected storage for direct boot (2026-11-26).
 
 ### 7.2 Still open from sections 2 and 3
@@ -211,7 +220,7 @@ Re-checked in the code on 2026-11-26; none of these has changed.
 | LOW | Mafatih sections of up to 21.8k characters are drawn in one `Text`. | `ui/screens/MafatihReaderScreen.kt` |
 | LOW | Two back arrows don't mirror (`Icons.Default.ArrowBack`), and the Ramadan «‹ ›» buttons have no TalkBack label. | `MafatihReaderScreen.kt:89`, `QuranReaderScreen.kt:107`, `RamadanScreen.kt:102,107` |
 | LOW | The voice id rule accepts `own_…`, which can collide with an imported voice. | `adhan/VoiceModels.kt:47` |
-| IDEA | A notification tap opens the Today tab; evening reminders before blessed nights and ليلة الجمعة; a fade-in for the adhan. | section 3 |
+| IDEA | A notification tap opens the Today tab; evening reminders before blessed nights and ليلة الجمعة; a fade-in for the adhan. **Done in v1.8.4.** | section 3 |
 | PLATFORM | targetSdk 34 → 35/36 with edge-to-edge insets, the AGP/Kotlin upgrade, Dependabot #5-#13, `androidTest`. | the planned v1.8.2 |
 
 ### 7.3 New findings (round 2)
@@ -235,9 +244,11 @@ Re-checked in the code on 2026-11-26; none of these has changed.
 ### 7.4 Small features worth adding
 - **Tasbih:** a strong vibration at 34, 67 and 100, so you can count without looking. Keep the screen on in the tasbih and the readers.
 - **Copy and share an ayah** from the ayah dialog. The dialog also cuts long ayahs at 6 lines.
-- **The Today resume tile** shows «صفحة N» in pages mode.
-- **Qada:** a «قضيتُ يوماً كاملاً» button that marks one of each of the five prayers.
-- **Widget:** a preview picture in the widget picker.
+- **The Today resume tile** shows «صفحة N» in pages mode. **Done in v1.8.4** (and «الآية N» in the list).
+- **Qada:** a «قضيتُ يوماً كاملاً» button that marks one of each of the five prayers. **Done in v1.8.4.**
+- **Widget:** a preview picture in the widget picker. **Done in v1.8.4.**
+
+The tasbih vibration, the screen kept on, and copying and sharing an ayah were done in v1.8.3, so every item of this list is now done.
 
 ### 7.5 Proposed release order (replaces section 4)
 
@@ -246,7 +257,8 @@ Re-checked in the code on 2026-11-26; none of these has changed.
 | **v1.8.1.6** (small, next) | The backup regression. The weekday favourite opening the wrong day. The zoom minimum. The favourites undo. The bulk qada undo. Saving the reader font sizes and fit mode. The basmala line height. The privacy-policy wording. |
 | **v1.8.2** (toolchain, as planned) | targetSdk 35/36 with edge-to-edge, the AGP/Kotlin upgrade, `androidTest`. The high-latitude rule. Direct-boot restore. Snooze across reboots. The "last fired" guard. Pausing on short interruptions. Skipping the service on silent. `setAlarmClock`. The dark start window. |
 | **v1.8.3** | Mushaf accessibility and the fit cache. Scrolling to the ayah. The Qibla in landscape. The cold-start work. The Mafatih `LazyColumn`. Reloading after a backup import. The back arrows and TalkBack labels. The `own_` prefix. Tasbih and khums safety. |
-| **then** | The section 7.4 features (each is small) and the v1.9.0+ roadmap. |
+| **v1.8.4** | The rest of section 7.4, the section 3 ideas apart from saved places (notification tap to Today, blessed-night eves, adhan fade-in, resuming at the last ayah), and reloading the Tools and Main view models after a backup import. |
+| **then** | The v1.9.0+ roadmap (string externalisation ar/en/fa, Quran translations, the hadith and Nahj al-Balagha library). |
 
 ### 7.6 Checked and found clean (round 2)
 - **Mushaf layout:**

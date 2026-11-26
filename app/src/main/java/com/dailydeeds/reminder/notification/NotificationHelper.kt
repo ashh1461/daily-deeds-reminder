@@ -16,6 +16,8 @@ import com.dailydeeds.reminder.model.DeedCategory
 object NotificationHelper {
     private const val TAG = "NotificationHelper"
     const val EXTRA_CATEGORY = "reminder_category"
+    /** Set on every notification's tap intent: the app opens (or goes back to) the Today tab. */
+    const val EXTRA_OPEN_TODAY = "open_today"
 
     /** Deed reminders and occasion alerts. */
     const val CHANNEL_ID = "daily_deeds_channel"
@@ -85,6 +87,7 @@ object NotificationHelper {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             category?.let { putExtra(EXTRA_CATEGORY, it.name) }
+            putExtra(EXTRA_OPEN_TODAY, true)
         }
         return PendingIntent.getActivity(
             context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

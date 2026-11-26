@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.dailydeeds.reminder.data.DataReloads
 import com.dailydeeds.reminder.data.DeedsRepository
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.DeedCategory
@@ -16,7 +17,10 @@ import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.model.ReminderType
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.notification.AlarmScheduler
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.delay
@@ -63,6 +67,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _eveningTime = MutableStateFlow(Pair(20, 0))
     val eveningTime: StateFlow<Pair<Int, Int>> = _eveningTime.asStateFlow()
 
+    /** A notification was tapped while the app was open: the navigation goes back to the Today tab. */
+    private val _openToday = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val openToday: SharedFlow<Unit> = _openToday.asSharedFlow()
+
+    fun requestToday() {
+        _openToday.tryEmit(Unit)
+    }
+
     init {
         loadDailyState()
         viewModelScope.launch {
@@ -71,6 +83,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 refreshDateIfNeeded()
             }
         }
+        // A backup import replaces the deeds of the day, the reminders and haptics: read them again.
+        val seen = DataReloads.imports.value
+        viewModelScope.launch { DataReloads.importsAfter(seen).collect { loadDailyState() } }
     }
 
     private fun refreshDateIfNeeded() {

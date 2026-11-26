@@ -39,6 +39,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_FAVORITES = "pref_favorites"
         private const val KEY_LAST_SURAH = "pref_last_surah"
         private const val KEY_LAST_PAGE = "pref_last_page"
+        private const val KEY_LAST_AYAH = "pref_last_ayah"
         private const val KEY_QURAN_PAGES_MODE = "pref_quran_pages_mode"
         private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
         private const val KEY_LAST_SAHIFA = "pref_last_sahifa"
@@ -52,6 +53,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_PLACE_ZONE = "pref_place_zone"
         private const val KEY_HIJRI_OFFSET = "pref_hijri_offset"
         private const val KEY_OCCASION_REMINDER = "pref_occasion_reminder"
+        private const val KEY_BLESSED_EVE = "pref_blessed_eve_enabled"
         private const val KEY_TASBIH = "worship_tasbih"
         private const val KEY_QADA = "worship_qada"
         private const val KEY_KHUMS_YEAR = "worship_khums_year"
@@ -226,6 +228,10 @@ class PreferencesManager(context: Context) {
     fun getLastSurah(): Int = prefs.getInt(KEY_LAST_SURAH, 0)
     fun setLastSurah(surah: Int) = prefs.edit().putInt(KEY_LAST_SURAH, surah).apply()
 
+    /** The ayah at the top of the list reader when it was last scrolled, in the last surah; 0 when none. */
+    fun getLastAyah(): Int = prefs.getInt(KEY_LAST_AYAH, 0)
+    fun setLastAyah(ayah: Int) = prefs.edit().putInt(KEY_LAST_AYAH, ayah).apply()
+
     /** Last mushaf page read (1..604), 0 when none. */
     fun getLastQuranPage(): Int = prefs.getInt(KEY_LAST_PAGE, 0)
     fun setLastQuranPage(page: Int) = prefs.edit().putInt(KEY_LAST_PAGE, page).apply()
@@ -305,6 +311,10 @@ class PreferencesManager(context: Context) {
     fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
     fun setOccasionReminderEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
+
+    /** The evening reminder before blessed nights and ليلة الجمعة (opt-in). */
+    fun isBlessedEveReminderEnabled(): Boolean = prefs.getBoolean(KEY_BLESSED_EVE, false)
+    fun setBlessedEveReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_BLESSED_EVE, enabled).apply()
 
     // --- Worship tools --------------------------------------------------------------------
 

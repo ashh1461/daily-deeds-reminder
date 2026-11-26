@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- previewLayout is read on Android 12+; previewImage is the picture for older versions. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:description="@string/widget_description"
     android:initialLayout="@layout/widget_prayer"
+    android:previewImage="@drawable/widget_preview"
+    android:previewLayout="@layout/widget_prayer_preview"
+    tools:ignore="UnusedAttribute"
     android:minWidth="180dp"
     android:minHeight="110dp"
     android:resizeMode="horizontal|vertical"

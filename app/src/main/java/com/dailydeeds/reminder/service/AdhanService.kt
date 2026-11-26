@@ -30,6 +30,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.dailydeeds.reminder.MainActivity
+import com.dailydeeds.reminder.adhan.AdhanFade
 import com.dailydeeds.reminder.adhan.BundledVoices
 import com.dailydeeds.reminder.adhan.PrayerAlarmText
 import com.dailydeeds.reminder.adhan.VoiceIds
@@ -61,6 +62,17 @@ class AdhanService : Service() {
     private var prayerForSnooze: Prayer? = null
     /** A short interruption (a notification sound, a call) holds the audio; the adhan waits and resumes after it. */
     private var focusLostBriefly = false
+    /** When the fade-in began (elapsed realtime), for [fadeStep]. */
+    private var fadeStartedAt = 0L
+    /** Raises the player's volume along [AdhanFade] until it is full. */
+    private val fadeStep = object : Runnable {
+        override fun run() {
+            val elapsed = SystemClock.elapsedRealtime() - fadeStartedAt
+            val volume = AdhanFade.volumeAt(elapsed)
+            runCatching { player?.setVolume(volume, volume) }
+            if (elapsed < AdhanFade.DURATION_MS) handler.postDelayed(this, AdhanFade.STEP_MS)
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -113,6 +125,7 @@ class AdhanService : Service() {
         val intent = Intent(this, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             .putExtra(EXTRA_STOP_ADHAN, true)
+            .putExtra(NotificationHelper.EXTRA_OPEN_TODAY, true)
         return PendingIntent.getActivity(
             this, OPEN_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -182,6 +195,11 @@ class AdhanService : Service() {
             }
             mp.setOnPreparedListener {
                 started = true
+                if (settings.fadeIn) {
+                    it.setVolume(AdhanFade.START_VOLUME, AdhanFade.START_VOLUME)
+                    fadeStartedAt = SystemClock.elapsedRealtime()
+                    handler.post(fadeStep)
+                }
                 // Prepared during a short interruption: wait for the focus to come back (the listener starts it).
                 if (!focusLostBriefly) it.start()
             }
@@ -327,6 +345,7 @@ class AdhanService : Service() {
         // The focus request is abandoned below, so no GAIN will clear this; a later playback must start normally.
         focusLostBriefly = false
         handler.removeCallbacks(timeout)
+        handler.removeCallbacks(fadeStep)
         disarmHardwareStop()
         player?.let {
             runCatching { if (it.isPlaying) it.stop() }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget picker's picture before Android 12 (previewImage): the widget's card with lines for its text. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="110dp"
+    android:viewportWidth="180"
+    android:viewportHeight="110">
+    <path
+        android:fillColor="#063F34"
+        android:strokeColor="#C9A24B"
+        android:strokeWidth="1"
+        android:pathData="M18.5,0.5h143a18,18 0 0,1 18,18v73a18,18 0 0,1 -18,18h-143a18,18 0 0,1 -18,-18v-73a18,18 0 0,1 18,-18z" />
+    <path android:fillColor="#E2BF66" android:pathData="M112,14h56v6h-56z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M88,26h80v9h-80z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M12,42h84v22h-84z" />
+    <path android:fillColor="#D7EDE5" android:pathData="M96,72h72v6h-72z" />
+    <path android:fillColor="#E2BF66" android:pathData="M120,86h48v6h-48z" />
+</vector>

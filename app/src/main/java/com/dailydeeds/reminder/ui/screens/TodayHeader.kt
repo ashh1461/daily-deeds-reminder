@@ -25,7 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.data.MafatihRepository
+import com.dailydeeds.reminder.data.QuranPages
 import com.dailydeeds.reminder.data.QuranRepository
+import com.dailydeeds.reminder.data.QuranResume
 import com.dailydeeds.reminder.data.WeekdayRepository
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.ui.components.EmeraldBanner
@@ -177,6 +179,9 @@ fun ResumeTiles(
     val lastSurah by tools.lastSurah.collectAsState()
     val lastMafatihId by tools.lastMafatihId.collectAsState()
     val lastSahifaId by tools.lastSahifaId.collectAsState()
+    val pagesMode by tools.quranPagesMode.collectAsState()
+    val lastPage by tools.lastQuranPage.collectAsState()
+    val lastAyah by tools.lastAyah.collectAsState()
     val surahName = remember(lastSurah) { QuranRepository().getSurahByNumber(lastSurah)?.nameArabic }
     val mafatihTitle = remember(lastMafatihId) { lastMafatihId?.let { MafatihRepository().getItemById(it)?.title } }
     val sahifaTitle = remember(lastSahifaId) { lastSahifaId?.let { MafatihRepository().getItemById(it)?.title } }
@@ -191,7 +196,12 @@ fun ResumeTiles(
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("تابع من حيث توقفت", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             if (surahName != null) {
-                OutlinedButton(onClick = { onSurah(lastSurah) }, modifier = Modifier.fillMaxWidth()) { Text("القرآن: سورة $surahName") }
+                // In pages mode the tile reopens (and names) the last mushaf page; in the list, the last ayah.
+                val label = remember(surahName, lastSurah, pagesMode, lastPage, lastAyah) {
+                    val pageShowsSurah = lastPage in 1..QuranPages.COUNT && QuranPages.page(lastPage).showsSurah(lastSurah)
+                    QuranResume.label(surahName, pagesMode, lastPage, pageShowsSurah, lastAyah)
+                }
+                OutlinedButton(onClick = { onSurah(lastSurah) }, modifier = Modifier.fillMaxWidth()) { Text(label) }
             }
             if (mafatihTitle != null) {
                 OutlinedButton(onClick = { onMafatih(lastMafatihId!!) }, modifier = Modifier.fillMaxWidth()) {

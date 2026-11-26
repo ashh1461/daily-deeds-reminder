@@ -65,6 +65,10 @@
             android:name=".receiver.OccasionAlarmReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".receiver.BlessedEveReceiver"
+            android:exported="false" />
+
         <!-- Home-screen widget: system broadcasts reach it although it is not exported. -->
         <receiver
             android:name=".widget.PrayerWidgetProvider"

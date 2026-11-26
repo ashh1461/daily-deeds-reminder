@@ -59,6 +59,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -78,6 +79,7 @@ import androidx.navigation.navArgument
 import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.data.QuranPages
+import com.dailydeeds.reminder.data.QuranResume
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.model.DeedCategory
 import com.dailydeeds.reminder.notification.AlarmScheduler
@@ -168,6 +170,8 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         applyReminderCategory(intent)
         stopAdhanIfAsked(intent)
+        // On a fresh start the app opens on Today anyway; while it is open, a tap leaves any pushed screen or tab.
+        if (intent.getBooleanExtra(NotificationHelper.EXTRA_OPEN_TODAY, false)) viewModel.requestToday()
     }
 
     /** A tap on the playing-adhan notification opens the app with this extra: the tap also silences the adhan. */
@@ -216,6 +220,14 @@ fun AppNavigation(
     val vms = remember(activityOwner) { LazyViewModels(activityOwner) }
 
     val navController = rememberNavController()
+    LaunchedEffect(navController) {
+        mainViewModel.openToday.collect {
+            navController.navigate("home") {
+                popUpTo("home")
+                launchSingleTop = true
+            }
+        }
+    }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val currentTab = appTabs.firstOrNull { it.route == currentRoute }
@@ -241,7 +253,12 @@ fun AppNavigation(
     }
     fun resumeSurah(surah: Int) {
         val page = toolsViewModel.lastQuranPage.value
-        if (pagesMode && page > 0 && QuranPages.page(page).showsSurah(surah)) go("quran/page/$page") else openSurah(surah)
+        val ayah = QuranResume.resumeAyah(surah, toolsViewModel.lastSurah.value, toolsViewModel.lastAyah.value)
+        when {
+            pagesMode && page > 0 && QuranPages.page(page).showsSurah(surah) -> go("quran/page/$page")
+            !pagesMode && ayah > 0 -> openAyah(surah, ayah)
+            else -> openSurah(surah)
+        }
     }
 
     Scaffold(

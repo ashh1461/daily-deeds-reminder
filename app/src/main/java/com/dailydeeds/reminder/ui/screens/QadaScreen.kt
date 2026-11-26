@@ -57,6 +57,21 @@ fun QadaScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
                 }
             }
 
+            WorshipCard {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("يوم كامل", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(
+                            "يُنقص واحدة من كل صلاة من الصلوات الخمس، ويُتراجع عنه دفعة واحدة.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    FilledTonalButton(onClick = { viewModel.markQadaFullDay() }, enabled = state.canMarkFullDay) {
+                        Text("قضيتُ يوماً كاملاً")
+                    }
+                }
+            }
+
             QadaKind.values().forEach { kind ->
                 WorshipCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

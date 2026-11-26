@@ -5,4 +5,10 @@
     <string name="channel_reminders_name">تنبيهات الأعمال اليومية</string>
     <string name="channel_reminders_desc">تذكير بالأوراد الصباحية والمسائية وعقيب الصلوات</string>
     <string name="widget_description">الصلاة القادمة والتاريخ الهجري ومناسبة اليوم</string>
+    <!-- Sample text of the widget preview in the widget picker. -->
+    <string name="widget_preview_place">بيروت</string>
+    <string name="widget_preview_next">الصلاة القادمة: المغرب</string>
+    <string name="widget_preview_time">16:42</string>
+    <string name="widget_preview_hijri">١٧ جمادى الآخرة ١٤٤٨ هـ</string>
+    <string name="widget_preview_occasion">ليلة الجمعة</string>
 </resources>

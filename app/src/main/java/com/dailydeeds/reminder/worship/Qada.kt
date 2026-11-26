@@ -50,6 +50,19 @@ data class QadaState(
         return QadaKind.PRAYERS.fold(this) { state, kind -> state.add(kind, days, epochDay, batch) }
     }
 
+    /** Every one of the five daily prayers is still owed, so «قضيتُ يوماً كاملاً» can mark a whole day. */
+    val canMarkFullDay: Boolean get() = QadaKind.PRAYERS.all { owed(it) > 0 }
+
+    /**
+     * «قضيتُ يوماً كاملاً»: one of each of the five prayers made up. The five entries share a new batch id, so one
+     * «تراجع عن الأخير» reverts the whole day. Does nothing unless all five are owed.
+     */
+    fun markFullDay(epochDay: Long): QadaState {
+        if (!canMarkFullDay) return this
+        val batch = (history.maxOfOrNull { it.batch } ?: 0L) + 1
+        return QadaKind.PRAYERS.fold(this) { state, kind -> state.change(kind, -1, epochDay, batch) }
+    }
+
     /** Marks up to [count] as made up; never goes below zero. */
     fun markMade(kind: QadaKind, count: Int, epochDay: Long): QadaState {
         val n = count.coerceIn(0, owed(kind))

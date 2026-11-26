@@ -6,6 +6,8 @@ Not done: no Gradle build or test run, and nothing tried on a device or emulator
 
 All paths are relative to `app/src/main/java/com/dailydeeds/reminder/`.
 
+> **Update 2026-11-26 (after v1.8.1.4 and v1.8.1.5, both merged into `master`):** what is done, what is still open, and a second review round are in [section 7](#7-status-after-v1815-and-review-round-2). Section 7 replaces the release order in section 4.
+
 ---
 
 ## 1. Your two notes
@@ -146,3 +148,95 @@ Each release follows the AGENTS.md checklist. Its release note must list the dev
 1. "Another area": was it only the missing picker in adhan settings and «موقعي» failing, or do you also want saved places?
 2. Which hardware stop do you want: power button, volume keys, or both?
 3. The dates for the missing occasions (al-Baqir, al-Kazim, al-Hadi): which references does your marja follow?
+
+---
+
+## 7. Status after v1.8.1.5, and review round 2
+
+Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4) and PR #29 (v1.8.1.5) merged. Round 2 was a read-only review of the parts the first round covered lightly: the new mushaf view, favourites, the worship tools, and readiness for Play. I re-checked the items marked "confirmed" in the code myself.
+
+### 7.1 Done
+- **v1.8.1.4:**
+  - 1.1 items 1-5: swipe, tap, power and volume stop the adhan; the in-app banner; no adhan without a notification.
+  - 1.2 items 1-4 and 6: the place card in the adhan settings, a fresh «موقعي» fix, the nearest city's time zone, Arabic-Indic digits, wrapping buttons, today in the place's zone.
+  - Audio focus honoured, snooze follows the mode, the `bundledAttempt` order.
+  - Night occasions on their eve. The al-Baqir, al-Kazim and al-Hadi occasions. The new «أعمال الأشهر القمرية» section.
+- **v1.8.1.5:**
+  - The ayah deep link from search and favourites.
+  - The Quran as 604 mushaf pages, resuming at the last page.
+  - Deleting and bulk-deleting favourites from the list.
+- **Settled by you:** saved places are not wanted for now (1.2 item 7).
+
+### 7.2 Still open from sections 2 and 3
+Re-checked in the code on 2026-11-26; none of these has changed.
+
+| Sev. | Item | Where |
+|---|---|---|
+| MED | No high-latitude rule: Fajr, Isha and their alarms are missing in summer above about 48°. | `util/PrayerTimes.kt`, `util/PrayerSchedule.kt` |
+| MED | After an overnight reboot, alarms come back only after the first unlock (no `directBootAware` or `LOCKED_BOOT_COMPLETED`). | `AndroidManifest.xml` |
+| MED | Qibla is wrong in landscape: there is no `remapCoordinateSystem` and the screen is not locked to portrait. | `ui/screens/QiblaScreen.kt:53-55` |
+| MED | Cold-start work: every ViewModel is created at start, and the search index is built on launch. | `MainActivity.kt:195-200`, `viewmodel/SearchViewModel.kt:42` |
+| LOW-MED | After a backup import, tasbih and qada are still held in memory, so the next tap writes the old values over the imported ones. | `viewmodel/WorshipViewModel.kt:33-58, 125-145` |
+| LOW-MED | A clock moved back after an adhan can play it again (no "last fired" guard). | `receiver/BootReceiver.kt`, `notification/ReligiousAlarms.kt` |
+| LOW | A short interruption (`AUDIOFOCUS_LOSS_TRANSIENT`) ends the adhan instead of pausing it. | `service/AdhanService.kt:226` |
+| LOW | A pending snooze is lost on reboot. | `notification/ReligiousAlarms.kt` |
+| LOW | On silent or vibrate, the adhan service still starts and shows its notification briefly. | `service/AdhanService.kt:123` |
+| OPT | `setExactAndAllowWhileIdle` instead of `setAlarmClock` for the adhan. | `AlarmScheduler.kt:40`, `ReligiousAlarms.kt:132` |
+| LOW | Reader font sizes (Quran list, Mafatih, mushaf size and fit mode) reset on every launch. | `viewmodel/QuranViewModel.kt:27,56-61`, `viewmodel/MafatihViewModel.kt:38` |
+| LOW | Mafatih sections of up to 21.8k characters are drawn in one `Text`. | `ui/screens/MafatihReaderScreen.kt` |
+| LOW | Two back arrows don't mirror (`Icons.Default.ArrowBack`), and the Ramadan «‹ ›» buttons have no TalkBack label. | `MafatihReaderScreen.kt:89`, `QuranReaderScreen.kt:107`, `RamadanScreen.kt:102,107` |
+| LOW | The voice id rule accepts `own_…`, which can collide with an imported voice. | `adhan/VoiceModels.kt:47` |
+| IDEA | A notification tap opens the Today tab; evening reminders before blessed nights and ليلة الجمعة; a fade-in for the adhan. | section 3 |
+| PLATFORM | targetSdk 34 → 35/36 with edge-to-edge insets, the AGP/Kotlin upgrade, Dependabot #5-#13, `androidTest`. | the planned v1.8.2 |
+
+### 7.3 New findings (round 2)
+
+| Sev. | Finding | Where | Fix |
+|---|---|---|---|
+| **MED (confirmed, regression in 1.8.1.5)** | **A backup restore drops the last mushaf page and the pages/list choice.** The two keys were added to the allow-list but not to the type check, so their Int and Boolean values are rejected and counted as "invalid items". The current values are deleted before the import, so they are lost even on the same phone. | `data/BackupCodec.kt:104-113`, `PreferencesManager.kt:316` | Add `pref_last_page` (Int) and `pref_quran_pages_mode` (Boolean) to `typeMatchesKey`. Add typed values to `BackupCodecTest.sample()`. |
+| MED (confirmed) | **A weekday du'a or ziyarah opened from Favourites shows today's text.** A starred «دعاء يوم الأحد» opened on a Tuesday shows Tuesday's du'a. | `FavoritesScreen.kt:125` passes only the kind; `WeekdayContentScreen.kt:74-75` starts on today | Put the day in the route (`…?day=SUNDAY`) and seed the selection from it. |
+| MED | **TalkBack users can't activate an ayah in the mushaf**, so they can't add a favourite or open Mizan. `ClickableText` has no accessibility click. | `QuranMushafScreen.kt:268-275` | Add custom accessibility actions per ayah, or use `LinkAnnotation` after the Compose upgrade. |
+| MED | **Fit mode can make page swipes stutter.** The fit search (about 9 full-page measurements) runs during composition for every composed page and is redone when you swipe back. Starring an ayah re-fits all three composed pages. | `QuranMushafScreen.kt:207-209` | Cache by (page, size, that page's favourites only) and compute outside composition. Check on a phone. |
+| LOW-MED | Favourites «تراجع» can remove a star added elsewhere in the meantime: the snapshot outlives navigation. | `FavoritesScreen.kt:100,116,140`, `ToolsViewModel.kt:87-90` | On undo, add back only what is missing (`snapshot - favorites`). |
+| LOW-MED | Undoing a bulk qada add (days of prayers) reverts only the last prayer of the five. | `worship/Qada.kt:40-41`, `QadaScreen.kt:84` | Give a bulk add one batch id and undo the whole batch. |
+| LOW (confirmed) | «تصغير الخط» can make the mushaf text bigger: fitted pages go down to 12 sp, but zoom clamps at 14. | `MushafFit.kt:28`, `QuranViewModel.kt:79` | Use one minimum for both. |
+| LOW | The basmala's line height is fixed at 28 sp while its font grows to 30-40 sp, so a wrapped basmala can overlap. | `ui/theme/Type.kt:31`, `QuranMushafScreen.kt:244` | Scale the line height with the font. Check on a phone. |
+| LOW | Tasbih counts are cleared with no confirmation or undo («إعادة العدّ», or picking a target). | `TasbihScreen.kt:72,117`, `worship/Tasbih.kt:57` | Confirm, or offer undo. |
+| LOW | Khums figures are lost when you leave the screen. | `KhumsScreen.kt:56-59` | Save a draft preference (it is already in the backup allow-list as `worship_khums_draft`). |
+| LOW | A cold start in dark mode flashes white (the window theme is Light). | `AndroidManifest.xml`, `res/values/themes.xml` | Use a DayNight window theme. |
+| LOW (Play) | `docs/PRIVACY.md` still says «موقعي» reads the last-known location once; since 1.8.1.4 it asks for a fresh fix. | `docs/PRIVACY.md`, `DeviceLocation.kt:45` | Update the policy and the Data safety wording before a store release. |
+| LOW | With fit mode off and a large font, the ayah opened from search can be below the screen. | `QuranMushafScreen.kt` | Scroll the page to the highlighted ayah. |
+
+### 7.4 Small features worth adding
+- **Tasbih:** a strong vibration at 34, 67 and 100, so you can count without looking. Keep the screen on in the tasbih and the readers.
+- **Copy and share an ayah** from the ayah dialog. The dialog also cuts long ayahs at 6 lines.
+- **The Today resume tile** shows «صفحة N» in pages mode.
+- **Qada:** a «قضيتُ يوماً كاملاً» button that marks one of each of the five prayers.
+- **Widget:** a preview picture in the widget picker.
+
+### 7.5 Proposed release order (replaces section 4)
+
+| Release | Contents |
+|---|---|
+| **v1.8.1.6** (small, next) | The backup regression. The weekday favourite opening the wrong day. The zoom minimum. The favourites undo. The bulk qada undo. Saving the reader font sizes and fit mode. The basmala line height. The privacy-policy wording. |
+| **v1.8.2** (toolchain, as planned) | targetSdk 35/36 with edge-to-edge, the AGP/Kotlin upgrade, `androidTest`. The high-latitude rule. Direct-boot restore. Snooze across reboots. The "last fired" guard. Pausing on short interruptions. Skipping the service on silent. `setAlarmClock`. The dark start window. |
+| **v1.8.3** | Mushaf accessibility and the fit cache. Scrolling to the ayah. The Qibla in landscape. The cold-start work. The Mafatih `LazyColumn`. Reloading after a backup import. The back arrows and TalkBack labels. The `own_` prefix. Tasbih and khums safety. |
+| **then** | The section 7.4 features (each is small) and the v1.9.0+ roadmap. |
+
+### 7.6 Checked and found clean (round 2)
+- **Mushaf layout:**
+  - Page 1: the Fatiha has no extra basmala, since its ayah 1 is the basmala.
+  - Page 2: the Baqara banner has a basmala.
+  - Surah 9 has no basmala.
+  - Page 604 shows its three surah banners.
+- **Mushaf navigation:**
+  - Page numbers in the route are clamped.
+  - The juz jump works, and the go-to dialog accepts Arabic-Indic digits.
+  - The last page is saved only once a page settles.
+  - Resume works, and pages turn right to left.
+- **Favourites:** the filter falls back correctly, and the selection survives rotation.
+- **Backup:** the place is validated, and prayer alarms are rescheduled after an import.
+- **Widget:** it refreshes when the place or the Hijri offset changes.
+- **Inputs:** khums accepts Arabic-Indic digits, and the qada and tasbih counts are capped.
+- **Location:** coordinates are rounded to about 1 km.
+- **Manifest:** only the launcher activity is exported.

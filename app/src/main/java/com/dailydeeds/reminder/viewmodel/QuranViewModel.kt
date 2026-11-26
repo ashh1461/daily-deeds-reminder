@@ -51,4 +51,33 @@ class QuranViewModel(
             _fontSizeSp.value -= 2f
         }
     }
+
+    /** Text size of the page view; smaller by default than the ayah list so most of a page fits the screen. */
+    private val _mushafFontSp = MutableStateFlow(MUSHAF_DEFAULT_SP)
+    val mushafFontSp: StateFlow<Float> = _mushafFontSp.asStateFlow()
+
+    /** Each page picks the largest text size that fits the screen, so a page is read without scrolling. */
+    private val _mushafFit = MutableStateFlow(true)
+    val mushafFit: StateFlow<Boolean> = _mushafFit.asStateFlow()
+
+    fun setMushafFit(fit: Boolean) {
+        _mushafFit.value = fit
+    }
+
+    /** Zooming leaves fit mode; [fromSp] is the size on screen, so the first step starts from what the reader sees. */
+    fun increaseMushafFont(fromSp: Float = _mushafFontSp.value) {
+        _mushafFit.value = false
+        _mushafFontSp.value = (fromSp + 2f).coerceIn(MUSHAF_MIN_SP, MUSHAF_MAX_SP)
+    }
+
+    fun decreaseMushafFont(fromSp: Float = _mushafFontSp.value) {
+        _mushafFit.value = false
+        _mushafFontSp.value = (fromSp - 2f).coerceIn(MUSHAF_MIN_SP, MUSHAF_MAX_SP)
+    }
+
+    private companion object {
+        const val MUSHAF_DEFAULT_SP = 20f
+        const val MUSHAF_MIN_SP = 14f
+        const val MUSHAF_MAX_SP = 40f
+    }
 }

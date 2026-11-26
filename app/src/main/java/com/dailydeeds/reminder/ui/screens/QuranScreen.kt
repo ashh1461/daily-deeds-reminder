@@ -36,22 +36,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.dailydeeds.reminder.util.ArabicDigits
 import com.dailydeeds.reminder.model.RevelationType
 import com.dailydeeds.reminder.viewmodel.QuranViewModel
 
 @Composable
 fun QuranScreen(
     viewModel: QuranViewModel,
-    onNavigateToSurah: (Int) -> Unit
+    pagesMode: Boolean,
+    lastPage: Int,
+    onPagesModeChange: (Boolean) -> Unit,
+    onNavigateToSurah: (Int) -> Unit,
+    onOpenPage: (Int) -> Unit
 ) {
     val surahs by viewModel.surahs.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    var showGoTo by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
+        QuranModeBar(pagesMode, lastPage, onPagesModeChange, onOpenPage, onGoTo = { showGoTo = true })
+        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { viewModel.onSearchQueryChanged(it) },
@@ -162,6 +177,36 @@ fun QuranScreen(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+    }
+
+    if (showGoTo) {
+        GoToPageDialog(onDismiss = { showGoTo = false }, onGo = { showGoTo = false; onOpenPage(it) })
+    }
+}
+
+/** Chooses how the Quran opens: the mushaf page by page, or one surah as a scrolling list of ayahs. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun QuranModeBar(
+    pagesMode: Boolean,
+    lastPage: Int,
+    onPagesModeChange: (Boolean) -> Unit,
+    onOpenPage: (Int) -> Unit,
+    onGoTo: () -> Unit
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        FilterChip(selected = pagesMode, onClick = { onPagesModeChange(true) }, label = { Text("صفحات المصحف") })
+        FilterChip(selected = !pagesMode, onClick = { onPagesModeChange(false) }, label = { Text("آيات متتالية") })
+        if (pagesMode) {
+            OutlinedButton(onClick = { onOpenPage(if (lastPage > 0) lastPage else 1) }) {
+                Text(if (lastPage > 0) "متابعة: صفحة ${ArabicDigits.format(lastPage)}" else "افتح المصحف")
+            }
+            OutlinedButton(onClick = onGoTo) { Text("صفحة أو جزء") }
         }
     }
 }

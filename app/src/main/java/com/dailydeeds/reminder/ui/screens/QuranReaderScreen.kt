@@ -24,6 +24,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -60,15 +64,26 @@ fun QuranReaderScreen(
     viewModel: QuranViewModel,
     tools: ToolsViewModel,
     onOpenMizan: (Int, Int) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    initialAyah: Int = 0
 ) {
     val surah by viewModel.selectedSurah.collectAsState()
     val ayahs by viewModel.ayahs.collectAsState()
     val fontSizeSp by viewModel.fontSizeSp.collectAsState()
 
     val favorites by tools.favorites.collectAsState()
+    val listState = rememberLazyListState()
     val currentSurah = surah ?: return
     LaunchedEffect(currentSurah.number) { tools.recordSurah(currentSurah.number) }
+    // Opened from search or favorites: bring that ayah into view once (item 0 is the surah banner, so ayah n is
+    // item n). Saved, so coming back from Mizan or rotating keeps the reader where it was scrolled since.
+    var jumped by rememberSaveable(currentSurah.number, initialAyah) { mutableStateOf(false) }
+    LaunchedEffect(currentSurah.number, initialAyah, ayahs.size) {
+        if (!jumped && initialAyah in 1..ayahs.size && ayahs.first().surahNumber == currentSurah.number) {
+            listState.scrollToItem(initialAyah)
+            jumped = true
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -112,6 +127,7 @@ fun QuranReaderScreen(
                 .padding(paddingValues)
         ) {
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp, vertical = 8.dp),

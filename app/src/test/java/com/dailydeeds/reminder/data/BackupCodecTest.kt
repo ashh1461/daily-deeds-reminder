@@ -58,7 +58,8 @@ class BackupCodecTest {
 
     @Test
     fun onlyKnownKeysAreAllowed() {
-        listOf("pref_favorites", "deed_12_stage_2026-01-01", "worship_qada", "pref_alarm_cfg_4", "pref_night_minute")
+        listOf("pref_favorites", "deed_12_stage_2026-01-01", "worship_qada", "pref_alarm_cfg_4", "pref_night_minute",
+            "pref_last_page", "pref_quran_pages_mode")
             .forEach { assertTrue(it, BackupCodec.isAllowedKey(it)) }
         listOf("pref_last_active_date", "voice_store", "deed_1_completed_x", "worship_", "pref_alarm_cfg_9", "../pref_favorites", "", "x".repeat(200))
             .forEach { assertFalse(it, BackupCodec.isAllowedKey(it)) }

@@ -2,10 +2,12 @@ package com.dailydeeds.reminder.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.adhan.AdhanGlobalSettings
 import com.dailydeeds.reminder.adhan.AdhanMode
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
 import com.dailydeeds.reminder.adhan.PrayerSettings
+import com.dailydeeds.reminder.data.DataReloads
 import com.dailydeeds.reminder.data.FavoriteKey
 import com.dailydeeds.reminder.data.FavoritesList
 import com.dailydeeds.reminder.data.PreferencesManager
@@ -16,6 +18,7 @@ import com.dailydeeds.reminder.util.PrayerContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /** State for the calendar, prayer times, qibla and favorites screens. */
 class ToolsViewModel(app: Application) : AndroidViewModel(app) {
@@ -51,8 +54,14 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
     private val _occasionReminder = MutableStateFlow(prefs.isOccasionReminderEnabled())
     val occasionReminder: StateFlow<Boolean> = _occasionReminder.asStateFlow()
 
+    private val _blessedEveReminder = MutableStateFlow(prefs.isBlessedEveReminderEnabled())
+    val blessedEveReminder: StateFlow<Boolean> = _blessedEveReminder.asStateFlow()
+
     private val _lastSurah = MutableStateFlow(prefs.getLastSurah())
     val lastSurah: StateFlow<Int> = _lastSurah.asStateFlow()
+
+    private val _lastAyah = MutableStateFlow(prefs.getLastAyah())
+    val lastAyah: StateFlow<Int> = _lastAyah.asStateFlow()
 
     private val _lastMafatihId = MutableStateFlow(prefs.getLastMafatihId())
     val lastMafatihId: StateFlow<String?> = _lastMafatihId.asStateFlow()
@@ -109,6 +118,11 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         if (page != _lastQuranPage.value) {
             prefs.setLastQuranPage(page)
             _lastQuranPage.value = page
+            // Reading went on in the mushaf: the ayah saved by the list is no longer where the reader is.
+            if (_lastAyah.value != 0) {
+                prefs.setLastAyah(0)
+                _lastAyah.value = 0
+            }
         }
         recordSurah(surah)
     }
@@ -117,6 +131,8 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         prefs.setPlace(place)
         _place.value = place
         ReligiousAlarms.schedulePrayer(getApplication())
+        // The eve reminder is an hour before Maghrib at the place, on the Hijri dates: it moves with them.
+        ReligiousAlarms.scheduleBlessedEve(getApplication())
     }
 
     fun setHijriOffset(days: Int) {
@@ -124,6 +140,8 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _hijriOffset.value = prefs.getHijriOffset()
         // The offset decides which days are in Ramadan (Imsak alarm) and the widget's Hijri date.
         ReligiousAlarms.schedulePrayer(getApplication())
+        // The eve reminder is an hour before Maghrib at the place, on the Hijri dates: it moves with them.
+        ReligiousAlarms.scheduleBlessedEve(getApplication())
     }
 
     fun setAlarmConfig(prayer: Prayer, config: PrayerAlarmConfig) {
@@ -132,6 +150,8 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _prayerContext.value = buildContext()
         if (config.mode == AdhanMode.OFF) ReligiousAlarms.cancelSnooze(getApplication(), prayer)
         ReligiousAlarms.schedulePrayer(getApplication())
+        // The eve reminder is an hour before Maghrib at the place, on the Hijri dates: it moves with them.
+        ReligiousAlarms.scheduleBlessedEve(getApplication())
     }
 
     fun setAdhanGlobal(settings: AdhanGlobalSettings) {
@@ -144,6 +164,8 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         _prayerSettings.value = settings
         _prayerContext.value = buildContext()
         ReligiousAlarms.schedulePrayer(getApplication())
+        // The eve reminder is an hour before Maghrib at the place, on the Hijri dates: it moves with them.
+        ReligiousAlarms.scheduleBlessedEve(getApplication())
     }
 
     fun setOccasionReminder(enabled: Boolean) {
@@ -152,15 +174,60 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
         ReligiousAlarms.scheduleOccasion(getApplication())
     }
 
+    fun setBlessedEveReminder(enabled: Boolean) {
+        prefs.setBlessedEveReminderEnabled(enabled)
+        _blessedEveReminder.value = enabled
+        ReligiousAlarms.scheduleBlessedEve(getApplication())
+    }
+
     fun recordSurah(surah: Int) {
         if (surah == _lastSurah.value) return
         prefs.setLastSurah(surah)
         _lastSurah.value = surah
+        // The saved ayah belonged to the previous surah.
+        if (_lastAyah.value != 0) {
+            prefs.setLastAyah(0)
+            _lastAyah.value = 0
+        }
+    }
+
+    /** Called when the list reader stops scrolling, with the ayah at its top. */
+    fun recordAyah(surah: Int, ayah: Int) {
+        recordSurah(surah)
+        if (ayah == _lastAyah.value) return
+        prefs.setLastAyah(ayah)
+        _lastAyah.value = ayah
     }
 
     fun recordMafatih(id: String) {
         if (id == _lastMafatihId.value) return
         prefs.setLastMafatihId(id)
         _lastMafatihId.value = id
+    }
+
+    /** Reads everything this view model keeps in memory again, after a backup import replaced it. */
+    private fun reloadFromPrefs() {
+        _favorites.value = prefs.getFavorites()
+        _place.value = prefs.getPlace()
+        _hijriOffset.value = prefs.getHijriOffset()
+        _alarmConfigs.value = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
+        _adhanGlobal.value = prefs.getAdhanGlobal()
+        _prayerSettings.value = prefs.getPrayerSettings()
+        _prayerContext.value = buildContext()
+        _occasionReminder.value = prefs.isOccasionReminderEnabled()
+        _blessedEveReminder.value = prefs.isBlessedEveReminderEnabled()
+        _lastSurah.value = prefs.getLastSurah()
+        _lastAyah.value = prefs.getLastAyah()
+        _lastMafatihId.value = prefs.getLastMafatihId()
+        _lastSahifaId.value = prefs.getLastSahifaId()
+        _themeMode.value = prefs.getThemeMode()
+        _quranPagesMode.value = prefs.getQuranPagesMode()
+        _lastQuranPage.value = prefs.getLastQuranPage()
+    }
+
+    init {
+        // Declared last so every flow above exists before the first reload. The import itself reschedules the alarms.
+        val seen = DataReloads.imports.value
+        viewModelScope.launch { DataReloads.importsAfter(seen).collect { reloadFromPrefs() } }
     }
 }

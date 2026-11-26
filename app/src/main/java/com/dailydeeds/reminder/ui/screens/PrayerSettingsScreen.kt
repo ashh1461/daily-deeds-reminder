@@ -195,6 +195,7 @@ fun PrayerSettingsScreen(
                 SwitchRow("الاهتزاز مع الأذان", global.vibrate) { tools.setAdhanGlobal(global.copy(vibrate = it)) }
                 SwitchRow("عدم تشغيل الصوت في الوضع الصامت", global.followRinger) { tools.setAdhanGlobal(global.copy(followRinger = it)) }
                 SwitchRow("إيقاف الأذان بزر التشغيل أو الصوت", global.hardwareStop) { tools.setAdhanGlobal(global.copy(hardwareStop = it)) }
+                SwitchRow("رفع صوت الأذان تدريجياً", global.fadeIn) { tools.setAdhanGlobal(global.copy(fadeIn = it)) }
                 Text(
                     "إطفاء الشاشة أثناء الأذان يوقفه أيضاً. ويمكن إيقافه دائماً بلمس إشعاره أو سحبه جانباً.",
                     style = MaterialTheme.typography.bodySmall,

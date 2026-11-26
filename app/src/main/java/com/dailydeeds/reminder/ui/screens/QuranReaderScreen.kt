@@ -25,6 +25,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import com.dailydeeds.reminder.data.QuranResume
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -77,6 +82,17 @@ fun QuranReaderScreen(
     val listState = rememberLazyListState()
     val currentSurah = surah ?: return
     LaunchedEffect(currentSurah.number) { tools.recordSurah(currentSurah.number) }
+    // When a scroll by the reader ends, the ayah at the top is saved, so «تابع من حيث توقفت» reopens there. The first
+    // value (no scroll yet) is skipped: opening the surah must not overwrite the saved ayah with its first one.
+    val currentAyahs by rememberUpdatedState(ayahs)
+    LaunchedEffect(currentSurah.number) {
+        snapshotFlow { listState.isScrollInProgress }.drop(1).filter { !it }.collect {
+            val list = currentAyahs
+            if (list.isNotEmpty() && list.first().surahNumber == currentSurah.number) {
+                tools.recordAyah(currentSurah.number, QuranResume.ayahOfFirstVisible(listState.firstVisibleItemIndex, list.size))
+            }
+        }
+    }
     // Opened from search or favorites: bring that ayah into view once (item 0 is the surah banner, so ayah n is
     // item n). Saved, so coming back from Mizan or rotating keeps the reader where it was scrolled since.
     var jumped by rememberSaveable(currentSurah.number, initialAyah) { mutableStateOf(false) }

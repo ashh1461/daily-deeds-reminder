@@ -13,13 +13,16 @@ import com.dailydeeds.reminder.adhan.PendingSnoozes
 import com.dailydeeds.reminder.data.PrefsStorage
 import com.dailydeeds.reminder.adhan.PlannedAlarm
 import com.dailydeeds.reminder.adhan.PrayerAlarmConfig
+import com.dailydeeds.reminder.calendar.BlessedEves
 import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.model.Place
+import com.dailydeeds.reminder.receiver.BlessedEveReceiver
 import com.dailydeeds.reminder.receiver.OccasionAlarmReceiver
 import com.dailydeeds.reminder.receiver.PrayerAlarmReceiver
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.util.PrayerContext
+import com.dailydeeds.reminder.util.PrayerSchedule
 import com.dailydeeds.reminder.widget.WidgetUpdater
 import com.dailydeeds.reminder.worship.DailyNotesConfig
 import java.time.LocalDate
@@ -36,8 +39,11 @@ object ReligiousAlarms {
     const val EXTRA_KIND = "extra_alarm_kind"
     const val EXTRA_SCHEDULED_AT = "extra_scheduled_at"
     const val EXTRA_SNOOZE = "extra_snooze"
+    /** The instant (epoch millis) a blessed-eve reminder was set for. */
+    const val EXTRA_EVE_AT = "extra_eve_at"
     private const val PRAYER_REQUEST_CODE = 3000
     private const val OCCASION_REQUEST_CODE = 3001
+    private const val BLESSED_EVE_REQUEST_CODE = 3002
     /** Plus the prayer id, so that one prayer's snooze can be cancelled without touching another's. */
     private const val SNOOZE_REQUEST_CODE = 3010
     /** The app screen the system opens from its "next alarm" entry. */
@@ -48,6 +54,7 @@ object ReligiousAlarms {
     fun scheduleAll(context: Context) {
         schedulePrayer(context)
         scheduleOccasion(context)
+        scheduleBlessedEve(context)
     }
 
     /**
@@ -145,6 +152,29 @@ object ReligiousAlarms {
         var at = now.toLocalDate().atTime(OCCASION_HOUR, 0).atZone(zone)
         if (!at.isAfter(now)) at = at.plusDays(1)
         set(context, OCCASION_REQUEST_CODE, at.toInstant().toEpochMilli(), Intent(context, OccasionAlarmReceiver::class.java))
+    }
+
+    /**
+     * The evening reminder before the next blessed night, an hour before that day's Maghrib at the saved place.
+     * [afterMillis] is the reminder that has just fired: the next one is planned strictly after it, so an alarm
+     * delivered a little early does not set the same reminder again.
+     */
+    fun scheduleBlessedEve(context: Context, afterMillis: Long = 0L) {
+        val prefs = PreferencesManager(context)
+        if (!prefs.isBlessedEveReminderEnabled()) {
+            cancel(context, BLESSED_EVE_REQUEST_CODE, BlessedEveReceiver::class.java)
+            return
+        }
+        val place = prefs.getPlace()
+        val configs = Prayer.values().associateWith { prefs.getAlarmConfig(it) }
+        val calc = PrayerContext(prefs.getPrayerSettings().params(), configs.mapValues { it.value.offsetMinutes })
+        val from = maxOf(System.currentTimeMillis(), afterMillis)
+        val now = ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(from), place.zone)
+        val at = BlessedEves.next(now, prefs.getHijriOffset()) { date ->
+            PrayerSchedule.timesFor(date, place, calc).maghrib
+        } ?: return
+        val millis = at.toInstant().toEpochMilli()
+        set(context, BLESSED_EVE_REQUEST_CODE, millis, Intent(context, BlessedEveReceiver::class.java).putExtra(EXTRA_EVE_AT, millis))
     }
 
     fun today(): LocalDate = LocalDate.now()

@@ -56,7 +56,7 @@ class VoiceStore(private val context: Context) {
         val name = resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
             if (it.moveToFirst()) it.getString(0) else null
         }?.substringBeforeLast('.')?.take(60)?.ifBlank { null } ?: "ملف صوتي"
-        val id = "own_" + java.lang.Long.toString(System.currentTimeMillis() / 1000, 36)
+        val id = VoiceIds.newOwnId(System.currentTimeMillis() / 1000) { index.contains(it) || audioFile(it).exists() }
         val part = partFile(id)
         try {
             resolver.openInputStream(uri)?.use { input ->

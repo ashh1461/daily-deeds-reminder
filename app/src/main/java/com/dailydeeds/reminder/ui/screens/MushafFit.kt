@@ -47,6 +47,58 @@ internal object MushafLayout {
 }
 
 /**
+ * What a fitted size depends on: the page, the favourites starred on that page (each adds a ★), the space available
+ * and the text scale. Favourites elsewhere are left out, so starring an ayah re-fits only its own page.
+ * The theme's text styles are constant inside the app, so they are not part of the key.
+ */
+internal data class MushafFitKey(
+    val page: Int,
+    val favorites: Set<FavoriteKey.Ayah>,
+    val width: Int,
+    val height: Int,
+    val density: Float,
+    val fontScale: Float
+)
+
+internal fun mushafFitKey(
+    page: QuranPages.Page,
+    favorites: Set<FavoriteKey>,
+    width: Int,
+    height: Int,
+    density: Float,
+    fontScale: Float
+): MushafFitKey {
+    val onPage = page.segments.asSequence()
+        .flatMap { it.ayahs.asSequence() }
+        .map { FavoriteKey.Ayah(it.surahNumber, it.ayahNumber) }
+        .filter { it in favorites }
+        .toSet()
+    return MushafFitKey(page.number, onPage, width, height, density, fontScale)
+}
+
+/** Fitted sizes of recently shown pages, most recently used kept, so swiping back costs nothing. Thread-safe. */
+internal class MushafFitCache(private val capacity: Int = DEFAULT_CAPACITY) {
+    private val sizes = object : LinkedHashMap<MushafFitKey, Float>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<MushafFitKey, Float>?): Boolean = size > capacity
+    }
+
+    @Synchronized
+    fun get(key: MushafFitKey): Float? = sizes[key]
+
+    @Synchronized
+    fun put(key: MushafFitKey, sp: Float) {
+        sizes[key] = sp
+    }
+
+    companion object {
+        const val DEFAULT_CAPACITY = 48
+    }
+}
+
+/** One cache for the whole process, so reopening the mushaf does not fit the same pages again. */
+internal val mushafFits = MushafFitCache()
+
+/**
  * The largest text size (in 0.5 sp steps, between [MushafLayout.FIT_MIN_SP] and [MushafLayout.FIT_MAX_SP]) at which the
  * whole page fits in [maxWidth] x [maxHeight] pixels. A page that does not fit even at the minimum gets the minimum
  * and scrolls.

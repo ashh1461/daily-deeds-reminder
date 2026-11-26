@@ -18,6 +18,9 @@ object ZahraStages {
         else -> 2
     }
 
+    /** True on the tap that completes a stage (the 34th takbir, the 33rd tahmid, the 33rd tasbih). */
+    fun isStageEnd(count: Int): Boolean = count == 34 || count == 67 || count == TOTAL
+
     /** Taps done inside the current stage. */
     fun doneInStage(count: Int): Int {
         val c = count.coerceIn(0, TOTAL)
@@ -54,7 +57,17 @@ data class TasbihState(
 
     fun resetZahra() = copy(zahraCount = 0)
     fun resetFree() = copy(freeCount = 0)
-    fun withTarget(target: Int) = copy(freeTarget = target.coerceIn(0, MAX_FREE), freeCount = 0)
+    /** A new target starts the count again; picking the current target again changes nothing. */
+    fun withTarget(target: Int): TasbihState {
+        val t = target.coerceIn(0, MAX_FREE)
+        return if (t == freeTarget) this else copy(freeTarget = t, freeCount = 0)
+    }
+
+    /** Whether «إعادة العدّ» would clear a count, so the screen asks first. */
+    fun resetLosesCount(zahra: Boolean): Boolean = if (zahra) zahraCount > 0 else freeCount > 0
+
+    /** Whether picking [target] would clear the free count, so the screen asks first. */
+    fun targetChangeLosesCount(target: Int): Boolean = freeCount > 0 && target.coerceIn(0, MAX_FREE) != freeTarget
 
     fun encode(): String = "$zahraCount,$zahraCompletions,$freeCount,$freeTarget,$lifetime"
 

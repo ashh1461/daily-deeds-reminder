@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -33,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.data.PreferencesManager
+import com.dailydeeds.reminder.ui.components.KeepScreenOn
+import com.dailydeeds.reminder.ui.components.rememberStrongBuzz
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import com.dailydeeds.reminder.worship.TasbihState
 import com.dailydeeds.reminder.worship.ZahraStages
@@ -44,7 +49,12 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
     val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
     val hapticsOn = remember { PreferencesManager(context).isHapticsEnabled() }
+    val strongBuzz = rememberStrongBuzz()
     var mode by rememberSaveable { mutableIntStateOf(0) }
+    // A count is cleared only after the reader agrees: the reset button, or a new target while counting.
+    var confirmReset by rememberSaveable { mutableStateOf(false) }
+    var pendingTarget by rememberSaveable { mutableStateOf<Int?>(null) }
+    KeepScreenOn()
 
     ToolScaffold("المسبحة", onNavigateBack) {
         Column(
@@ -57,24 +67,73 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
             if (mode == 0) {
                 ZahraPanel(state)
             } else {
-                FreePanel(state, viewModel)
+                FreePanel(state) { target ->
+                    if (state.targetChangeLosesCount(target)) pendingTarget = target else viewModel.setFreeTarget(target)
+                }
             }
 
             CounterButton(
                 count = if (mode == 0) state.zahraCount else state.freeCount,
                 finished = if (mode == 0) state.zahraDone else state.freeDone,
                 onTap = {
-                    if (hapticsOn) haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    // A strong buzz at 34, 67 and 100 (and at the free target), so one can count without looking.
+                    val reachesMark = if (mode == 0) {
+                        !state.zahraDone && ZahraStages.isStageEnd(state.zahraCount + 1)
+                    } else {
+                        !state.freeDone && state.tapFree().freeDone
+                    }
+                    if (hapticsOn) {
+                        if (reachesMark) strongBuzz() else haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
                     if (mode == 0) viewModel.tapZahra() else viewModel.tapFree()
                 }
             )
 
-            OutlinedButton(onClick = { if (mode == 0) viewModel.resetZahra() else viewModel.resetFree() }) {
+            OutlinedButton(onClick = {
+                when {
+                    state.resetLosesCount(zahra = mode == 0) -> confirmReset = true
+                    mode == 0 -> viewModel.resetZahra()
+                    else -> viewModel.resetFree()
+                }
+            }) {
                 Text("إعادة العدّ")
             }
             WorshipNote("إجمالي ما سبّحته عبر التطبيق: ${state.lifetime}")
         }
     }
+
+    if (confirmReset) {
+        val count = if (mode == 0) state.zahraCount else state.freeCount
+        ClearCountDialog(
+            text = "سيُمسح العدّ الحالي ($count). هل تريد البدء من جديد؟",
+            onConfirm = {
+                confirmReset = false
+                if (mode == 0) viewModel.resetZahra() else viewModel.resetFree()
+            },
+            onDismiss = { confirmReset = false }
+        )
+    }
+    pendingTarget?.let { target ->
+        ClearCountDialog(
+            text = "تغيير الهدف يبدأ العدّ من جديد، وسيُمسح العدّ الحالي (${state.freeCount}). هل تريد المتابعة؟",
+            onConfirm = {
+                pendingTarget = null
+                viewModel.setFreeTarget(target)
+            },
+            onDismiss = { pendingTarget = null }
+        )
+    }
+}
+
+@Composable
+private fun ClearCountDialog(text: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("مسح العدّ؟") },
+        text = { Text(text) },
+        confirmButton = { TextButton(onClick = onConfirm) { Text("مسح العدّ") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("إبقاء العدّ") } }
+    )
 }
 
 @Composable
@@ -111,10 +170,10 @@ private fun ZahraPanel(state: TasbihState) {
 }
 
 @Composable
-private fun FreePanel(state: TasbihState, viewModel: WorshipViewModel) {
+private fun FreePanel(state: TasbihState, onPickTarget: (Int) -> Unit) {
     WorshipCard {
         WorshipHeading("الهدف")
-        ChoiceRow(TasbihState.TARGETS, state.freeTarget, { if (it == 0) "مفتوح" else "$it" }) { viewModel.setFreeTarget(it) }
+        ChoiceRow(TasbihState.TARGETS, state.freeTarget, { if (it == 0) "مفتوح" else "$it" }, onPickTarget)
         if (state.freeDone) {
             Text("بلغتَ الهدف.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
         }

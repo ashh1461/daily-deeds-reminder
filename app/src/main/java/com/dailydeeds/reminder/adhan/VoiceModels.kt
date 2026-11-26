@@ -88,8 +88,9 @@ object VoiceManifest {
     private fun validate(o: JSONObject): String? {
         val id = o.optString("id")
         if (!ID.matches(id)) return "bad id"
-        // A pack must not take over the app default, the phone tone or a bundled adhan.
+        // A pack must not take over the app default, the phone tone, a bundled adhan or a voice the user imported.
         if (id == VoiceIds.DEFAULT || id == VoiceIds.SYSTEM_TONE || BundledVoices.byId(id) != null) return "reserved id"
+        if (id.startsWith(VoiceIds.OWN_PREFIX)) return "reserved id"
         if (o.optString("nameAr").isBlank() || o.optString("nameAr").length > 80) return "bad nameAr"
         if (o.optString("reciter").isBlank()) return "missing reciter"
         if (o.optLong("sizeBytes") !in 10_000L..MAX_VOICE_BYTES) return "bad sizeBytes"

@@ -6,6 +6,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.view.Surface
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.util.Qibla
@@ -34,10 +36,14 @@ import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-/** Heading of the device's top edge, degrees clockwise from true north, or null without a compass. */
+/**
+ * Heading of the screen's top edge, degrees clockwise from true north, or null without a compass. The sensor reports
+ * the device's natural (portrait) axes, so in landscape the matrix is remapped to the screen's current rotation.
+ */
 @Composable
 private fun rememberTrueHeading(latitude: Double, longitude: Double): Float? {
     val context = LocalContext.current
+    val view = LocalView.current
     var heading by remember { mutableFloatStateOf(Float.NaN) }
     val declination = remember(latitude, longitude) {
         GeomagneticField(latitude.toFloat(), longitude.toFloat(), 0f, System.currentTimeMillis()).declination
@@ -48,10 +54,23 @@ private fun rememberTrueHeading(latitude: Double, longitude: Double): Float? {
     DisposableEffect(sensorManager, rotation, declination) {
         val listener = object : SensorEventListener {
             private val matrix = FloatArray(9)
+            private val remapped = FloatArray(9)
             private val orientation = FloatArray(3)
             override fun onSensorChanged(event: SensorEvent) {
                 SensorManager.getRotationMatrixFromVector(matrix, event.values)
-                SensorManager.getOrientation(matrix, orientation)
+                val screen = when (view.display?.rotation ?: Surface.ROTATION_0) {
+                    Surface.ROTATION_90 -> remapped.also {
+                        SensorManager.remapCoordinateSystem(matrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, it)
+                    }
+                    Surface.ROTATION_180 -> remapped.also {
+                        SensorManager.remapCoordinateSystem(matrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y, it)
+                    }
+                    Surface.ROTATION_270 -> remapped.also {
+                        SensorManager.remapCoordinateSystem(matrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X, it)
+                    }
+                    else -> matrix
+                }
+                SensorManager.getOrientation(screen, orientation)
                 val raw = (Math.toDegrees(orientation[0].toDouble()).toFloat() + declination + 360f) % 360f
                 heading = if (heading.isNaN()) raw else {
                     // Low-pass filter, taking the shortest way around the circle.

@@ -23,6 +23,21 @@ object VoiceIds {
 
     /** The phone's notification sound, only when the user picks it. */
     const val SYSTEM_TONE = "system_tone"
+
+    /** Starts the id of every voice the user imports from their own files; no downloadable voice may use it. */
+    const val OWN_PREFIX = "own_"
+
+    /**
+     * A new id for an imported voice: the prefix and the time in base 36, with `_2`, `_3`... added when that id is
+     * [isTaken] (two imports in the same second).
+     */
+    fun newOwnId(epochSeconds: Long, isTaken: (String) -> Boolean): String {
+        val base = OWN_PREFIX + java.lang.Long.toString(epochSeconds, 36)
+        if (!isTaken(base)) return base
+        var n = 2
+        while (isTaken("${base}_$n")) n++
+        return "${base}_$n"
+    }
 }
 
 /** Per-prayer alarm configuration. */

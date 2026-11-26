@@ -3,6 +3,7 @@ package com.dailydeeds.reminder.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.dailydeeds.reminder.data.DataReloads
 import com.dailydeeds.reminder.data.MafatihRepository
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.data.ReaderFonts
@@ -14,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -51,6 +53,13 @@ class MafatihViewModel @JvmOverloads constructor(
         viewModelScope.launch {
             withContext(Dispatchers.Default) { repository.warmUp() }
             refresh()
+        }
+        // A backup import replaces the text size; read it again so the next zoom does not undo it.
+        val seen = DataReloads.imports.value
+        viewModelScope.launch {
+            DataReloads.imports.filter { it != seen }.collect {
+                _fontSizeSp.value = prefs.getReaderFontSp(ReaderFonts.KEY_MAFATIH, ReaderFonts.MAFATIH)
+            }
         }
     }
 

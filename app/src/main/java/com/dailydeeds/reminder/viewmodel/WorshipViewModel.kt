@@ -5,9 +5,11 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dailydeeds.reminder.data.BackupCodec
+import com.dailydeeds.reminder.data.DataReloads
 import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.notification.AlarmScheduler
 import com.dailydeeds.reminder.notification.ReligiousAlarms
+import com.dailydeeds.reminder.worship.KhumsDraft
 import com.dailydeeds.reminder.worship.KhumsYear
 import com.dailydeeds.reminder.worship.QadaKind
 import com.dailydeeds.reminder.worship.QadaState
@@ -19,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -75,6 +78,16 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _imsakAlarm = MutableStateFlow(prefs.isImsakAlarmEnabled())
     val imsakAlarm: StateFlow<Boolean> = _imsakAlarm.asStateFlow()
+
+    /** The figures typed into the khums calculator, kept until they are cleared. */
+    private val _khumsDraft = MutableStateFlow(prefs.getKhumsDraft())
+    val khumsDraft: StateFlow<KhumsDraft> = _khumsDraft.asStateFlow()
+
+    fun setKhumsDraft(draft: KhumsDraft) {
+        if (draft == _khumsDraft.value) return
+        _khumsDraft.value = draft
+        prefs.setKhumsDraft(draft)
+    }
 
     fun setKhumsYear(year: KhumsYear?) {
         prefs.setKhumsYear(year)
@@ -134,6 +147,7 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
                         is BackupCodec.Import.Error -> BackupStatus(result.message, false)
                         is BackupCodec.Import.Ok -> {
                             prefs.importFromBackup(result.entries)
+                            DataReloads.backupImported()
                             AlarmScheduler.scheduleAllReminders(getApplication())
                             val skipped = if (result.skipped > 0) " (تم تجاهل ${result.skipped} عنصر غير صالح)" else ""
                             BackupStatus("تم استيراد ${result.entries.size} عنصر$skipped. أعد تشغيل التطبيق لتطبيق البيانات.", true, restartNeeded = true)
@@ -142,6 +156,24 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
                 }.getOrElse { BackupStatus("تعذّر قراءة النسخة الاحتياطية", false) }
             }
         }
+    }
+
+    /** Reads everything this view model keeps in memory again, after a backup import replaced it. */
+    private fun reloadFromPrefs() {
+        _tasbih.value = prefs.getTasbih()
+        _qada.value = prefs.getQada()
+        _khumsYear.value = prefs.getKhumsYear()
+        _khumsDraft.value = prefs.getKhumsDraft()
+        _khumsReminder.value = prefs.isKhumsReminderEnabled()
+        _eclipseReminder.value = prefs.isEclipseReminderEnabled()
+        _imsakAlarm.value = prefs.isImsakAlarmEnabled()
+    }
+
+    init {
+        // Declared last so every flow above exists before the first reload. Imports counted before this view model
+        // existed are already in what it read from the preferences.
+        val seen = DataReloads.imports.value
+        viewModelScope.launch { DataReloads.imports.filter { it != seen }.collect { reloadFromPrefs() } }
     }
 
     private fun readCapped(input: InputStream): String? {

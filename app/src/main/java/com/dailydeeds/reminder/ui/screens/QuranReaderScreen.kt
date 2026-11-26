@@ -31,7 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.dailydeeds.reminder.ui.components.KeepScreenOn
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
@@ -72,6 +73,7 @@ fun QuranReaderScreen(
     val fontSizeSp by viewModel.fontSizeSp.collectAsState()
 
     val favorites by tools.favorites.collectAsState()
+    KeepScreenOn()
     val listState = rememberLazyListState()
     val currentSurah = surah ?: return
     LaunchedEffect(currentSurah.number) { tools.recordSurah(currentSurah.number) }
@@ -104,7 +106,7 @@ fun QuranReaderScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "رجوع")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
                     }
                 },
                 actions = {

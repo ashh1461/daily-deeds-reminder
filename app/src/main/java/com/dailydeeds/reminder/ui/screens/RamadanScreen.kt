@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -99,12 +101,16 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
         ) {
             WorshipCard {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedButton(onClick = { move(-1) }) { Text("‹") }
+                    OutlinedButton(onClick = { move(-1) }) {
+                        Text("‹", Modifier.clearAndSetSemantics { contentDescription = "الشهر السابق" })
+                    }
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(monthTitle, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(place.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    OutlinedButton(onClick = { move(1) }) { Text("›") }
+                    OutlinedButton(onClick = { move(1) }) {
+                        Text("›", Modifier.clearAndSetSemantics { contentDescription = "الشهر التالي" })
+                    }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { year = Timetable.nextRamadanYear(today, offset); month = 9 }, modifier = Modifier.weight(1f)) {

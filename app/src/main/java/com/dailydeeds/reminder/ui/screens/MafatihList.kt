@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.MafatihItem
 import com.dailydeeds.reminder.ui.components.cardBorder
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /** A row of a grouped list: either a chapter header or a section. */
 sealed interface ListRow {
@@ -92,7 +94,7 @@ fun ItemRow(title: String, subtitle: String? = null, onClick: () -> Unit) {
                     Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -104,10 +106,10 @@ fun SearchField(value: String, placeholder: String, onChange: (String) -> Unit) 
         onValueChange = onChange,
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(placeholder) },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث") },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.action_search)) },
         trailingIcon = {
             if (value.isNotEmpty()) {
-                IconButton(onClick = { onChange("") }) { Icon(Icons.Default.Clear, contentDescription = "مسح") }
+                IconButton(onClick = { onChange("") }) { Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.action_clear)) }
             }
         },
         shape = MaterialTheme.shapes.medium,

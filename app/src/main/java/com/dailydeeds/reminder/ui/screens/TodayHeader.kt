@@ -45,6 +45,8 @@ import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.labelRes
 import com.dailydeeds.reminder.ui.countdownText
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.surahDisplayName
 
 private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -186,7 +188,8 @@ fun ResumeTiles(
     val pagesMode by tools.quranPagesMode.collectAsState()
     val lastPage by tools.lastQuranPage.collectAsState()
     val lastAyah by tools.lastAyah.collectAsState()
-    val surahName = remember(lastSurah) { QuranRepository().getSurahByNumber(lastSurah)?.nameArabic }
+    val surah = remember(lastSurah) { QuranRepository().getSurahByNumber(lastSurah) }
+    val surahName = surah?.nameArabic
     val mafatihTitle = remember(lastMafatihId) { lastMafatihId?.let { MafatihRepository().getItemById(it)?.title } }
     val sahifaTitle = remember(lastSahifaId) { lastSahifaId?.let { MafatihRepository().getItemById(it)?.title } }
     if (surahName == null && mafatihTitle == null && sahifaTitle == null) return
@@ -201,9 +204,15 @@ fun ResumeTiles(
             Text(stringResource(R.string.today_resume_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             if (surahName != null) {
                 // In pages mode the tile reopens (and names) the last mushaf page; in the list, the last ayah.
-                val label = remember(surahName, lastSurah, pagesMode, lastPage, lastAyah) {
+                val target = remember(lastSurah, pagesMode, lastPage, lastAyah) {
                     val pageShowsSurah = lastPage in 1..QuranPages.COUNT && QuranPages.page(lastPage).showsSurah(lastSurah)
-                    QuranResume.label(surahName, pagesMode, lastPage, pageShowsSurah, lastAyah)
+                    QuranResume.target(pagesMode, lastPage, pageShowsSurah, lastAyah)
+                }
+                val name = surah?.let { surahDisplayName(it) } ?: surahName
+                val label = when (target.kind) {
+                    QuranResume.Kind.SURAH -> stringResource(R.string.today_resume_quran, name)
+                    QuranResume.Kind.PAGE -> stringResource(R.string.today_resume_quran_page, name, localNumber(target.number))
+                    QuranResume.Kind.AYAH -> stringResource(R.string.today_resume_quran_ayah, name, localNumber(target.number))
                 }
                 OutlinedButton(onClick = { onSurah(lastSurah) }, modifier = Modifier.fillMaxWidth()) { Text(label) }
             }

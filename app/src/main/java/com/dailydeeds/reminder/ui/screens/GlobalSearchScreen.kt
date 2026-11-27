@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.model.SearchResultItem
 import com.dailydeeds.reminder.model.SearchResultType
 import com.dailydeeds.reminder.viewmodel.SearchViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.labelRes
 
 @Composable
 fun GlobalSearchScreen(
@@ -55,7 +58,7 @@ fun GlobalSearchScreen(
     val selectedFilter by viewModel.selectedFilter.collectAsState()
     val results by viewModel.results.collectAsState()
 
-    ToolScaffold("البحث", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.search_title), onNavigateBack) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,12 +68,12 @@ fun GlobalSearchScreen(
             value = query,
             onValueChange = { viewModel.onQueryChanged(it) },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("ابحث في القرآن والمفاتيح والصحيفة والأعمال...", textAlign = TextAlign.Right) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث") },
+            placeholder = { Text(stringResource(R.string.search_hint), textAlign = TextAlign.Start) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.action_search)) },
             trailingIcon = {
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { viewModel.onQueryChanged("") }) {
-                        Icon(Icons.Default.Clear, contentDescription = "مسح")
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.action_clear))
                     }
                 }
             },
@@ -90,7 +93,7 @@ fun GlobalSearchScreen(
                     onClick = { viewModel.setFilter(filter) },
                     label = {
                         Text(
-                            text = filter.labelArabic,
+                            text = stringResource(filter.labelRes),
                             fontWeight = if (filter == selectedFilter) FontWeight.Bold else FontWeight.Normal
                         )
                     },
@@ -112,7 +115,7 @@ fun GlobalSearchScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "لم يتم العثور على نتائج تطابق: \"$query\"",
+                    text = stringResource(R.string.search_no_results, query),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -149,7 +152,7 @@ fun GlobalSearchScreen(
                 if (query.isNotBlank()) {
                     item {
                         OutlinedButton(onClick = { onSearchMizan(query) }, modifier = Modifier.fillMaxWidth()) {
-                            Text("ابحث عن «$query» في تفسير الميزان كاملاً")
+                            Text(stringResource(R.string.search_in_mizan, query))
                         }
                     }
                 }
@@ -200,7 +203,7 @@ private fun SearchResultCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = item.type.labelArabic,
+                        text = stringResource(item.type.labelRes),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold
                     )

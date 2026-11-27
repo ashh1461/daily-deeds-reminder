@@ -7,25 +7,26 @@ import org.junit.Test
 class QuranResumeTest {
 
     @Test
-    fun pagesModeShowsTheLastPageInArabicDigits() {
+    fun pagesModeResumesAtTheLastPage() {
         assertEquals(
-            "القرآن: سورة الكهف، صفحة ٣٠٢",
-            QuranResume.label("الكهف", pagesMode = true, lastPage = 302, pageShowsSurah = true, lastAyah = 0)
+            QuranResume.Target(QuranResume.Kind.PAGE, 302),
+            QuranResume.target(pagesMode = true, lastPage = 302, pageShowsSurah = true, lastAyah = 0)
         )
     }
 
     @Test
     fun pagesModeWithoutAMatchingPageShowsOnlyTheSurah() {
         // The last page belongs to another surah (the surah was opened from the list since), or no page was read yet.
-        assertEquals("القرآن: سورة الكهف", QuranResume.label("الكهف", true, 302, pageShowsSurah = false, lastAyah = 0))
-        assertEquals("القرآن: سورة الكهف", QuranResume.label("الكهف", true, 0, pageShowsSurah = true, lastAyah = 0))
+        val surah = QuranResume.Target(QuranResume.Kind.SURAH, 0)
+        assertEquals(surah, QuranResume.target(true, 302, pageShowsSurah = false, lastAyah = 0))
+        assertEquals(surah, QuranResume.target(true, 0, pageShowsSurah = true, lastAyah = 0))
     }
 
     @Test
     fun listModeShowsTheLastAyahPastTheFirst() {
-        assertEquals("القرآن: سورة الكهف، الآية ٤٥", QuranResume.label("الكهف", false, 302, true, lastAyah = 45))
-        assertEquals("القرآن: سورة الكهف", QuranResume.label("الكهف", false, 302, true, lastAyah = 1))
-        assertEquals("القرآن: سورة الكهف", QuranResume.label("الكهف", false, 302, true, lastAyah = 0))
+        assertEquals(QuranResume.Target(QuranResume.Kind.AYAH, 45), QuranResume.target(false, 302, true, lastAyah = 45))
+        assertEquals(QuranResume.Target(QuranResume.Kind.SURAH, 0), QuranResume.target(false, 302, true, lastAyah = 1))
+        assertEquals(QuranResume.Target(QuranResume.Kind.SURAH, 0), QuranResume.target(false, 302, true, lastAyah = 0))
     }
 
     @Test

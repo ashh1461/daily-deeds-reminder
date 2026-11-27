@@ -16,6 +16,10 @@ import com.dailydeeds.reminder.worship.Visibility
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
+import com.dailydeeds.reminder.model.Surah
+import com.dailydeeds.reminder.model.RevelationType
+import com.dailydeeds.reminder.model.SearchResultType
+import com.dailydeeds.reminder.util.ArabicDigits
 
 /*
  * UI wording of model values in the app language (v1.9.0). The models stay free of Android resources so they keep
@@ -113,6 +117,32 @@ fun appLocale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.getDef
 /** A Gregorian month name (1-12) in the app language. */
 @Composable
 fun gregorianMonthName(month: Int): String = Month.of(month).getDisplayName(TextStyle.FULL, appLocale())
+
+/** A number in the app language's digits: Western in English, Arabic-Indic otherwise (as before v1.9.0). */
+@Composable
+fun localNumber(n: Int): String = if (appLocale().language == "en") n.toString() else ArabicDigits.format(n)
+
+/** The surah's name for UI chrome: its English name in the English UI, the Arabic name otherwise. */
+@Composable
+fun surahDisplayName(surah: Surah): String = if (appLocale().language == "en") surah.nameEnglish else surah.nameArabic
+
+@get:StringRes
+val RevelationType.labelRes: Int
+    get() = when (this) {
+        RevelationType.MAKKI -> R.string.revelation_makki
+        RevelationType.MADANI -> R.string.revelation_madani
+    }
+
+@get:StringRes
+val SearchResultType.labelRes: Int
+    get() = when (this) {
+        SearchResultType.ALL -> R.string.search_type_all
+        SearchResultType.QURAN -> R.string.tab_quran_title
+        SearchResultType.MAFATIH -> R.string.tab_mafatih_title
+        SearchResultType.SAHIFA -> R.string.tab_sahifa_title
+        SearchResultType.WEEKDAY -> R.string.search_type_weekday
+        SearchResultType.DEEDS -> R.string.search_type_deeds
+    }
 
 /** "today", "tomorrow" or "in N days". */
 @Composable

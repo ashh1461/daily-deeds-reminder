@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import com.dailydeeds.reminder.data.DeedsRepository
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.viewmodel.MainViewModel
+import com.dailydeeds.reminder.ui.theme.RtlContent
 
 @Composable
 fun ReaderCounterScreen(
@@ -53,7 +54,7 @@ fun ReaderCounterScreen(
             )
         },
         containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
+    ) { innerPadding -> RtlContent {
         if (deed.type == DeedType.READING) {
             ReaderReadingContent(
                 deed = deed,
@@ -79,4 +80,5 @@ fun ReaderCounterScreen(
             )
         }
     }
+}
 }

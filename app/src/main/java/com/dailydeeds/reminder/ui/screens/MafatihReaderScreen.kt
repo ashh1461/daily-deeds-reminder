@@ -49,6 +49,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.viewmodel.MafatihViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.theme.RtlContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,22 +93,22 @@ fun MafatihReaderScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { tools.toggleFavorite((if (currentItem.fromMafatihBook) FavoriteKey.Mafatih(currentItem.id) else FavoriteKey.Sahifa(currentItem.id))) }) {
                         Icon(
                             if ((if (currentItem.fromMafatihBook) FavoriteKey.Mafatih(currentItem.id) else FavoriteKey.Sahifa(currentItem.id)) in favorites) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "المفضلة",
+                            contentDescription = stringResource(R.string.action_favorites),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     IconButton(onClick = { viewModel.increaseFontSize() }) {
-                        Icon(Icons.Default.ZoomIn, contentDescription = "تكبير الخط")
+                        Icon(Icons.Default.ZoomIn, contentDescription = stringResource(R.string.font_larger))
                     }
                     IconButton(onClick = { viewModel.decreaseFontSize() }) {
-                        Icon(Icons.Default.ZoomOut, contentDescription = "تصغير الخط")
+                        Icon(Icons.Default.ZoomOut, contentDescription = stringResource(R.string.font_smaller))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -131,7 +134,7 @@ fun MafatihReaderScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedIconButton(onClick = { viewModel.resetCounter() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "إعادة ضبط العداد")
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.counter_reset_short))
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -143,7 +146,7 @@ fun MafatihReaderScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "تكرار",
+                            text = stringResource(R.string.reader_repeat),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -153,14 +156,14 @@ fun MafatihReaderScreen(
                         onClick = { viewModel.incrementCounter() },
                         shape = CircleShape
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "تسبيح / عدّ")
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.reader_count_action))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("عـدّ", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.reader_count), fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
-    ) { paddingValues ->
+    ) { paddingValues -> RtlContent {
         val panel = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
         val textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = fontSizeSp.sp, lineHeight = (fontSizeSp * 1.7f).sp)
         LazyColumn(
@@ -193,6 +196,7 @@ fun MafatihReaderScreen(
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
+}
 }
 
 /** The section's lines, split at its line breaks; joined with "\n" they give back the exact text. */

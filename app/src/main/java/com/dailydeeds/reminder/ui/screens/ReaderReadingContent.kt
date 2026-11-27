@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.model.Deed
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 @Composable
 internal fun ReaderReadingContent(
@@ -89,7 +91,7 @@ internal fun ReaderReadingContent(
             // Font Size Adjusters
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "حجم الخط: ",
+                    text = stringResource(R.string.reader_font_size),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -133,7 +135,7 @@ internal fun ReaderReadingContent(
                     FilterChip(
                         selected = !useAlternativeVariant,
                         onClick = { onAlternativeVariantChange(false) },
-                        label = { Text("الرواية المشهورة الأولى") },
+                        label = { Text(stringResource(R.string.reader_variant_main)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimary
@@ -150,7 +152,7 @@ internal fun ReaderReadingContent(
                     FilterChip(
                         selected = useAlternativeVariant,
                         onClick = { onAlternativeVariantChange(true) },
-                        label = { Text(deed.alternativeLabel ?: "الرواية الأخرى") },
+                        label = { Text(deed.alternativeLabel ?: stringResource(R.string.reader_variant_other)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimary
@@ -195,7 +197,7 @@ internal fun ReaderReadingContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "التعليمات والمصدر",
+                            text = stringResource(R.string.reader_instructions_source),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
@@ -219,7 +221,7 @@ internal fun ReaderReadingContent(
                     if (!deed.referenceSource.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "المصدر: ${deed.referenceSource}",
+                            text = stringResource(R.string.reader_source, deed.referenceSource),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
@@ -252,7 +254,7 @@ internal fun ReaderReadingContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = if (isCompleted) "أُنجزت القراءة بحمد الله ✓ (اضغط للإلغاء)" else "إتمام القراءة وتسجيل الإنجاز",
+                text = stringResource(if (isCompleted) R.string.reader_done else R.string.reader_complete),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp

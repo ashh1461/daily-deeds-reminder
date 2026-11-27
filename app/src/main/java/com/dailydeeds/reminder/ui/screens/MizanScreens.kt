@@ -61,6 +61,10 @@ import com.dailydeeds.reminder.model.MizanParagraph
 import com.dailydeeds.reminder.ui.components.cardBorder
 import com.dailydeeds.reminder.viewmodel.MizanState
 import com.dailydeeds.reminder.viewmodel.MizanViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.theme.RtlContent
 
 private fun rangeLabel(h: MizanHeader) = if (h.from == h.to) "الآية ${h.from}" else "الآيات ${h.from} – ${h.to}"
 
@@ -73,13 +77,13 @@ private fun StatusBox(state: MizanState, onRetry: () -> Unit, content: @Composab
         MizanState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 CircularProgressIndicator()
-                Text("جارٍ تجهيز الكتاب (في المرة الأولى فقط)…", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.mizan_preparing), style = MaterialTheme.typography.bodyMedium)
             }
         }
         is MizanState.Failed -> Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(state.message, textAlign = TextAlign.Center)
-                Button(onClick = onRetry) { Text("إعادة المحاولة") }
+                Text(stringResource(R.string.mizan_failed), textAlign = TextAlign.Center)
+                Button(onClick = onRetry) { Text(stringResource(R.string.common_retry)) }
             }
         }
         is MizanState.Ready -> content(state.data)
@@ -95,7 +99,7 @@ fun MizanHomeScreen(
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    ToolScaffold("تفسير الميزان", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.hub_mizan), onNavigateBack) {
         StatusBox(state, viewModel::load) { data -> MizanHomeContent(data, viewModel, onOpenSurah, onOpenEntry) }
     }
 }
@@ -123,11 +127,11 @@ private fun MizanHomeContent(
                 onValueChange = { text = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("ابحث في نص الميزان كاملاً") },
+                label = { Text(stringResource(R.string.mizan_search_hint)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (text.isNotEmpty()) {
-                        IconButton(onClick = { text = ""; viewModel.clearSearch() }) { Icon(Icons.Default.Clear, contentDescription = "مسح") }
+                        IconButton(onClick = { text = ""; viewModel.clearSearch() }) { Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.action_clear)) }
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -139,15 +143,15 @@ private fun MizanHomeContent(
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         LinearProgressIndicator(progress = { search.progress }, modifier = Modifier.fillMaxWidth())
-                        Text("جارٍ البحث في الكتاب…", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.mizan_searching), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             } else if (search.hits.isEmpty()) {
-                item { Text("لا نتائج لـ «${search.query}».", style = MaterialTheme.typography.bodyMedium) }
+                item { Text(stringResource(R.string.mizan_no_results, search.query), style = MaterialTheme.typography.bodyMedium) }
             } else {
                 item {
                     Text(
-                        "النتائج (حتى ${search.hits.size})",
+                        stringResource(R.string.mizan_results, search.hits.size.toString()),
                         style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -163,24 +167,24 @@ private fun MizanHomeContent(
         } else {
             item {
                 Text(
-                    "الميزان في تفسير القرآن للعلامة الطباطبائي: النص الكامل بلا اختصار، موزّع على ${data.headers.count { it.kind == MizanKind.SECTION }} موضعاً من آيات القرآن، مع المقدمة وفهارس الأجزاء.",
+                    stringResource(R.string.mizan_about, data.headers.count { it.kind == MizanKind.SECTION }.toString()),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             data.front?.let { front ->
-                item { MizanCard(title = front.title, subtitle = "مقدمة المؤلف وصفحات الكتاب الأولى", onClick = { onOpenEntry(front.id, 0) }) }
+                item { MizanCard(title = front.title, subtitle = stringResource(R.string.mizan_front_subtitle), onClick = { onOpenEntry(front.id, 0) }) }
             }
             items(surahs, key = { it.number }) { surah ->
                 val count = data.sectionsOf(surah.number).size
                 MizanCard(
                     title = "${surah.number}. سورة ${surah.nameArabic}",
-                    subtitle = "$count موضعاً من التفسير",
+                    subtitle = stringResource(R.string.mizan_sections_count, count.toString()),
                     onClick = { onOpenSurah(surah.number) }
                 )
             }
             item {
                 Text(
-                    "فهارس الأجزاء", style = MaterialTheme.typography.titleSmall,
+                    stringResource(R.string.mizan_indices), style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -218,7 +222,7 @@ fun MizanSurahScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val name = remember(surah) { QuranRepository().getSurahByNumber(surah)?.nameArabic.orEmpty() }
-    ToolScaffold("الميزان · سورة $name", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.mizan_surah_title, name), onNavigateBack) {
         StatusBox(state, viewModel::load) { data ->
             val sections = remember(data, surah) { data.sectionsOf(surah) }
             LazyColumn(
@@ -246,10 +250,10 @@ fun MizanAyahScreen(
     val state by viewModel.state.collectAsState()
     val id = (state as? MizanState.Ready)?.data?.sectionIdFor(surah, ayah)
     LaunchedEffect(id) { id?.let(onResolved) }
-    ToolScaffold("تفسير الميزان", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.hub_mizan), onNavigateBack) {
         StatusBox(state, viewModel::load) {
             if (id == null) Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-                Text("لا يوجد قسم في الميزان لهذه الآية.", textAlign = TextAlign.Center)
+                Text(stringResource(R.string.mizan_no_section), textAlign = TextAlign.Center)
             }
         }
     }
@@ -317,9 +321,9 @@ fun MizanReaderScreen(
     val fontSp by viewModel.fontSp.collectAsState()
     val names = remember { QuranRepository().getAllSurahs().associate { it.number to it.nameArabic } }
     val data = (state as? MizanState.Ready)?.data
-    val title = data?.header(entryId)?.let { entryTitle(it, { n -> names[n].orEmpty() }) } ?: "تفسير الميزان"
+    val title = data?.header(entryId)?.let { entryTitle(it, { n -> names[n].orEmpty() }) } ?: stringResource(R.string.hub_mizan)
 
-    ToolScaffold(title, onNavigateBack) {
+    ToolScaffold(title, onNavigateBack) { RtlContent {
         StatusBox(state, viewModel::load) { book ->
             var entry by remember(entryId) { mutableStateOf<MizanEntry?>(null) }
             LaunchedEffect(entryId, book) { entry = viewModel.readEntry(book, entryId) }
@@ -345,13 +349,14 @@ fun MizanReaderScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedButton(onClick = { onOpenEntry(entryId - 1) }, enabled = entryId > 0) { Text("السابق") }
+                    OutlinedButton(onClick = { onOpenEntry(entryId - 1) }, enabled = entryId > 0) { Text(stringResource(R.string.action_previous)) }
                     Text("${entryId + 1} / ${book.headers.size}", Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium)
-                    IconButton(onClick = viewModel::decreaseFont) { Icon(Icons.Default.ZoomOut, contentDescription = "تصغير الخط") }
-                    IconButton(onClick = viewModel::increaseFont) { Icon(Icons.Default.ZoomIn, contentDescription = "تكبير الخط") }
-                    OutlinedButton(onClick = { onOpenEntry(entryId + 1) }, enabled = entryId + 1 < book.headers.size) { Text("التالي") }
+                    IconButton(onClick = viewModel::decreaseFont) { Icon(Icons.Default.ZoomOut, contentDescription = stringResource(R.string.font_smaller)) }
+                    IconButton(onClick = viewModel::increaseFont) { Icon(Icons.Default.ZoomIn, contentDescription = stringResource(R.string.font_larger)) }
+                    OutlinedButton(onClick = { onOpenEntry(entryId + 1) }, enabled = entryId + 1 < book.headers.size) { Text(stringResource(R.string.action_next)) }
                 }
             }
         }
     }
+}
 }

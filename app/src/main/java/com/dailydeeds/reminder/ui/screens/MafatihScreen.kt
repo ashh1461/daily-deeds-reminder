@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.MafatihCategoryType
 import com.dailydeeds.reminder.viewmodel.MafatihViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /** The Mafatih al-Jinan tab: thematic chips over the complete book, plus the chapter index. */
 @Composable
@@ -38,7 +40,7 @@ fun MafatihScreen(
     val rows = remember(items) { buildRows(items) }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        SearchField(searchQuery, "ابحث في ${selectedCategory.titleArabic}...", viewModel::onSearchQueryChanged)
+        SearchField(searchQuery, stringResource(R.string.search_in, selectedCategory.titleArabic), viewModel::onSearchQueryChanged)
 
         Spacer(Modifier.height(10.dp))
 
@@ -67,10 +69,10 @@ fun MafatihScreen(
             if (searchQuery.isBlank()) {
                 when (selectedCategory) {
                     MafatihCategoryType.ADIYAH -> item(key = "pin_duas") {
-                        ItemRow("أدعية الأيام السبعة", "دعاء لكل يوم من أيام الأسبوع", onNavigateToDuas)
+                        ItemRow(stringResource(R.string.mafatih_week_duas), stringResource(R.string.hub_duas_desc), onNavigateToDuas)
                     }
                     MafatihCategoryType.ZIYARAT -> item(key = "pin_ziyarat") {
-                        ItemRow("زيارات أيام الأسبوع", "زيارة لكل يوم من أيام الأسبوع", onNavigateToZiyarat)
+                        ItemRow(stringResource(R.string.mafatih_week_ziyarat), stringResource(R.string.hub_ziyarat_desc), onNavigateToZiyarat)
                     }
                     else -> Unit
                 }

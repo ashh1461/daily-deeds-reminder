@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.Deed
 import com.dailydeeds.reminder.model.DeedType
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,13 +62,15 @@ fun DeedCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
+            val completeLabel = stringResource(R.string.deed_complete_action, deed.title)
+            val stateLabel = stringResource(if (isCompleted) R.string.deed_state_done else R.string.deed_state_not_done)
             // Interactive Status Badge Button
             FilledTonalIconToggleButton(
                 checked = isCompleted,
                 onCheckedChange = { onToggleCompleted() },
                 modifier = Modifier.size(48.dp).semantics {
-                    contentDescription = "إتمام ${deed.title}"
-                    stateDescription = if (isCompleted) "مكتمل" else "غير مكتمل"
+                    contentDescription = completeLabel
+                    stateDescription = stateLabel
                 }
             ) {
                 if (isCompleted) {

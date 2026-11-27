@@ -34,6 +34,10 @@ import com.dailydeeds.reminder.worship.LunarMonthDeeds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private class LunarMonthsData(val sections: List<LunarMonthDeeds.Section>, val general: LunarMonthDeeds.Section)
 
@@ -54,12 +58,14 @@ fun LunarMonthsScreen(tools: ToolsViewModel, onNavigateBack: () -> Unit, onOpenI
         }
     }
 
-    ToolScaffold("أعمال الأشهر القمرية", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.lunar_title), onNavigateBack) {
         val loaded = data
         if (loaded == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
-            MonthsList(loaded, hijri.month, hijri.monthName, hijri.toString(), onOpenItem)
+            MonthsList(
+                loaded, hijri.month, CalendarNames.month(hijri.month, appLanguage()), CalendarNames.date(hijri, appLanguage()), onOpenItem
+            )
         }
     }
 }
@@ -79,8 +85,8 @@ private fun MonthsList(data: LunarMonthsData, month: Int, monthName: String, tod
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("نحن في $monthName", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("اليوم: $today", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.lunar_current_month, monthName), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.lunar_today, today.toString()), style = MaterialTheme.typography.bodySmall)
                         current.items.forEach { DeedRow(it, onOpenItem) }
                     }
                 }
@@ -90,7 +96,7 @@ private fun MonthsList(data: LunarMonthsData, month: Int, monthName: String, tod
         data.sections.forEach { s -> section(s, onOpenItem, "m${s.months.first()}") }
         item(key = "source") {
             Text(
-                "النصوص كاملة من «مفاتيح الجنان» للشيخ عباس القمي، الباب الثاني: في أعمال أشهر السنة.",
+                stringResource(R.string.lunar_source),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

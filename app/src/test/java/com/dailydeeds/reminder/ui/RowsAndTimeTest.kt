@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.Assert.assertFalse
 
 class RowsAndTimeTest {
     private fun item(id: String, group: String) =
@@ -35,10 +36,12 @@ class RowsAndTimeTest {
     fun countdownFormatsHoursAndMinutesAndNeverGoesNegative() {
         val zone = ZoneId.of("Asia/Beirut")
         val now = ZonedDateTime.of(2026, 10, 15, 10, 0, 0, 0, zone)
-        assertEquals("بعد 2 ساعة و30 دقيقة", TimeFormat.countdown(now, now.plusMinutes(150)))
-        assertEquals("بعد 3 ساعة", TimeFormat.countdown(now, now.plusHours(3)))
-        assertEquals("بعد 45 دقيقة", TimeFormat.countdown(now, now.plusMinutes(45)))
-        assertEquals("الآن", TimeFormat.countdown(now, now.plusSeconds(20)))
-        assertEquals("الآن", TimeFormat.countdown(now, now.minusMinutes(5)))
+        // The UI words these in the app language (ui/Labels.kt countdownText).
+        assertEquals(TimeFormat.Countdown(2, 30), TimeFormat.countdown(now, now.plusMinutes(150)))
+        assertEquals(TimeFormat.Countdown(3, 0), TimeFormat.countdown(now, now.plusHours(3)))
+        assertEquals(TimeFormat.Countdown(0, 45), TimeFormat.countdown(now, now.plusMinutes(45)))
+        assertTrue(TimeFormat.countdown(now, now.plusSeconds(20)).isNow)
+        assertTrue(TimeFormat.countdown(now, now.minusMinutes(5)).isNow)
+        assertFalse(TimeFormat.countdown(now, now.plusMinutes(1)).isNow)
     }
 }

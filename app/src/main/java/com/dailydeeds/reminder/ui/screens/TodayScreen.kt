@@ -38,6 +38,8 @@ import com.dailydeeds.reminder.ui.components.FilterChipRow
 import com.dailydeeds.reminder.ui.components.cardBorder
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /**
  * The "اليوم" tab: hero, today's prayers, today's dua and ziyarah, resume tiles and then the daily deeds.
@@ -90,11 +92,11 @@ fun TodayScreen(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = { menuOpen = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "خيارات الأعمال")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.today_deed_options))
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
-                        text = { Text("إعادة ضبط إنجاز اليوم") },
+                        text = { Text(stringResource(R.string.today_reset_menu)) },
                         onClick = { menuOpen = false; confirmReset = true }
                     )
                 }
@@ -115,12 +117,12 @@ fun TodayScreen(
     if (confirmReset) {
         AlertDialog(
             onDismissRequest = { confirmReset = false },
-            title = { Text("تأكيد إعادة التصفير") },
-            text = { Text("هل تود تصفير تقدم الأعمال والعدادات لليوم؟") },
+            title = { Text(stringResource(R.string.today_reset_confirm_title)) },
+            text = { Text(stringResource(R.string.today_reset_confirm_text)) },
             confirmButton = {
-                TextButton(onClick = { viewModel.resetToday(); confirmReset = false }) { Text("نعم، صفّر الإنجاز") }
+                TextButton(onClick = { viewModel.resetToday(); confirmReset = false }) { Text(stringResource(R.string.today_reset_confirm_yes)) }
             },
-            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text("إلغاء") } }
+            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(stringResource(R.string.common_cancel)) } }
         )
     }
 }
@@ -139,10 +141,10 @@ private fun DailyProgressCard(completed: Int, total: Int, modifier: Modifier = M
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("إنجاز الأوراد اليومية", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.today_progress_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    if (completed == total && total > 0) "ما شاء الله! أتممت جميع الأوراد المباركة لليوم"
-                    else "أنجزت $completed من أصل $total عملاً",
+                    if (completed == total && total > 0) stringResource(R.string.today_progress_all_done)
+                    else stringResource(R.string.today_progress_count, completed.toString(), total.toString()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

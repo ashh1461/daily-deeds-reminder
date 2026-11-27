@@ -33,30 +33,36 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.ZoneId
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.coordinateErrorText
+import com.dailydeeds.reminder.ui.appLanguage
+import com.dailydeeds.reminder.util.AppLanguage
 
 /** Offline city search (Arabic or Latin names) over the bundled GeoNames list. */
 @Composable
 fun CitySearchDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<Place>>(emptyList()) }
+    val latinNames = appLanguage() == AppLanguage.ENGLISH
     LaunchedEffect(query) {
         delay(200)
-        results = withContext(Dispatchers.Default) { PlaceSearch.search(query) }
+        results = withContext(Dispatchers.Default) { PlaceSearch.search(query, latinNames = latinNames) }
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("بحث عن مدينة") },
+        title = { Text(stringResource(R.string.place_search_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
                     singleLine = true,
-                    placeholder = { Text("اكتب اسم المدينة بالعربية أو الإنجليزية") },
+                    placeholder = { Text(stringResource(R.string.place_search_hint)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 if (query.trim().length >= 2 && results.isEmpty()) {
-                    Text("لا نتائج. جرّب كتابة الاسم بالإنجليزية أو أدخل الإحداثيات يدوياً.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.place_search_empty), style = MaterialTheme.typography.bodySmall)
                 }
                 LazyColumn(Modifier.heightIn(max = 320.dp)) {
                     items(results) { place ->
@@ -71,7 +77,7 @@ fun CitySearchDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text("إغلاق") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) } }
     )
 }
 
@@ -90,14 +96,17 @@ fun CoordinatesDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
     val lonResult = CoordinateInput.longitude(lon)
     val latValue = (latResult as? CoordinateInput.Result.Valid)?.degrees
     val lonValue = (lonResult as? CoordinateInput.Result.Valid)?.degrees
+    val customName = stringResource(R.string.place_custom_coordinates)
+    val nearFormat = stringResource(R.string.place_near, "%s")
+    val latinNames = appLanguage() == AppLanguage.ENGLISH
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("إحداثيات يدوية") },
+        title = { Text(stringResource(R.string.place_coordinates_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CoordinateField(lat, { lat = it }, "خط العرض (من -90 إلى 90)", latResult)
-                CoordinateField(lon, { lon = it }, "خط الطول (من -180 إلى 180)", lonResult)
-                Text("يُستخدم توقيت أقرب مدينة إلى الإحداثيات لحساب الأوقات.", style = MaterialTheme.typography.bodySmall)
+                CoordinateField(lat, { lat = it }, stringResource(R.string.place_lat_label), latResult)
+                CoordinateField(lon, { lon = it }, stringResource(R.string.place_lon_label), lonResult)
+                Text(stringResource(R.string.place_coordinates_note), style = MaterialTheme.typography.bodySmall)
             }
         },
         confirmButton = {
@@ -108,20 +117,23 @@ fun CoordinatesDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
                     saving = true
                     scope.launch {
                         val place = withContext(Dispatchers.Default) {
-                            PlaceSearch.placeAt(latValue, lonValue, "إحداثيات مخصصة", ZoneId.systemDefault().id)
+                            PlaceSearch.placeAt(
+                                latValue, lonValue, customName, ZoneId.systemDefault().id,
+                                nearLabel = { nearFormat.format(it) }, latinNames = latinNames
+                            )
                         }
                         onPick(place)
                     }
                 }
-            ) { Text("اعتماد") }
+            ) { Text(stringResource(R.string.common_apply)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("إلغاء") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } }
     )
 }
 
 @Composable
 private fun CoordinateField(value: String, onChange: (String) -> Unit, label: String, result: CoordinateInput.Result) {
-    val error = (result as? CoordinateInput.Result.Invalid)?.messageArabic
+    val error = (result as? CoordinateInput.Result.Invalid)?.let { coordinateErrorText(it) }
     OutlinedTextField(
         value = value,
         onValueChange = onChange,

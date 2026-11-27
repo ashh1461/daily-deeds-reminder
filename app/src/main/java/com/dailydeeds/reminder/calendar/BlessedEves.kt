@@ -5,6 +5,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
+import com.dailydeeds.reminder.worship.NoteWords
+import com.dailydeeds.reminder.worship.ArabicNoteWords
 
 /**
  * The opt-in evening reminder before blessed nights: ليلة الجمعة every Thursday, and the eve of each night in
@@ -21,9 +23,14 @@ object BlessedEves {
     private const val SEARCH_DAYS = 8L
 
     /** The blessed nights that begin at the sunset of [date]. */
-    fun nightsBeginningOn(date: LocalDate, dayOffset: Int): List<String> {
-        val friday = if (date.dayOfWeek == DayOfWeek.THURSDAY) listOf(FRIDAY_NIGHT) else emptyList()
-        val listed = ShiaCalendar.occasionsOn(date, dayOffset).filter { it.kind == OccasionKind.NIGHT }.map { it.title }
+    fun nightsBeginningOn(
+        date: LocalDate,
+        dayOffset: Int,
+        fridayNight: String = FRIDAY_NIGHT,
+        nameOf: (Occasion) -> String = { it.title }
+    ): List<String> {
+        val friday = if (date.dayOfWeek == DayOfWeek.THURSDAY) listOf(fridayNight) else emptyList()
+        val listed = ShiaCalendar.occasionsOn(date, dayOffset).filter { it.kind == OccasionKind.NIGHT }.map(nameOf)
         return friday + listed
     }
 
@@ -49,9 +56,9 @@ object BlessedEves {
     }
 
     /** The notification for the eve [date], or null when no blessed night begins that evening. */
-    fun note(date: LocalDate, dayOffset: Int): DailyNote? {
-        val nights = nightsBeginningOn(date, dayOffset)
+    fun note(date: LocalDate, dayOffset: Int, words: NoteWords = ArabicNoteWords): DailyNote? {
+        val nights = nightsBeginningOn(date, dayOffset, words.fridayNight) { CalendarNames.occasion(it, words.language) }
         if (nights.isEmpty()) return null
-        return DailyNote(ID_NOTE, nights.joinToString(" • "), "تبدأ الليلة المباركة بأذان المغرب هذا المساء.")
+        return DailyNote(ID_NOTE, nights.joinToString(" • "), words.eveBody)
     }
 }

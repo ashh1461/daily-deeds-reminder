@@ -1,11 +1,17 @@
 package com.dailydeeds.reminder.ui.screens
 
+import android.app.Activity
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.text.format.DateFormat
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,19 +33,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.model.ReminderSettings
 import com.dailydeeds.reminder.model.ReminderType
 import com.dailydeeds.reminder.ui.components.PermissionHealthCard
 import com.dailydeeds.reminder.ui.components.cardBorder
+import com.dailydeeds.reminder.util.AppLanguage
 import com.dailydeeds.reminder.viewmodel.MainViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import java.time.LocalDate
 import java.util.Locale
+import com.dailydeeds.reminder.notification.ReminderWording
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
-/** All settings in one grouped screen: prayer, calendar, deed reminders, appearance and credits. */
+/** All settings in one grouped screen: language, prayer, calendar, deed reminders, appearance and credits. */
 @Composable
 fun SettingsScreen(
     viewModel: MainViewModel,
@@ -60,82 +72,78 @@ fun SettingsScreen(
         if (uri != null) worship.importBackup(uri)
     }
 
-    ToolScaffold("الإعدادات", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.settings_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             PermissionHealthCard()
 
-            SectionTitle("الأذان والصلاة")
+            SectionTitle(R.string.settings_section_language)
+            SettingsCard { LanguagePicker(tools) }
+
+            SectionTitle(R.string.settings_section_prayer)
             SettingsCard {
-                Text("المدينة الحالية: ${place.name}", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.settings_current_city, CalendarNames.place(place, appLanguage())), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = { onOpenRoute("prayer") }, modifier = Modifier.fillMaxWidth()) {
-                    Text("أوقات الصلاة")
+                    Text(stringResource(R.string.settings_prayer_times))
                 }
                 OutlinedButton(onClick = { onOpenRoute("prayer/settings") }, modifier = Modifier.fillMaxWidth()) {
-                    Text("الأذان وطريقة الحساب")
+                    Text(stringResource(R.string.settings_adhan_and_method))
                 }
             }
 
-            SectionTitle("التقويم")
+            SectionTitle(R.string.settings_section_calendar)
             SettingsCard {
-                Text("تعديل رؤية الهلال وتذكير مناسبات أهل البيت (ع).", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.settings_calendar_desc), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = { onOpenRoute("calendar") }, modifier = Modifier.fillMaxWidth()) {
-                    Text("التقويم والمناسبات")
+                    Text(stringResource(R.string.settings_calendar_open))
                 }
             }
 
-            SectionTitle("تذكيرات الأعمال")
-            Text(
-                "أوقات الليل والنوم وصباح الخميس أوقات تذكير مقترحة قابلة للتعديل. جميع الأوقات بحسب توقيت الجهاز.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            SectionTitle(R.string.settings_section_reminders)
+            NoteText(R.string.settings_reminders_note)
             ReminderType.values().forEach { type ->
                 val settings = reminders[type] ?: ReminderSettings(true, type.defaultHour, 0)
                 ReminderSettingCard(type, settings) { viewModel.setReminder(type, it) }
             }
-            Text(
-                "الزيارة المختصرة ودعاء استيداع المستقبل متاحان ضمن «في أي وقت» وليس لهما موعد محدد.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            NoteText(R.string.settings_reminders_anytime_note)
 
-            SectionTitle("المظهر والتفاعل")
+            SectionTitle(R.string.settings_section_appearance)
             SettingsCard {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    listOf("system" to "حسب النظام", "light" to "فاتح", "dark" to "داكن").forEach { (mode, label) ->
-                        FilterChip(selected = themeMode == mode, onClick = { tools.setThemeMode(mode) }, label = { Text(label) })
+                    listOf(
+                        "system" to R.string.settings_theme_system,
+                        "light" to R.string.settings_theme_light,
+                        "dark" to R.string.settings_theme_dark
+                    ).forEach { (mode, label) ->
+                        FilterChip(
+                            selected = themeMode == mode,
+                            onClick = { tools.setThemeMode(mode) },
+                            label = { Text(stringResource(label)) }
+                        )
                     }
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("الاهتزاز أثناء العد", Modifier.weight(1f))
+                    Text(stringResource(R.string.settings_haptics), Modifier.weight(1f))
                     Switch(checked = hapticsEnabled, onCheckedChange = viewModel::toggleHaptics)
                 }
             }
 
-            SectionTitle("الودجت")
+            SectionTitle(R.string.settings_section_widget)
             SettingsCard {
-                Text(
-                    "أضف ودجت «الصلاة القادمة» إلى شاشتك الرئيسية: اضغط مطولاً على مساحة فارغة، اختر الأدوات (Widgets)، ثم «ورد».",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(stringResource(R.string.settings_widget_desc), style = MaterialTheme.typography.bodyMedium)
             }
 
-            SectionTitle("البيانات والنسخ الاحتياطي")
+            SectionTitle(R.string.settings_section_backup)
             SettingsCard {
-                Text(
-                    "صدّر المفضلة وأماكن القراءة وسجل الأعمال والمسبحة والقضاء وإعدادات الصلاة والتنبيهات إلى ملف، ثم استوردها على جهاز آخر. " +
-                        "لا تُرسَل البيانات إلى أي خادم، ولا تشمل النسخة ملفات الأصوات.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(stringResource(R.string.settings_backup_desc), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(
                     onClick = { exportLauncher.launch("daily-deeds-backup-${LocalDate.now()}.json") },
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("تصدير نسخة احتياطية") }
+                ) { Text(stringResource(R.string.settings_backup_export)) }
                 OutlinedButton(onClick = { importLauncher.launch(arrayOf("*/*")) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("استيراد نسخة احتياطية")
+                    Text(stringResource(R.string.settings_backup_import))
                 }
                 backup?.let {
                     Text(
@@ -145,37 +153,80 @@ fun SettingsScreen(
                 }
             }
 
-            SectionTitle("حول التطبيق")
+            SectionTitle(R.string.settings_section_about)
             SettingsCard {
-                Text(
-                    "يضم التطبيق الأعمال اليومية، والقرآن الكريم كاملاً، وتفسير الميزان كاملاً، ومفاتيح الجنان كاملاً، والصحيفة السجادية الكاملة، وأوقات الصلاة والقبلة والتقويم.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(stringResource(R.string.settings_about_desc), style = MaterialTheme.typography.bodyMedium)
                 // Attribution required by the data licences, plus the provenance of the bundled adhan; keep in step with
-                // docs/licenses/DATA_LICENSE.md, THIRD_PARTY_NOTICES.md and ADHAN_AUDIO.md. The licence URL has its own
-                // line so it does not break the RTL sentence order.
+                // docs/licenses/DATA_LICENSE.md, THIRD_PARTY_NOTICES.md and ADHAN_AUDIO.md. The licence URLs have their
+                // own lines so they do not break the RTL sentence order.
                 listOf(
-                    "نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني.",
-                    "مفاتيح الجنان للشيخ عباس القمي، والصحيفة السجادية للإمام زين العابدين (ع)، والميزان في تفسير القرآن للعلامة السيد محمد حسين الطباطبائي: نصوص مقتبسة من مدونة OpenITI، عن رقمنة المكتبة الشاملة وموقعَي rafed.net و altafsir.com.",
-                    "التعديلات: قُسِّمت النصوص إلى المواضع التي يعرضها التطبيق، وحُوِّلت علامات OpenITI أو أُزيلت، ووُضعت الآيات المقتبسة في الميزان بين قوسين مزخرفين، وأُبقيت أرقام الصفحات علاماتٍ. لم يُحذف حرف من نص الميزان، ولم يُعدَّل لفظ ولم يُختصر.",
-                    "رخصة هذه النصوص: المشاع الإبداعي، نَسب المصنَّف - غير تجاري - الترخيص بالمثل 4.0 الدولية (CC BY-NC-SA 4.0)، والتطبيق مجاني وغير تجاري. نص الرخصة:",
-                    "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-                    "أسماء المدن للبحث دون اتصال: GeoNames (geonames.org)، برخصة CC BY 4.0:",
-                    "https://creativecommons.org/licenses/by/4.0/",
-                    "جدول الكسوف والخسوف لصلاة الآيات: NASA/GSFC، إعداد Fred Espenak.",
-                    "الخطوط: أميري وتجوال (رخصة SIL OFL).",
-                    "تسجيلا الأذان المضمَّنان (الحرم الحسيني في كربلاء، والحرم الرضوي في مشهد): قدّمهما مالكُ المشروع وأكّد أنهما خاليان من قيود الترخيص، ولا يرد اسم المؤذن في الملفين. قُصَّ الصمت من بداية أذان كربلاء ومن نهاية أذان مشهد، ووُحِّدت شدة الصوت، وضُغطا بصيغة Opus. التفاصيل في docs/licenses/ADHAN_AUDIO.md."
+                    R.string.settings_credit_quran,
+                    R.string.settings_credit_books,
+                    R.string.settings_credit_changes,
+                    R.string.settings_credit_license,
+                    R.string.settings_credit_license_url,
+                    R.string.settings_credit_geonames,
+                    R.string.settings_credit_geonames_url,
+                    R.string.settings_credit_eclipses,
+                    R.string.settings_credit_fonts,
+                    R.string.settings_credit_adhan
                 ).forEach { line ->
-                    Text(line, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(line), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
     }
 }
 
+/**
+ * Arabic, English, Persian, or the device language. Each language is named in its own script so it can be found
+ * whatever the current UI language is. Choosing one recreates the activity, which reloads in the new language.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SectionTitle(text: String) {
-    Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+private fun LanguagePicker(tools: ToolsViewModel) {
+    val current by tools.appLanguage.collectAsState()
+    val context = LocalContext.current
+    val choices = AppLanguage.entries.map { it.tag to it.nativeName } +
+        (AppLanguage.SYSTEM to stringResource(R.string.settings_language_system))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        choices.forEach { (pref, label) ->
+            FilterChip(
+                selected = current == pref,
+                onClick = {
+                    if (current != pref) {
+                        tools.setAppLanguage(pref)
+                        context.findActivity()?.recreate()
+                    }
+                },
+                label = { Text(label) }
+            )
+        }
+    }
+    Text(
+        stringResource(R.string.settings_language_note),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+
+@Composable
+private fun SectionTitle(@StringRes text: Int) {
+    Text(
+        stringResource(text), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+private fun NoteText(@StringRes text: Int) {
+    Text(stringResource(text), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 @Composable
@@ -198,9 +249,9 @@ private fun ReminderSettingCard(
 ) {
     val context = LocalContext.current
     SettingsCard {
-        Text(type.title, style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(ReminderWording.titleRes(type)), style = MaterialTheme.typography.titleMedium)
         Text(
-            if (type.dayOfWeek != null) "كل خميس صباحاً، عند الخروج لطلب الحاجة" else "كل يوم",
+            stringResource(if (type.dayOfWeek != null) R.string.settings_reminder_thursday else R.string.settings_reminder_daily),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -215,7 +266,7 @@ private fun ReminderSettingCard(
                     { _, hour, minute -> onChange(settings.copy(hour = hour, minute = minute)) },
                     settings.hour, settings.minute, DateFormat.is24HourFormat(context)
                 ).show()
-            }) { Text("تعديل الوقت") }
+            }) { Text(stringResource(R.string.settings_change_time)) }
             Spacer(Modifier.width(12.dp))
             Switch(checked = settings.enabled, onCheckedChange = { onChange(settings.copy(enabled = it)) })
         }

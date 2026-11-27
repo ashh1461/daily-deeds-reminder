@@ -62,6 +62,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.viewmodel.QuranViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.labelRes
+import com.dailydeeds.reminder.ui.theme.RtlContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +119,10 @@ fun QuranReaderScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "${currentSurah.revelationType.arabicName} • ${currentSurah.ayahCount} آية • جزء ${currentSurah.juzStart}",
+                            text = stringResource(
+                                R.string.quran_surah_meta, stringResource(currentSurah.revelationType.labelRes),
+                                currentSurah.ayahCount.toString(), currentSurah.juzStart.toString()
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -122,15 +130,15 @@ fun QuranReaderScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.increaseFontSize() }) {
-                        Icon(Icons.Default.ZoomIn, contentDescription = "تكبير الخط")
+                        Icon(Icons.Default.ZoomIn, contentDescription = stringResource(R.string.font_larger))
                     }
                     IconButton(onClick = { viewModel.decreaseFontSize() }) {
-                        Icon(Icons.Default.ZoomOut, contentDescription = "تصغير الخط")
+                        Icon(Icons.Default.ZoomOut, contentDescription = stringResource(R.string.font_smaller))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -138,7 +146,7 @@ fun QuranReaderScreen(
                 )
             )
         }
-    ) { paddingValues ->
+    ) { paddingValues -> RtlContent {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -161,7 +169,10 @@ fun QuranReaderScreen(
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "${currentSurah.revelationType.arabicName} • ${currentSurah.ayahCount} آية • الجزء ${currentSurah.juzStart}",
+                                text = stringResource(
+                                    R.string.quran_surah_meta, stringResource(currentSurah.revelationType.labelRes),
+                                    currentSurah.ayahCount.toString(), currentSurah.juzStart.toString()
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.White.copy(alpha = 0.85f)
                             )
@@ -200,7 +211,7 @@ fun QuranReaderScreen(
                                 IconButton(onClick = { tools.toggleFavorite(fav) }) {
                                     Icon(
                                         if (fav in favorites) Icons.Default.Star else Icons.Default.StarBorder,
-                                        contentDescription = "المفضلة",
+                                        contentDescription = stringResource(R.string.action_favorites),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -209,10 +220,10 @@ fun QuranReaderScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.MenuBook,
-                                        contentDescription = "تفسير الميزان",
+                                        contentDescription = stringResource(R.string.hub_mizan),
                                         modifier = Modifier.padding(end = 4.dp)
                                     )
-                                    Text("تفسير الميزان", style = MaterialTheme.typography.labelMedium)
+                                    Text(stringResource(R.string.hub_mizan), style = MaterialTheme.typography.labelMedium)
                                 }
                                 }
 
@@ -255,4 +266,5 @@ fun QuranReaderScreen(
             }
         }
     }
+}
 }

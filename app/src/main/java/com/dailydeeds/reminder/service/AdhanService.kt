@@ -42,6 +42,10 @@ import com.dailydeeds.reminder.util.Prayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.LocaleSupport
+import com.dailydeeds.reminder.adhan.AlarmWords
+import com.dailydeeds.reminder.ui.labelRes
 
 /**
  * Plays the adhan as a foreground media service so Android keeps the process alive for the whole call.
@@ -51,6 +55,11 @@ import kotlinx.coroutines.flow.asStateFlow
  * banner inside the app, and, unless switched off, the power button or either volume key.
  */
 class AdhanService : Service() {
+
+    // Notification texts in the app language (v1.9.0); the setting is a boot key, readable while locked.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleSupport.localized(newBase))
+    }
 
     private var player: MediaPlayer? = null
     private var focusRequest: AudioFocusRequest? = null
@@ -93,11 +102,12 @@ class AdhanService : Service() {
 
     private fun goForeground(prayer: Prayer?, test: Boolean) {
         prayerForSnooze = prayer
-        val title = if (test) "تجربة الأذان" else "أذان ${prayer?.nameArabic ?: ""}".trim()
+        val title = if (test) getString(R.string.adhan_test_title)
+        else prayer?.let { getString(R.string.adhan_title, getString(it.labelRes)) } ?: getString(R.string.adhan_mode_adhan)
         val stop = actionIntent(AdhanActionReceiver.ACTION_STOP, 1)
         val snooze = actionIntent(AdhanActionReceiver.ACTION_SNOOZE, 2)
         val builder = NotificationHelper.baseBuilder(
-            this, NotificationHelper.CHANNEL_PRAYER_ADHAN, NOTIFICATION_ID, title, "يُشغَّل الأذان الآن. المس الإشعار لإيقافه."
+            this, NotificationHelper.CHANNEL_PRAYER_ADHAN, NOTIFICATION_ID, title, getString(R.string.adhan_playing_body)
         )
             .setOngoing(true)
             .setAutoCancel(false)
@@ -107,8 +117,8 @@ class AdhanService : Service() {
             .setDeleteIntent(stop)
             // A tap opens the app with a stop request (an activity intent: Android 12+ blocks notification trampolines).
             .setContentIntent(openAndStopIntent())
-            .addAction(0, "إيقاف", stop)
-        if (!test && prayer != null) builder.addAction(0, "تأجيل", snooze)
+            .addAction(0, getString(R.string.adhan_action_stop), stop)
+        if (!test && prayer != null) builder.addAction(0, getString(R.string.adhan_action_snooze), snooze)
         val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0
         ServiceCompat.startForeground(this, NOTIFICATION_ID, builder.build(), type)
     }
@@ -231,7 +241,7 @@ class AdhanService : Service() {
     /** Shutdown removes the foreground notification, so leave the usual prayer-time notification behind. */
     private fun postReminder() {
         val prayer = prayerForSnooze ?: return
-        val text = PrayerAlarmText.reminder(prayer)
+        val text = PrayerAlarmText.reminder(prayer, words = AlarmWords.of(LocaleSupport.current(this)))
         NotificationHelper.showNotification(
             this, PrayerAlarmText.notificationId(prayer), text.title, text.text,
             channelId = NotificationHelper.CHANNEL_PRAYER_REMINDER

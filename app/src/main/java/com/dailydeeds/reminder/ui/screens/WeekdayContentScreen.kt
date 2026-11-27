@@ -63,6 +63,11 @@ import com.dailydeeds.reminder.data.WeekdayRepository
 import com.dailydeeds.reminder.model.DayContentKind
 import java.time.DayOfWeek
 import java.time.LocalDate
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.theme.RtlContent
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 /**
  * شاشة الأدعية أو الزيارات الأسبوعية: شريط أيام الأسبوع (مع تمييز اليوم الحالي)
@@ -94,7 +99,7 @@ fun WeekdayContentScreen(
                 navigationIcon = {
                     if (onNavigateBack != null) {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                         }
                     }
                 },
@@ -109,7 +114,7 @@ fun WeekdayContentScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "من مفاتيح الجنان • أعمال أيام الأسبوع",
+                            text = stringResource(R.string.weekday_source),
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -119,31 +124,31 @@ fun WeekdayContentScreen(
                     IconButton(onClick = { tools.toggleFavorite(favKey) }) {
                         Icon(
                             if (favKey in favorites) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "المفضلة",
+                            contentDescription = stringResource(R.string.action_favorites),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     IconButton(onClick = { if (fontSize > 16) fontSize -= 2 }) {
                         Icon(
                             Icons.Default.TextDecrease,
-                            contentDescription = "تصغير الخط",
+                            contentDescription = stringResource(R.string.font_smaller),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(onClick = { if (fontSize < 34) fontSize += 2 }) {
                         Icon(
                             Icons.Default.TextIncrease,
-                            contentDescription = "تكبير الخط",
+                            contentDescription = stringResource(R.string.font_larger),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(onClick = {
                         clipboard.setText(AnnotatedString("${content.title}\n\n${content.text}"))
-                        Toast.makeText(context, "تم نسخ النص", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.text_copied), Toast.LENGTH_SHORT).show()
                     }) {
                         Icon(
                             Icons.Default.ContentCopy,
-                            contentDescription = "نسخ النص",
+                            contentDescription = stringResource(R.string.copy_text),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -152,7 +157,7 @@ fun WeekdayContentScreen(
             )
         },
         containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
+    ) { innerPadding -> RtlContent {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -233,6 +238,7 @@ fun WeekdayContentScreen(
         }
     }
 }
+}
 
 @Composable
 private fun DaySelectorRow(
@@ -253,14 +259,14 @@ private fun DaySelectorRow(
                 label = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = WeekdayRepository.dayNameArabic(day),
+                            text = CalendarNames.weekday(day, appLanguage()),
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
                         if (isToday) {
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = "اليوم",
+                                text = stringResource(R.string.days_today),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (day == selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.secondary

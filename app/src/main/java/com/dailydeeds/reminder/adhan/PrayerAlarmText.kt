@@ -6,8 +6,9 @@ import com.dailydeeds.reminder.util.Prayer
 data class AlarmText(val title: String, val text: String)
 
 /**
- * Wording of the prayer notifications, kept pure so that it is unit-tested. An alarm delivered long after its
- * time (Doze, inexact alarms) must neither announce "now" nor count down to a prayer time that has already come.
+ * Which prayer notification fits, kept pure so that it is unit-tested. An alarm delivered long after its time
+ * (Doze, inexact alarms) must neither announce "now" nor count down to a prayer time that has already come.
+ * The words come from [AlarmWords] in the app language; Arabic, the wording of every earlier version, is the default.
  */
 object PrayerAlarmText {
     const val STALE_AFTER_MS = 10 * 60 * 1000L
@@ -22,31 +23,28 @@ object PrayerAlarmText {
      * The heads-up [preMinutes] before the prayer. Delivered late it counts the minutes really left, and once the
      * prayer time has come (the planner then skips that prayer's own alarm) it says that the time has come.
      */
-    fun pre(prayer: Prayer, preMinutes: Int, scheduledAt: Long, now: Long): AlarmText {
+    fun pre(prayer: Prayer, preMinutes: Int, scheduledAt: Long, now: Long, words: AlarmWords = ArabicAlarmWords): AlarmText {
         val elapsed = if (scheduledAt > 0) ((now - scheduledAt) / MINUTE_MS).coerceAtLeast(0) else 0L
         // Part of a minute left counts as a whole one, never "after 0 minutes".
         val remaining = preMinutes - elapsed
         return when {
-            remaining <= 0 -> passed(prayer, (elapsed - preMinutes).coerceAtLeast(1))
-            elapsed == 0L ->
-                AlarmText("اقترب وقت صلاة ${prayer.nameArabic}", "بعد $preMinutes دقيقة يحين موعد أذان ${prayer.nameArabic}.")
-            else ->
-                AlarmText(
-                    "اقترب وقت صلاة ${prayer.nameArabic}",
-                    "بعد ${minutes(remaining, genitive = true)} يحين موعد أذان ${prayer.nameArabic}."
-                )
+            remaining <= 0 -> passed(prayer, (elapsed - preMinutes).coerceAtLeast(1), words)
+            elapsed == 0L -> AlarmText(words.approaching(prayer), words.preOnTime(prayer, preMinutes))
+            else -> AlarmText(words.approaching(prayer), words.preRemaining(prayer, remaining))
         }
     }
 
     /** The prayer-time notification without sound. */
-    fun silent(prayer: Prayer, scheduledAt: Long = 0L, now: Long = 0L, snooze: Boolean = false): AlarmText =
-        late(prayer, scheduledAt, now, snooze)
-            ?: AlarmText("حان وقت صلاة ${prayer.nameArabic}", "حان الآن موعد أذان ${prayer.nameArabic}.")
+    fun silent(
+        prayer: Prayer, scheduledAt: Long = 0L, now: Long = 0L, snooze: Boolean = false, words: AlarmWords = ArabicAlarmWords
+    ): AlarmText =
+        late(prayer, scheduledAt, now, snooze, words) ?: AlarmText(words.timeCame(prayer), words.silentBody(prayer))
 
     /** The prayer-time notification with sound; also what is left behind when the adhan cannot be played. */
-    fun reminder(prayer: Prayer, scheduledAt: Long = 0L, now: Long = 0L, snooze: Boolean = false): AlarmText =
-        late(prayer, scheduledAt, now, snooze)
-            ?: AlarmText("حان وقت صلاة ${prayer.nameArabic}", "حان الآن موعد أذان ${prayer.nameArabic} بحسب الفقه الجعفري.")
+    fun reminder(
+        prayer: Prayer, scheduledAt: Long = 0L, now: Long = 0L, snooze: Boolean = false, words: AlarmWords = ArabicAlarmWords
+    ): AlarmText =
+        late(prayer, scheduledAt, now, snooze, words) ?: AlarmText(words.timeCame(prayer), words.reminderBody(prayer))
 
     /**
      * [n] minutes in Arabic: one and two have their own forms, 3 to 10 take the plural, 11 and more the singular.
@@ -59,14 +57,14 @@ object PrayerAlarmText {
         else -> "$n دقيقة"
     }
 
-    private fun late(prayer: Prayer, scheduledAt: Long, now: Long, snooze: Boolean): AlarmText? {
+    private fun late(prayer: Prayer, scheduledAt: Long, now: Long, snooze: Boolean, words: AlarmWords): AlarmText? {
         if (!isLate(scheduledAt, now)) return null
         // A snooze is due some minutes after the adhan time, so how long ago the adhan was is not known.
-        return if (snooze) AlarmText("دخل وقت صلاة ${prayer.nameArabic}", "مضى موعد أذان ${prayer.nameArabic}.")
-        else passed(prayer, (now - scheduledAt) / MINUTE_MS)
+        return if (snooze) AlarmText(words.begun(prayer), words.snoozedBody(prayer))
+        else passed(prayer, (now - scheduledAt) / MINUTE_MS, words)
     }
 
     /** The prayer time came [ago] minutes before. */
-    private fun passed(prayer: Prayer, ago: Long): AlarmText =
-        AlarmText("دخل وقت صلاة ${prayer.nameArabic}", "مضى على موعد أذان ${prayer.nameArabic} ${minutes(ago)}.")
+    private fun passed(prayer: Prayer, ago: Long, words: AlarmWords): AlarmText =
+        AlarmText(words.begun(prayer), words.passedBody(prayer, ago))
 }

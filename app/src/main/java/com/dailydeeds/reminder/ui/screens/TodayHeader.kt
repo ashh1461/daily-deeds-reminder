@@ -41,6 +41,14 @@ import com.dailydeeds.reminder.util.PrayerSchedule
 import com.dailydeeds.reminder.util.TimeFormat
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.labelRes
+import com.dailydeeds.reminder.ui.countdownText
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.surahDisplayName
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -66,7 +74,7 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center
             )
             Text(
-                hijri.toString(),
+                CalendarNames.date(hijri, appLanguage()),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -75,11 +83,11 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
             Text("$today", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             OrnamentDivider(Modifier.padding(vertical = 8.dp), color = GoldBright)
             occasions.firstOrNull()?.let {
-                Text(it.displayTitle, style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
+                Text(CalendarNames.occasionDisplay(it, appLanguage()), style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
             }
             if (next != null) {
                 Text(
-                    "${next.prayer.nameArabic} ${next.time.format(HOUR_MINUTE)} • ${TimeFormat.countdown(now, next.time)}",
+                    "${stringResource(next.prayer.labelRes)} ${next.time.format(HOUR_MINUTE)} • ${countdownText(TimeFormat.countdown(now, next.time))}",
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
                     textAlign = TextAlign.Center,
@@ -143,8 +151,8 @@ fun TodayWeekdayTiles(onDua: () -> Unit, onZiyarah: () -> Unit, modifier: Modifi
     val ziyarah = remember(day) { WeekdayRepository.get(DayContentKind.ZIYARAT, day) }
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf(
-            Triple("دعاء اليوم", dua.title, onDua),
-            Triple("زيارة اليوم", ziyarah.title, onZiyarah)
+            Triple(stringResource(R.string.today_dua_of_day), dua.title, onDua),
+            Triple(stringResource(R.string.today_ziyarah_of_day), ziyarah.title, onZiyarah)
         ).forEach { (label, title, click) ->
             Card(
                 modifier = Modifier.weight(1f).clickable(onClick = click),
@@ -182,7 +190,8 @@ fun ResumeTiles(
     val pagesMode by tools.quranPagesMode.collectAsState()
     val lastPage by tools.lastQuranPage.collectAsState()
     val lastAyah by tools.lastAyah.collectAsState()
-    val surahName = remember(lastSurah) { QuranRepository().getSurahByNumber(lastSurah)?.nameArabic }
+    val surah = remember(lastSurah) { QuranRepository().getSurahByNumber(lastSurah) }
+    val surahName = surah?.nameArabic
     val mafatihTitle = remember(lastMafatihId) { lastMafatihId?.let { MafatihRepository().getItemById(it)?.title } }
     val sahifaTitle = remember(lastSahifaId) { lastSahifaId?.let { MafatihRepository().getItemById(it)?.title } }
     if (surahName == null && mafatihTitle == null && sahifaTitle == null) return
@@ -194,23 +203,29 @@ fun ResumeTiles(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("تابع من حيث توقفت", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.today_resume_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             if (surahName != null) {
                 // In pages mode the tile reopens (and names) the last mushaf page; in the list, the last ayah.
-                val label = remember(surahName, lastSurah, pagesMode, lastPage, lastAyah) {
+                val target = remember(lastSurah, pagesMode, lastPage, lastAyah) {
                     val pageShowsSurah = lastPage in 1..QuranPages.COUNT && QuranPages.page(lastPage).showsSurah(lastSurah)
-                    QuranResume.label(surahName, pagesMode, lastPage, pageShowsSurah, lastAyah)
+                    QuranResume.target(pagesMode, lastPage, pageShowsSurah, lastAyah)
+                }
+                val name = surah?.let { surahDisplayName(it) } ?: surahName
+                val label = when (target.kind) {
+                    QuranResume.Kind.SURAH -> stringResource(R.string.today_resume_quran, name)
+                    QuranResume.Kind.PAGE -> stringResource(R.string.today_resume_quran_page, name, localNumber(target.number))
+                    QuranResume.Kind.AYAH -> stringResource(R.string.today_resume_quran_ayah, name, localNumber(target.number))
                 }
                 OutlinedButton(onClick = { onSurah(lastSurah) }, modifier = Modifier.fillMaxWidth()) { Text(label) }
             }
             if (mafatihTitle != null) {
                 OutlinedButton(onClick = { onMafatih(lastMafatihId!!) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("المفاتيح: $mafatihTitle", maxLines = 1)
+                    Text(stringResource(R.string.today_resume_mafatih, mafatihTitle), maxLines = 1)
                 }
             }
             if (sahifaTitle != null) {
                 OutlinedButton(onClick = { onSahifa(lastSahifaId!!) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("الصحيفة: $sahifaTitle", maxLines = 1)
+                    Text(stringResource(R.string.today_resume_sahifa, sahifaTitle), maxLines = 1)
                 }
             }
         }

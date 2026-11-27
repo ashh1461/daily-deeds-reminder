@@ -199,6 +199,7 @@ Checked on 2026-11-26 against `master` at `e5d5352`, which has PR #28 (v1.8.1.4)
   - A notification tap opens the Today tab.
   - An opt-in evening reminder before blessed nights: ليلة الجمعة every Thursday, mid-Sha'ban and the Laylat al-Qadr nights, an hour before Maghrib.
   - An opt-in fade-in of the adhan (10 s, off by default).
+- **v1.9.0 (prepared 2026-11-27):** the interface in Arabic, English and Persian (`docs/plans/v1.9.0-ui-languages.md`, `docs/releases/v1.9.0.md`). Religious text stays Arabic.
 - **Settled by you:** saved places are not wanted for now (1.2 item 7). Settings in device-protected storage for direct boot (2026-11-26).
 
 ### 7.2 Still open from sections 2 and 3
@@ -258,7 +259,9 @@ The tasbih vibration, the screen kept on, and copying and sharing an ayah were d
 | **v1.8.2** (toolchain, as planned) | targetSdk 35/36 with edge-to-edge, the AGP/Kotlin upgrade, `androidTest`. The high-latitude rule. Direct-boot restore. Snooze across reboots. The "last fired" guard. Pausing on short interruptions. Skipping the service on silent. `setAlarmClock`. The dark start window. |
 | **v1.8.3** | Mushaf accessibility and the fit cache. Scrolling to the ayah. The Qibla in landscape. The cold-start work. The Mafatih `LazyColumn`. Reloading after a backup import. The back arrows and TalkBack labels. The `own_` prefix. Tasbih and khums safety. |
 | **v1.8.4** | The rest of section 7.4, the section 3 ideas apart from saved places (notification tap to Today, blessed-night eves, adhan fade-in, resuming at the last ayah), and reloading the Tools and Main view models after a backup import. |
-| **then** | The v1.9.0+ roadmap (string externalisation ar/en/fa, Quran translations, the hadith and Nahj al-Balagha library). |
+| **v1.8.5** | Security hardening from the 2026-11-27 APK audit (prefs store split, pinned voice manifest). |
+| **v1.9.0** | The interface in Arabic, English and Persian (string externalisation, notifications, widget, calendar and city names). |
+| **then** | v1.9.1: deed titles and instructions in English and Persian (owner review), Quran translations and the hadith and Nahj al-Balagha library once each licence is checked; v1.10 audio; v1.11 polish. |
 
 ### 7.6 Checked and found clean (round 2)
 - **Mushaf layout:**

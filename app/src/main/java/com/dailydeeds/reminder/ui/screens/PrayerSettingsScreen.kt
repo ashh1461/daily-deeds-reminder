@@ -48,6 +48,9 @@ import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import com.dailydeeds.reminder.viewmodel.VoiceViewModel
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.labelRes
 
 /** Calculation method, per-prayer alarm mode, pre-adhan, voice and manual offsets. */
 @Composable
@@ -64,62 +67,68 @@ fun PrayerSettingsScreen(
     val installed by voices.installed.collectAsState()
     val context = LocalContext.current
 
-    ToolScaffold("إعدادات الأذان وطريقة الحساب", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.prayer_settings_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             PermissionHealthCard()
 
-            Heading("المكان")
+            Heading(stringResource(R.string.prayer_heading_place))
             PlacePickerCard(place, onPick = tools::setPlace)
 
-            Heading("طريقة الحساب")
+            Heading(stringResource(R.string.prayer_heading_method))
             SettingsBox {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                     CalcMethod.values().forEach { m ->
                         FilterChip(
                             selected = settings.method == m,
                             onClick = { tools.setPrayerSettings(settings.copy(method = m)) },
-                            label = { Text(m.labelArabic) }
+                            label = { Text(stringResource(m.labelRes)) }
                         )
                     }
                 }
                 val p = settings.params()
                 Text(
-                    String.format(Locale.US, "الفجر %.1f° • المغرب %.1f° • العشاء %.1f°", p.fajrAngle, p.maghribAngle, p.ishaAngle),
+                    stringResource(
+                        R.string.prayer_angles, "%.1f".format(Locale.US, p.fajrAngle),
+                        "%.1f".format(Locale.US, p.maghribAngle), "%.1f".format(Locale.US, p.ishaAngle)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (settings.method == CalcMethod.CUSTOM) {
-                    Stepper("زاوية الفجر", String.format(Locale.US, "%.1f°", settings.customFajr),
+                    Stepper(stringResource(R.string.prayer_angle_fajr), String.format(Locale.US, "%.1f°", settings.customFajr),
                         { tools.setPrayerSettings(settings.copy(customFajr = (settings.customFajr - 0.5).coerceAtLeast(10.0))) },
                         { tools.setPrayerSettings(settings.copy(customFajr = (settings.customFajr + 0.5).coerceAtMost(22.0))) })
-                    Stepper("زاوية العشاء", String.format(Locale.US, "%.1f°", settings.customIsha),
+                    Stepper(stringResource(R.string.prayer_angle_isha), String.format(Locale.US, "%.1f°", settings.customIsha),
                         { tools.setPrayerSettings(settings.copy(customIsha = (settings.customIsha - 0.5).coerceAtLeast(10.0))) },
                         { tools.setPrayerSettings(settings.copy(customIsha = (settings.customIsha + 0.5).coerceAtMost(20.0))) })
-                    Stepper("زاوية المغرب", String.format(Locale.US, "%.1f°", settings.customMaghrib),
+                    Stepper(stringResource(R.string.prayer_angle_maghrib), String.format(Locale.US, "%.1f°", settings.customMaghrib),
                         { tools.setPrayerSettings(settings.copy(customMaghrib = (settings.customMaghrib - 0.5).coerceAtLeast(0.0))) },
                         { tools.setPrayerSettings(settings.copy(customMaghrib = (settings.customMaghrib + 0.5).coerceAtMost(8.0))) })
                 }
-                Stepper("تأخير المغرب بعد الغروب", if (settings.maghribDelayMinutes == 0) "بالزاوية" else "${settings.maghribDelayMinutes} د",
+                Stepper(
+                    stringResource(R.string.prayer_maghrib_delay),
+                    if (settings.maghribDelayMinutes == 0) stringResource(R.string.prayer_by_angle)
+                    else stringResource(R.string.unit_minutes_short, settings.maghribDelayMinutes.toString()),
                     { tools.setPrayerSettings(settings.copy(maghribDelayMinutes = (settings.maghribDelayMinutes - 1).coerceAtLeast(0))) },
                     { tools.setPrayerSettings(settings.copy(maghribDelayMinutes = (settings.maghribDelayMinutes + 1).coerceAtMost(30))) })
-                Stepper("الإمساك قبل الفجر", "${settings.imsakMinutes} د",
+                Stepper(stringResource(R.string.prayer_imsak_before_fajr), stringResource(R.string.unit_minutes_short, settings.imsakMinutes.toString()),
                     { tools.setPrayerSettings(settings.copy(imsakMinutes = (settings.imsakMinutes - 1).coerceAtLeast(0))) },
                     { tools.setPrayerSettings(settings.copy(imsakMinutes = (settings.imsakMinutes + 1).coerceAtMost(30))) })
             }
 
-            Heading("تنبيه كل صلاة")
+            Heading(stringResource(R.string.prayer_heading_alerts))
             SettingsBox {
-                Text("صوت الأذان لكل الصلوات", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.voice_all_prayers), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 var allMenu by remember { mutableStateOf(false) }
                 val commonVoice = AdhanVoiceChoice.commonVoiceId(configs, AdhanVoiceChoice.ALARM_PRAYERS)
-                val allName = commonVoice?.let { voiceLabel(it, installed) } ?: "مختلف حسب الصلاة"
+                val allName = commonVoice?.let { voiceLabel(it, installed) } ?: stringResource(R.string.voice_varies)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Box(Modifier.weight(1f)) {
                         OutlinedButton(onClick = { allMenu = true }, modifier = Modifier.fillMaxWidth()) {
-                            Text("الصوت: $allName", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(stringResource(R.string.voice_current, allName), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                         VoiceMenu(allMenu, commonVoice, installed, onDismiss = { allMenu = false }) { id ->
                             val updated = AdhanVoiceChoice.withVoiceForAll(configs, AdhanVoiceChoice.ALARM_PRAYERS, id)
@@ -133,10 +142,10 @@ fun PrayerSettingsScreen(
                         val testVoice = commonVoice
                             ?: (configs[AdhanVoiceChoice.ALARM_PRAYERS.first()] ?: PrayerAlarmConfig()).voiceId
                         AdhanService.play(context, Prayer.FAJR, testVoice, test = true)
-                    }) { Text("تجربة") }
+                    }) { Text(stringResource(R.string.voice_try)) }
                 }
                 Text(
-                    "يُستعمل الصوت في الصلوات المضبوطة على «أذان»؛ اختر الوضع من بطاقة كل صلاة.",
+                    stringResource(R.string.voice_mode_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -144,24 +153,29 @@ fun PrayerSettingsScreen(
             AdhanVoiceChoice.ALARM_PRAYERS.forEach { prayer ->
                 val config = configs[prayer] ?: PrayerAlarmConfig()
                 SettingsBox {
-                    Text(prayer.nameArabic, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(prayer.labelRes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                         AdhanMode.values().forEach { mode ->
                             FilterChip(
                                 selected = config.mode == mode,
                                 onClick = { tools.setAlarmConfig(prayer, config.copy(mode = mode)) },
-                                label = { Text(mode.labelArabic) }
+                                label = { Text(stringResource(mode.labelRes)) }
                             )
                         }
                     }
                     if (config.mode != AdhanMode.OFF && config.mode != AdhanMode.SILENT) {
-                        Text("تنبيه قبل الصلاة", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.prayer_pre_alert), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                             PrayerAlarmConfig.PRE_CHOICES.forEach { minutes ->
                                 FilterChip(
                                     selected = config.preMinutes == minutes,
                                     onClick = { tools.setAlarmConfig(prayer, config.copy(preMinutes = minutes)) },
-                                    label = { Text(if (minutes == 0) "بلا" else "$minutes د") }
+                                    label = {
+                                        Text(
+                                            if (minutes == 0) stringResource(R.string.prayer_pre_none)
+                                            else stringResource(R.string.unit_minutes_short, minutes.toString())
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -172,43 +186,46 @@ fun PrayerSettingsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Box(Modifier.weight(1f)) {
                                 OutlinedButton(onClick = { menu = true }, modifier = Modifier.fillMaxWidth()) {
-                                    Text("الصوت: $currentName", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text(stringResource(R.string.voice_current, currentName), maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 }
                                 VoiceMenu(menu, config.voiceId, installed, onDismiss = { menu = false }) { id ->
                                     tools.setAlarmConfig(prayer, config.copy(voiceId = id))
                                 }
                             }
-                            OutlinedButton(onClick = { AdhanService.play(context, prayer, config.voiceId, test = true) }) { Text("تجربة") }
+                            OutlinedButton(onClick = { AdhanService.play(context, prayer, config.voiceId, test = true) }) { Text(stringResource(R.string.voice_try)) }
                         }
                     }
                     Stepper(
-                        "تعديل الوقت يدوياً",
-                        if (config.offsetMinutes > 0) "+${config.offsetMinutes} د" else "${config.offsetMinutes} د",
+                        stringResource(R.string.prayer_manual_offset),
+                        stringResource(
+                            R.string.unit_minutes_short,
+                            if (config.offsetMinutes > 0) "+${config.offsetMinutes}" else config.offsetMinutes.toString()
+                        ),
                         { tools.setAlarmConfig(prayer, config.copy(offsetMinutes = (config.offsetMinutes - 1).coerceAtLeast(-PrayerAlarmConfig.MAX_OFFSET))) },
                         { tools.setAlarmConfig(prayer, config.copy(offsetMinutes = (config.offsetMinutes + 1).coerceAtMost(PrayerAlarmConfig.MAX_OFFSET))) }
                     )
                 }
             }
 
-            Heading("عام")
+            Heading(stringResource(R.string.prayer_heading_general))
             SettingsBox {
-                SwitchRow("الاهتزاز مع الأذان", global.vibrate) { tools.setAdhanGlobal(global.copy(vibrate = it)) }
-                SwitchRow("عدم تشغيل الصوت في الوضع الصامت", global.followRinger) { tools.setAdhanGlobal(global.copy(followRinger = it)) }
-                SwitchRow("إيقاف الأذان بزر التشغيل أو الصوت", global.hardwareStop) { tools.setAdhanGlobal(global.copy(hardwareStop = it)) }
-                SwitchRow("رفع صوت الأذان تدريجياً", global.fadeIn) { tools.setAdhanGlobal(global.copy(fadeIn = it)) }
+                SwitchRow(stringResource(R.string.adhan_vibrate), global.vibrate) { tools.setAdhanGlobal(global.copy(vibrate = it)) }
+                SwitchRow(stringResource(R.string.adhan_follow_ringer), global.followRinger) { tools.setAdhanGlobal(global.copy(followRinger = it)) }
+                SwitchRow(stringResource(R.string.adhan_hardware_stop), global.hardwareStop) { tools.setAdhanGlobal(global.copy(hardwareStop = it)) }
+                SwitchRow(stringResource(R.string.adhan_fade_in), global.fadeIn) { tools.setAdhanGlobal(global.copy(fadeIn = it)) }
                 Text(
-                    "إطفاء الشاشة أثناء الأذان يوقفه أيضاً. ويمكن إيقافه دائماً بلمس إشعاره أو سحبه جانباً.",
+                    stringResource(R.string.adhan_stop_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Stepper("مدة التأجيل", "${global.snoozeMinutes} د",
+                Stepper(stringResource(R.string.adhan_snooze), stringResource(R.string.unit_minutes_short, global.snoozeMinutes.toString()),
                     { tools.setAdhanGlobal(global.copy(snoozeMinutes = (global.snoozeMinutes - 1).coerceAtLeast(1))) },
                     { tools.setAdhanGlobal(global.copy(snoozeMinutes = (global.snoozeMinutes + 1).coerceAtMost(30))) })
             }
 
-            Button(onClick = onOpenVoices, modifier = Modifier.fillMaxWidth()) { Text("أصوات الأذان وتنزيلها") }
+            Button(onClick = onOpenVoices, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.voices_open)) }
             Text(
-                "عند وضع «أذان» يُشغَّل الصوت المختار عبر قناة المنبّه. الأذان الافتراضي مضمَّن في التطبيق، ويُشغَّل إن حُذف الصوت المختار.",
+                stringResource(R.string.adhan_channel_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -221,13 +238,14 @@ private fun Heading(text: String) {
     Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
 }
 
-/** The Arabic name of [voiceId] as the voice buttons show it. */
+/** The name of [voiceId] as the voice buttons show it. Voice names themselves are Arabic. */
+@Composable
 private fun voiceLabel(voiceId: String, installed: List<VoiceStore.Installed>): String = when (voiceId) {
-    VoiceIds.DEFAULT -> BundledVoices.byId(BundledVoices.DEFAULT_ID)?.nameAr.orEmpty() + " (افتراضي)"
-    VoiceIds.SYSTEM_TONE -> "نغمة الهاتف"
+    VoiceIds.DEFAULT -> stringResource(R.string.voice_default_name, BundledVoices.byId(BundledVoices.DEFAULT_ID)?.nameAr.orEmpty())
+    VoiceIds.SYSTEM_TONE -> stringResource(R.string.voice_phone_tone)
     else -> BundledVoices.byId(voiceId)?.nameAr
         ?: installed.firstOrNull { it.id == voiceId }?.nameAr
-        ?: "صوت غير مثبّت (سيُستخدم الأذان الافتراضي)"
+        ?: stringResource(R.string.voice_not_installed)
 }
 
 /**
@@ -244,7 +262,7 @@ private fun VoiceMenu(
 ) {
     val selected = selectedId?.let { AdhanVoiceChoice.effectiveVoiceId(it) }
     val entries = BundledVoices.all.map { it.id to it.nameAr } +
-        listOf(VoiceIds.SYSTEM_TONE to "نغمة الهاتف") +
+        listOf(VoiceIds.SYSTEM_TONE to stringResource(R.string.voice_phone_tone)) +
         installed.map { it.id to it.nameAr }
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
         entries.forEach { (id, name) ->

@@ -21,7 +21,8 @@ class PrefsClassifierTest {
             "alarm_pending_snoozes",
             "pref_place_name", "pref_place_lat", "pref_place_lng", "pref_place_zone",
             "pref_alarm_cfg_1", "pref_alarm_cfg_2", "pref_alarm_cfg_3", "pref_alarm_cfg_4",
-            "pref_prayer_alarm_1", "pref_prayer_alarm_4" // legacy per-prayer on/off, read as a fallback
+            "pref_prayer_alarm_1", "pref_prayer_alarm_4", // legacy per-prayer on/off, read as a fallback
+            "pref_app_language" // the adhan notification is written in the chosen language while locked
         )
         boot.forEach { assertTrue(it, PrefsClassifier.isBootKey(it)) }
     }

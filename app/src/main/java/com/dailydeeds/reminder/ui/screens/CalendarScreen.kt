@@ -26,6 +26,11 @@ import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.LocalDate
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.daysAwayText
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 @Composable
 fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
@@ -36,7 +41,7 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
     val hijri = remember(offset) { ShiaCalendar.toHijri(today, offset) }
     val upcoming = remember(offset) { ShiaCalendar.upcoming(today, 120, offset) }
 
-    ToolScaffold("التقويم والمناسبات", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.settings_calendar_open), onNavigateBack) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -48,16 +53,16 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(hijri.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                        Text("الموافق $today", style = MaterialTheme.typography.bodyMedium)
+                        Text(CalendarNames.date(hijri, appLanguage()), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.calendar_corresponds, today.toString()), style = MaterialTheme.typography.bodyMedium)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("تعديل الرؤية:", style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.calendar_adjust), style = MaterialTheme.typography.bodySmall)
                             OutlinedButton(onClick = { viewModel.setHijriOffset(offset - 1) }, enabled = offset > -ShiaCalendar.MAX_OFFSET) { Text("−") }
                             Text(if (offset > 0) "+$offset" else "$offset", fontWeight = FontWeight.Bold)
                             OutlinedButton(onClick = { viewModel.setHijriOffset(offset + 1) }, enabled = offset < ShiaCalendar.MAX_OFFSET) { Text("+") }
                         }
                         Text(
-                            "يعتمد التاريخ على جداول أم القرى وقد يختلف يوماً عن رؤية الهلال في بلدك؛ عدّله هنا.",
+                            stringResource(R.string.calendar_adjust_note),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -65,16 +70,16 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
             }
             item {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("تذكير صباحي بمناسبة اليوم", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.calendar_morning_reminder), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                     Switch(checked = reminder, onCheckedChange = viewModel::setOccasionReminder)
                 }
             }
             item {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("تذكير مسائي قبل الليالي المباركة", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.calendar_eve_reminder), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "ليلة الجمعة كل خميس، وليلة النصف من شعبان وليالي القدر، قبل المغرب بساعة.",
+                            stringResource(R.string.calendar_eve_note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -82,17 +87,13 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
                     Switch(checked = eveReminder, onCheckedChange = viewModel::setBlessedEveReminder)
                 }
             }
-            item { Text("المناسبات القادمة", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
+            item { Text(stringResource(R.string.calendar_upcoming), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
             items(upcoming, key = { "${it.date}_${it.occasion.title}" }) { u ->
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(u.occasion.displayTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text(CalendarNames.occasionDisplay(u.occasion, appLanguage()), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                         Text(
-                            "${u.hijri} • ${u.date} • " + when (u.daysAway) {
-                                0 -> "اليوم"
-                                1 -> "غداً"
-                                else -> "بعد ${u.daysAway} يوماً"
-                            },
+                            "${CalendarNames.date(u.hijri, appLanguage())} • ${u.date} • " + daysAwayText(u.daysAway.toLong()),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -101,7 +102,7 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
             }
             item {
                 Text(
-                    "تتفاوت بعض تواريخ الولادات والوفيات بين الأقوال والمراجع؛ يُرجى مراجعة مرجع التقليد.",
+                    stringResource(R.string.calendar_dates_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

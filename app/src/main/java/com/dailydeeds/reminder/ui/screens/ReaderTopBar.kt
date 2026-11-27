@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.model.Deed
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +55,7 @@ internal fun ReaderTopBar(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "رجوع",
+                    contentDescription = stringResource(R.string.common_back),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -62,7 +64,7 @@ internal fun ReaderTopBar(
             IconButton(onClick = { onToggleCompleted() }) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = if (isCompleted) "مكتمل (اضغط للإلغاء)" else "تحديد كـ مكتمل",
+                    contentDescription = stringResource(if (isCompleted) R.string.deed_done_tap_undo else R.string.deed_mark_done),
                     tint = if (isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -70,7 +72,7 @@ internal fun ReaderTopBar(
                 IconButton(onClick = { onResetCount() }) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "إعادة ضبط العداد",
+                        contentDescription = stringResource(R.string.counter_reset_short),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }

@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.model.Deed
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 @Composable
 internal fun ReaderCounterContent(
@@ -117,7 +119,7 @@ internal fun ReaderCounterContent(
             Spacer(Modifier.height(8.dp))
         }
         deed.referenceSource?.let {
-            Text("المصدر: $it", style = MaterialTheme.typography.bodySmall,
+            Text(stringResource(R.string.reader_source, it), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             Spacer(Modifier.height(16.dp))
         }
@@ -131,7 +133,7 @@ internal fun ReaderCounterContent(
         ) {
             if (isCompleted) {
                 Text(
-                    text = "تم إكمال هذا العمل المبارك لليوم بنجاح تقبل الله منا ومنكم 🌿",
+                    text = stringResource(R.string.counter_done_today),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.tertiary
@@ -140,7 +142,7 @@ internal fun ReaderCounterContent(
                 )
             } else {
                 Text(
-                    text = "المس الدائرة للعدّ، أو اضغط الزر أدناه لتحديده كمكتمل فوراً",
+                    text = stringResource(R.string.counter_hint),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -166,7 +168,7 @@ internal fun ReaderCounterContent(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (isCompleted) "أُنجز بحمد الله ✓ (اضغط لإلغاء التحديد)" else "تحديد كـ مكتمل مباشرة دون نقر",
+                    text = stringResource(if (isCompleted) R.string.counter_marked_done else R.string.counter_mark_done),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
@@ -184,7 +186,7 @@ internal fun ReaderCounterContent(
             ) {
                 Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "تصفير العداد والبدء من جديد")
+                Text(text = stringResource(R.string.counter_reset))
             }
         }
     }

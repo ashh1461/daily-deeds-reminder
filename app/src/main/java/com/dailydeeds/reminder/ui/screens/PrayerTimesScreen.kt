@@ -33,6 +33,10 @@ import com.dailydeeds.reminder.util.TimeFormat
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.labelRes
+import com.dailydeeds.reminder.ui.countdownText
 
 private val TIME_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -55,17 +59,17 @@ fun PrayerTimesScreen(
     val next = remember(place, now, calc) { PrayerSchedule.next(now, place, calc) }
 
     val rows: List<Triple<String, LocalTime?, Prayer?>> = listOf(
-        Triple("الإمساك", times.imsak, null),
-        Triple("الفجر", times.fajr, Prayer.FAJR),
-        Triple("الشروق", times.sunrise, null),
-        Triple("الظهر", times.dhuhr, Prayer.DHUHR),
-        Triple("الغروب", times.sunset, null),
-        Triple("المغرب", times.maghrib, Prayer.MAGHRIB),
-        Triple("العشاء", times.isha, Prayer.ISHA),
-        Triple("منتصف الليل الشرعي", times.midnight, null)
+        Triple(stringResource(R.string.time_imsak), times.imsak, null),
+        Triple(stringResource(R.string.prayer_fajr), times.fajr, Prayer.FAJR),
+        Triple(stringResource(R.string.time_sunrise), times.sunrise, null),
+        Triple(stringResource(R.string.prayer_dhuhr), times.dhuhr, Prayer.DHUHR),
+        Triple(stringResource(R.string.time_sunset), times.sunset, null),
+        Triple(stringResource(R.string.prayer_maghrib), times.maghrib, Prayer.MAGHRIB),
+        Triple(stringResource(R.string.prayer_isha), times.isha, Prayer.ISHA),
+        Triple(stringResource(R.string.time_midnight), times.midnight, null)
     )
 
-    ToolScaffold("أوقات الصلاة والأذان", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.prayer_times_title), onNavigateBack) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -75,7 +79,12 @@ fun PrayerTimesScreen(
             item {
                 PlacePickerCard(place, onPick = viewModel::setPlace) {
                     next?.let {
-                        Text("الصلاة القادمة: ${it.prayer.nameArabic} عند ${it.time.format(TIME_FORMAT)} • ${TimeFormat.countdown(now, it.time)}")
+                        Text(
+                            stringResource(
+                                R.string.prayer_next_at, stringResource(it.prayer.labelRes), it.time.format(TIME_FORMAT),
+                                countdownText(TimeFormat.countdown(now, it.time))
+                            )
+                        )
                     }
                 }
             }
@@ -92,11 +101,11 @@ fun PrayerTimesScreen(
                     ) {
                         Column(Modifier.weight(1f)) {
                             val estimated = prayer != null && prayer in times.estimated
-                            Text(if (estimated) "$label (تقديري)" else label, style = MaterialTheme.typography.titleSmall)
+                            Text(if (estimated) stringResource(R.string.prayer_estimated, label) else label, style = MaterialTheme.typography.titleSmall)
                             if (prayer != null) {
                                 val mode = configs[prayer]?.mode ?: AdhanMode.OFF
                                 Text(
-                                    "التنبيه: ${mode.labelArabic}",
+                                    stringResource(R.string.prayer_alert_mode, stringResource(mode.labelRes)),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -109,22 +118,21 @@ fun PrayerTimesScreen(
             if (times.estimated.isNotEmpty()) {
                 item {
                     Text(
-                        "في هذا الموقع لا تبلغ الشمس زاوية بعض الأوقات في هذا الفصل، فقُدّرت «تقديري» بجزء من الليل " +
-                            "(طريقة الزاوية). راجع مرجعك في أوقات البلاد ذات العرض العالي.",
+                        stringResource(R.string.prayer_estimated_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
             item {
-                Button(onClick = onOpenSettings, modifier = Modifier.fillMaxWidth()) { Text("إعدادات الأذان وطريقة الحساب") }
+                Button(onClick = onOpenSettings, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.prayer_settings_title)) }
             }
             item {
-                OutlinedButton(onClick = onOpenQibla, modifier = Modifier.fillMaxWidth()) { Text("اتجاه القبلة") }
+                OutlinedButton(onClick = onOpenQibla, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.qibla_title)) }
             }
             item {
                 Text(
-                    "الحساب بالفقه الجعفري، وطريقته قابلة للتغيير من الإعدادات. قارن بجدول مرجعك المحلي واحتط عند الحاجة.",
+                    stringResource(R.string.prayer_method_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

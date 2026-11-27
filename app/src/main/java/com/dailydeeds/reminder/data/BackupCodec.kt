@@ -36,7 +36,11 @@ object BackupCodec {
 
     sealed class Import {
         class Ok(val entries: Map<String, Any>, val skipped: Int) : Import()
-        class Error(val message: String) : Import()
+        class Error(val reason: Reason) : Import()
+    }
+
+    /** Why a file was refused; the UI words it in the app language. */
+    enum class Reason { TOO_LARGE, NOT_A_BACKUP, OTHER_APP, UNSUPPORTED_VERSION, EMPTY, TOO_MANY_ENTRIES, NO_VALID_DATA
     }
 
     /** [all] is `SharedPreferences.getAll()`; keys that are not part of the backup are left out. */
@@ -60,16 +64,16 @@ object BackupCodec {
     }
 
     fun parse(text: String): Import {
-        if (text.length > MAX_BYTES) return Import.Error("الملف أكبر من الحد المسموح")
+        if (text.length > MAX_BYTES) return Import.Error(Reason.TOO_LARGE)
         val root = try {
             JSONObject(text)
         } catch (e: JSONException) {
-            return Import.Error("الملف ليس نسخة احتياطية صالحة")
+            return Import.Error(Reason.NOT_A_BACKUP)
         }
-        if (root.optString("app") != FORMAT) return Import.Error("الملف ليس نسخة احتياطية من هذا التطبيق")
-        if (root.optInt("version", -1) != VERSION) return Import.Error("إصدار النسخة الاحتياطية غير مدعوم")
-        val prefs = root.optJSONObject("prefs") ?: return Import.Error("النسخة الاحتياطية فارغة")
-        if (prefs.length() > MAX_ENTRIES) return Import.Error("النسخة الاحتياطية كبيرة جداً")
+        if (root.optString("app") != FORMAT) return Import.Error(Reason.OTHER_APP)
+        if (root.optInt("version", -1) != VERSION) return Import.Error(Reason.UNSUPPORTED_VERSION)
+        val prefs = root.optJSONObject("prefs") ?: return Import.Error(Reason.EMPTY)
+        if (prefs.length() > MAX_ENTRIES) return Import.Error(Reason.TOO_MANY_ENTRIES)
 
         val entries = LinkedHashMap<String, Any>()
         var skipped = 0
@@ -84,7 +88,7 @@ object BackupCodec {
                 if (entries.remove(it) != null) skipped++
             }
         }
-        if (entries.isEmpty()) return Import.Error("لا توجد بيانات صالحة في الملف")
+        if (entries.isEmpty()) return Import.Error(Reason.NO_VALID_DATA)
         return Import.Ok(entries, skipped)
     }
 

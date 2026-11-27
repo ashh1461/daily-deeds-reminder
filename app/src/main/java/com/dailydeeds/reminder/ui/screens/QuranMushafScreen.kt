@@ -87,6 +87,10 @@ import com.dailydeeds.reminder.util.ArabicDigits
 import com.dailydeeds.reminder.viewmodel.QuranViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.surahDisplayName
 
 private const val AYAH_TAG = "ayah"
 internal const val MUSHAF_BASMALA = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
@@ -133,10 +137,10 @@ fun QuranMushafScreen(
                 TopAppBar(
                     title = {
                         Column {
-                            Text("صفحة ${ArabicDigits.format(current.number)}", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.mushaf_page, localNumber(current.number)), fontWeight = FontWeight.Bold)
                             Text(
-                                current.segments.joinToString(" • ") { "سورة ${it.surah.nameArabic}" } +
-                                    " • الجزء ${ArabicDigits.format(current.juz)}",
+                                (current.segments.map { stringResource(R.string.surah_title, surahDisplayName(it.surah)) } +
+                                    stringResource(R.string.juz_n, localNumber(current.juz))).joinToString(" • "),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -146,26 +150,26 @@ fun QuranMushafScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                         }
                     },
                     actions = {
                         IconButton(onClick = { showGoTo = true }) {
-                            Icon(Icons.Default.FindInPage, contentDescription = "الانتقال إلى صفحة أو جزء")
+                            Icon(Icons.Default.FindInPage, contentDescription = stringResource(R.string.mushaf_go_to))
                         }
                         val onScreenSp = if (fit) fittedSizes[current.number] ?: fontSizeSp else fontSizeSp
                         IconButton(onClick = { viewModel.setMushafFit(!fit) }) {
                             Icon(
                                 Icons.Default.AspectRatio,
-                                contentDescription = if (fit) "ملاءمة الصفحة للشاشة: مفعّلة" else "ملاءمة الصفحة للشاشة",
+                                contentDescription = stringResource(if (fit) R.string.mushaf_fit_on else R.string.mushaf_fit),
                                 tint = if (fit) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         IconButton(onClick = { viewModel.increaseMushafFont(onScreenSp) }) {
-                            Icon(Icons.Default.ZoomIn, contentDescription = "تكبير الخط")
+                            Icon(Icons.Default.ZoomIn, contentDescription = stringResource(R.string.font_larger))
                         }
                         IconButton(onClick = { viewModel.decreaseMushafFont(onScreenSp) }) {
-                            Icon(Icons.Default.ZoomOut, contentDescription = "تصغير الخط")
+                            Icon(Icons.Default.ZoomOut, contentDescription = stringResource(R.string.font_smaller))
                         }
                     }
                 )
@@ -415,7 +419,7 @@ private fun AyahActionsDialog(
     val shareText = remember(ayah, surahName) { ayahShareText(ayah, surahName) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("سورة $surahName - الآية ${ArabicDigits.format(ayah.ayahNumber)}") },
+        title = { Text(stringResource(R.string.favorites_ayah_title, surahName, localNumber(ayah.ayahNumber))) },
         text = {
             Column {
                 // The whole ayah, scrolling when it is long, instead of cutting it at six lines.
@@ -426,25 +430,25 @@ private fun AyahActionsDialog(
                             ?.setPrimaryClip(ClipData.newPlainText("آية", shareText))
                         // Android 13 and later confirm a copy on their own.
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                            Toast.makeText(context, "نُسخت الآية", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.ayah_copied), Toast.LENGTH_SHORT).show()
                         }
-                    }) { Text("نسخ") }
+                    }) { Text(stringResource(R.string.action_copy)) }
                     TextButton(onClick = {
                         val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareText)
-                        context.startActivity(Intent.createChooser(send, "مشاركة الآية"))
-                    }) { Text("مشاركة") }
+                        context.startActivity(Intent.createChooser(send, context.getString(R.string.ayah_share)))
+                    }) { Text(stringResource(R.string.action_share)) }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onToggleFavorite(); onDismiss() }) {
-                Text(if (isFavorite) "إزالة من المفضلة" else "إضافة إلى المفضلة")
+                Text(stringResource(if (isFavorite) R.string.favorite_remove else R.string.favorite_add))
             }
         },
         dismissButton = {
             Row {
-                TextButton(onClick = { onDismiss(); onOpenMizan() }) { Text("تفسير الميزان") }
-                TextButton(onClick = onDismiss) { Text("إغلاق") }
+                TextButton(onClick = { onDismiss(); onOpenMizan() }) { Text(stringResource(R.string.hub_mizan)) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) }
             }
         }
     )
@@ -464,26 +468,26 @@ internal fun GoToPageDialog(onDismiss: () -> Unit, onGo: (Int) -> Unit) {
     val target = page ?: juz?.let { QuranPages.firstPageOfJuz(it) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("الانتقال في المصحف") },
+        title = { Text(stringResource(R.string.mushaf_go_to_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = pageText, onValueChange = { pageText = it; if (it.isNotEmpty()) juzText = "" },
-                    singleLine = true, label = { Text("رقم الصفحة (١ - ٦٠٤)") },
+                    singleLine = true, label = { Text(stringResource(R.string.mushaf_page_number, localNumber(1), localNumber(604))) },
                     isError = pageText.isNotBlank() && page == null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = juzText, onValueChange = { juzText = it; if (it.isNotEmpty()) pageText = "" },
-                    singleLine = true, label = { Text("أو رقم الجزء (١ - ٣٠)") },
+                    singleLine = true, label = { Text(stringResource(R.string.mushaf_juz_number, localNumber(1), localNumber(30))) },
                     isError = juzText.isNotBlank() && juz == null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
-        confirmButton = { TextButton(enabled = target != null, onClick = { target?.let(onGo) }) { Text("انتقال") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("إلغاء") } }
+        confirmButton = { TextButton(enabled = target != null, onClick = { target?.let(onGo) }) { Text(stringResource(R.string.mushaf_go)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } }
     )
 }

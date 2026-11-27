@@ -48,6 +48,12 @@ import com.dailydeeds.reminder.data.WeekdayRepository
 import com.dailydeeds.reminder.model.DayContentKind
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.DayOfWeek
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.appLocale
+import androidx.compose.ui.platform.LocalContext
+import com.dailydeeds.reminder.model.Surah
 
 private data class FavoriteRow(val key: FavoriteKey, val title: String, val subtitle: String)
 
@@ -65,8 +71,9 @@ private val SnapshotSaver = Saver<List<FavoriteKey>?, String>(
 )
 
 /** Narrows the list by kind, so "select all" can clear one kind at once. */
-private enum class FavoriteFilter(val label: String) {
-    ALL("الكل"), AYAH("الآيات"), MAFATIH("المفاتيح"), SAHIFA("الصحيفة"), WEEKDAY("أدعية وزيارات الأيام");
+private enum class FavoriteFilter(@StringRes val label: Int) {
+    ALL(R.string.search_type_all), AYAH(R.string.favorites_ayahs), MAFATIH(R.string.tab_mafatih), SAHIFA(R.string.tab_sahifa),
+    WEEKDAY(R.string.search_type_weekday);
 
     fun matches(key: FavoriteKey): Boolean = when (this) {
         ALL -> true
@@ -92,7 +99,20 @@ fun FavoritesScreen(
     val favorites by viewModel.favorites.collectAsState()
     val quran = remember { QuranRepository() }
     val mafatih = remember { MafatihRepository() }
-    val rows = remember(favorites) { favorites.mapNotNull { favoriteRow(it, quran, mafatih) } }
+    // Rows are built outside composition, so the strings they need are resolved here (the activity's context
+    // carries the app language; changing it recreates the screen).
+    val context = LocalContext.current
+    val english = appLocale().language == "en"
+    val sahifaLabel = stringResource(R.string.tab_sahifa_title)
+    val rows = remember(favorites) {
+        val ayahTitle = { s: Surah, n: Int ->
+            context.getString(
+                R.string.favorites_ayah_title, if (english) s.nameEnglish else s.nameArabic,
+                if (english) n.toString() else ArabicDigits.format(n)
+            )
+        }
+        favorites.mapNotNull { favoriteRow(it, quran, mafatih, ayahTitle, sahifaLabel) }
+    }
 
     var chosenFilter by rememberSaveable { mutableStateOf(FavoriteFilter.ALL) }
     var selecting by rememberSaveable { mutableStateOf(false) }
@@ -128,7 +148,7 @@ fun FavoritesScreen(
 
     BackHandler(enabled = selecting) { endSelection() }
 
-    ToolScaffold("المفضلة", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.action_favorites), onNavigateBack) {
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -146,7 +166,7 @@ fun FavoritesScreen(
             if (rows.isEmpty()) {
                 item(key = "empty") {
                     Text(
-                        "لا توجد عناصر مفضلة بعد. اضغط على النجمة في أي آية أو دعاء أو زيارة لإضافتها هنا.",
+                        stringResource(R.string.favorites_empty),
                         modifier = Modifier.padding(8.dp),
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -187,24 +207,30 @@ fun FavoritesScreen(
         val count = selectedVisible.size
         AlertDialog(
             onDismissRequest = { confirmBulk = false },
-            title = { Text("حذف $count من المفضلة؟") },
-            text = { Text("تُزال العناصر المحددة من المفضلة فقط، ولا يُحذف أي نص. يمكنك التراجع بعد الحذف مباشرة.") },
-            confirmButton = { TextButton(onClick = { confirmBulk = false; delete(selectedVisible) }) { Text("حذف") } },
-            dismissButton = { TextButton(onClick = { confirmBulk = false }) { Text("إلغاء") } }
+            title = { Text(stringResource(R.string.favorites_delete_title, count.toString())) },
+            text = { Text(stringResource(R.string.favorites_delete_text)) },
+            confirmButton = { TextButton(onClick = { confirmBulk = false; delete(selectedVisible) }) { Text(stringResource(R.string.common_delete)) } },
+            dismissButton = { TextButton(onClick = { confirmBulk = false }) { Text(stringResource(R.string.common_cancel)) } }
         )
     }
 }
 
-private fun favoriteRow(key: FavoriteKey, quran: QuranRepository, mafatih: MafatihRepository): FavoriteRow? = when (key) {
+private fun favoriteRow(
+    key: FavoriteKey,
+    quran: QuranRepository,
+    mafatih: MafatihRepository,
+    ayahTitle: (Surah, Int) -> String,
+    sahifaLabel: String
+): FavoriteRow? = when (key) {
     is FavoriteKey.Ayah -> {
         val s = quran.getSurahByNumber(key.surah)
         val a = quran.getAyah(key.surah, key.ayah)
         if (s != null && a != null) {
-            FavoriteRow(key, "سورة ${s.nameArabic} - الآية ${ArabicDigits.format(key.ayah)}", a.textArabic)
+            FavoriteRow(key, ayahTitle(s, key.ayah), a.textArabic)
         } else null
     }
     is FavoriteKey.Mafatih -> mafatih.getItemById(key.itemId)?.let { FavoriteRow(key, it.title, it.category.titleArabic) }
-    is FavoriteKey.Sahifa -> mafatih.getItemById(key.itemId)?.let { FavoriteRow(key, it.title, "الصحيفة السجادية") }
+    is FavoriteKey.Sahifa -> mafatih.getItemById(key.itemId)?.let { FavoriteRow(key, it.title, sahifaLabel) }
     is FavoriteKey.Weekday -> {
         val c = WeekdayRepository.get(key.kind, key.day)
         FavoriteRow(key, c.title, key.kind.titleArabic)
@@ -218,7 +244,7 @@ private fun FilterChips(rows: List<FavoriteRow>, current: FavoriteFilter, onSele
         FavoriteFilter.values().forEach { f ->
             val count = rows.count { f.matches(it.key) }
             if (f == FavoriteFilter.ALL || count > 0) {
-                FilterChip(selected = f == current, onClick = { onSelect(f) }, label = { Text("${f.label} ($count)") })
+                FilterChip(selected = f == current, onClick = { onSelect(f) }, label = { Text("${stringResource(f.label)} ($count)") })
             }
         }
     }
@@ -236,13 +262,13 @@ private fun SelectionBar(
 ) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         if (!selecting) {
-            Text("$visibleCount عنصر", Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
-            TextButton(onClick = onStart, enabled = visibleCount > 0) { Text("تحديد") }
+            Text(stringResource(R.string.favorites_count, visibleCount.toString()), Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+            TextButton(onClick = onStart, enabled = visibleCount > 0) { Text(stringResource(R.string.favorites_select)) }
         } else {
-            Text("تم تحديد $selectedCount", Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
-            TextButton(onClick = onToggleAll) { Text(if (selectedCount == visibleCount) "إلغاء الكل" else "تحديد الكل") }
-            TextButton(onClick = onDelete, enabled = selectedCount > 0) { Text("حذف") }
-            TextButton(onClick = onCancel) { Text("إلغاء") }
+            Text(stringResource(R.string.favorites_selected, selectedCount.toString()), Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+            TextButton(onClick = onToggleAll) { Text(stringResource(if (selectedCount == visibleCount) R.string.favorites_unselect_all else R.string.favorites_select_all)) }
+            TextButton(onClick = onDelete, enabled = selectedCount > 0) { Text(stringResource(R.string.common_delete)) }
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.common_cancel)) }
         }
     }
 }
@@ -252,12 +278,12 @@ private fun UndoBar(removed: Int, onUndo: () -> Unit, onDismiss: () -> Unit) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Row(Modifier.fillMaxWidth().padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (removed == 1) "حُذف عنصر من المفضلة" else "حُذف $removed من المفضلة",
+                if (removed == 1) stringResource(R.string.favorites_removed_one) else stringResource(R.string.favorites_removed_n, removed.toString()),
                 Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            TextButton(onClick = onUndo) { Text("تراجع") }
-            TextButton(onClick = onDismiss) { Text("إخفاء") }
+            TextButton(onClick = onUndo) { Text(stringResource(R.string.action_undo)) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_hide)) }
         }
     }
 }
@@ -285,7 +311,7 @@ private fun FavoriteCard(
             }
             if (!selecting) {
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "حذف من المفضلة", tint = MaterialTheme.colorScheme.error)
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.favorite_remove), tint = MaterialTheme.colorScheme.error)
                 }
             }
         }

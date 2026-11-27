@@ -46,6 +46,10 @@ import androidx.compose.runtime.setValue
 import com.dailydeeds.reminder.util.ArabicDigits
 import com.dailydeeds.reminder.model.RevelationType
 import com.dailydeeds.reminder.viewmodel.QuranViewModel
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.localNumber
+import com.dailydeeds.reminder.ui.labelRes
 
 @Composable
 fun QuranScreen(
@@ -71,12 +75,12 @@ fun QuranScreen(
             value = searchQuery,
             onValueChange = { viewModel.onSearchQueryChanged(it) },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("ابحث عن سورة بالاسم أو الرقم...", textAlign = TextAlign.Right) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث") },
+            placeholder = { Text(stringResource(R.string.quran_search_hint), textAlign = TextAlign.Start) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.action_search)) },
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
                     IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
-                        Icon(Icons.Default.Clear, contentDescription = "مسح")
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.action_clear))
                     }
                 }
             },
@@ -122,7 +126,7 @@ fun QuranScreen(
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = surah.revelationType.arabicName,
+                                    text = stringResource(surah.revelationType.labelRes),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -131,7 +135,7 @@ fun QuranScreen(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Text(
-                                text = "${surah.ayahCount} آية",
+                                text = stringResource(R.string.quran_ayah_count, surah.ayahCount.toString()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -146,7 +150,7 @@ fun QuranScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "${surah.nameEnglish} • جزء ${surah.juzStart}",
+                                    text = stringResource(R.string.quran_english_juz, surah.nameEnglish, surah.juzStart.toString()),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -200,13 +204,13 @@ private fun QuranModeBar(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        FilterChip(selected = pagesMode, onClick = { onPagesModeChange(true) }, label = { Text("صفحات المصحف") })
-        FilterChip(selected = !pagesMode, onClick = { onPagesModeChange(false) }, label = { Text("آيات متتالية") })
+        FilterChip(selected = pagesMode, onClick = { onPagesModeChange(true) }, label = { Text(stringResource(R.string.quran_mode_pages)) })
+        FilterChip(selected = !pagesMode, onClick = { onPagesModeChange(false) }, label = { Text(stringResource(R.string.quran_mode_list)) })
         if (pagesMode) {
             OutlinedButton(onClick = { onOpenPage(if (lastPage > 0) lastPage else 1) }) {
-                Text(if (lastPage > 0) "متابعة: صفحة ${ArabicDigits.format(lastPage)}" else "افتح المصحف")
+                Text(if (lastPage > 0) stringResource(R.string.quran_continue_page, localNumber(lastPage)) else stringResource(R.string.quran_open_mushaf))
             }
-            OutlinedButton(onClick = onGoTo) { Text("صفحة أو جزء") }
+            OutlinedButton(onClick = onGoTo) { Text(stringResource(R.string.quran_page_or_juz)) }
         }
     }
 }

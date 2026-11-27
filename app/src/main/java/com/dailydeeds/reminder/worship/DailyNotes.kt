@@ -7,6 +7,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import com.dailydeeds.reminder.calendar.CalendarNames
 
 data class DailyNote(val id: Int, val title: String, val body: String)
 
@@ -34,7 +35,8 @@ object DailyNotes {
         place: Place,
         dayOffset: Int,
         config: DailyNotesConfig,
-        eclipses: List<Eclipse> = Eclipses.all
+        eclipses: List<Eclipse> = Eclipses.all,
+        words: NoteWords = ArabicNoteWords
     ): List<DailyNote> {
         val today = now.toLocalDate()
         val notes = ArrayList<DailyNote>()
@@ -43,8 +45,8 @@ object DailyNotes {
             val occasions = ShiaCalendar.occasionsOn(today, dayOffset)
             if (occasions.isNotEmpty()) {
                 notes += DailyNote(
-                    ID_OCCASION, "مناسبة اليوم: ${ShiaCalendar.toHijri(today, dayOffset)}",
-                    occasions.joinToString("\n") { it.displayTitle }
+                    ID_OCCASION, words.occasionTitle(CalendarNames.date(ShiaCalendar.toHijri(today, dayOffset), words.language)),
+                    occasions.joinToString("\n") { CalendarNames.occasionDisplay(it, words.language) }
                 )
             }
         }
@@ -53,9 +55,9 @@ object DailyNotes {
             val next = Khums.nextAnniversary(today, year, dayOffset)
             val daysAway = next?.let { ChronoUnit.DAYS.between(today, it).toInt() }
             if (daysAway == 0) {
-                notes += DailyNote(ID_KHUMS, "رأس السنة الخمسية", "اليوم موعد حساب الخمس. افتح حاسبة الخمس لتقدير ما عليك.")
+                notes += DailyNote(ID_KHUMS, words.khumsTodayTitle, words.khumsTodayBody)
             } else if (daysAway == 7) {
-                notes += DailyNote(ID_KHUMS, "اقتراب رأس السنة الخمسية", "بقي أسبوع على موعد حساب الخمس.")
+                notes += DailyNote(ID_KHUMS, words.khumsWeekTitle, words.khumsWeekBody)
             }
         }
 
@@ -68,9 +70,7 @@ object DailyNotes {
             }?.let { e ->
                 val local = e.greatest.atZone(place.zone)
                 notes += DailyNote(
-                    ID_ECLIPSE, "خسوف القمر ${e.type.labelArabic}",
-                    "ذروة الخسوف عند ${local.format(CLOCK)} بتوقيت ${place.name}. " +
-                        "تجب صلاة الآيات على من يرى الخسوف في بلده."
+                    ID_ECLIPSE, words.eclipseTitle(e.type), words.eclipseBody(local.format(CLOCK), CalendarNames.place(place, words.language))
                 )
             }
         }

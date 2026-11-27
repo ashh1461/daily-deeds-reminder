@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 internal fun canScheduleExactAlarms(context: Context): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
@@ -68,20 +70,20 @@ fun PermissionHealthCard(modifier: Modifier = Modifier) {
         )
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("تنبيهات الأذان والأعمال تحتاج إلى أذونات", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.perm_title), fontWeight = FontWeight.Bold)
             if (!notificationsOk) {
-                Text("الإشعارات متوقفة لهذا التطبيق، فلن تصلك أي تنبيهات.", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.perm_notifications_off), style = MaterialTheme.typography.bodyMedium)
                 Button(onClick = {
                     context.startActivity(
                         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
-                }) { Text("فتح إعدادات الإشعارات") }
+                }) { Text(stringResource(R.string.perm_open_notification_settings)) }
             }
             if (!exactOk && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Text(
-                    "لم يُسمح بالمنبّهات الدقيقة، فقد تتأخر التنبيهات عن موعدها بدقائق، وقد لا يُشغَّل صوت الأذان فيصلك إشعار عادي بدلًا منه. اسمح بـ «المنبّهات والتذكيرات» لهذا التطبيق.",
+                    stringResource(R.string.perm_exact_alarms_off),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Button(onClick = {
@@ -89,7 +91,7 @@ fun PermissionHealthCard(modifier: Modifier = Modifier) {
                         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
-                }) { Text("السماح بالمنبّهات الدقيقة") }
+                }) { Text(stringResource(R.string.perm_allow_exact_alarms)) }
             }
         }
     }

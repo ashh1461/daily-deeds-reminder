@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailydeeds.reminder.model.DeedType
 import com.dailydeeds.reminder.model.Deed
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 @Composable
 internal fun CounterStageRow(
@@ -57,7 +59,7 @@ internal fun CounterStageRow(
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
-                    text = "مراحل التسبيح المبارك (١٠٠ تسبيحة):",
+                    text = stringResource(R.string.counter_tasbih_stages),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
@@ -171,7 +173,7 @@ internal fun CounterOrb(
                 color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary)
             )
             Text(
-                text = "من ${deed.targetCount}",
+                text = stringResource(R.string.counter_of_target, deed.targetCount.toString()),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -180,7 +182,7 @@ internal fun CounterOrb(
             )
             if (!isCompleted) {
                 Text(
-                    text = "بقي: ${deed.targetCount - currentCount}",
+                    text = stringResource(R.string.counter_remaining, (deed.targetCount - currentCount).toString()),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontSize = 12.sp,
                         color = (if (isCompleted) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onPrimary).copy(alpha = 0.75f)

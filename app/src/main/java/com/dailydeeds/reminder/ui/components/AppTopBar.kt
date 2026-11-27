@@ -13,6 +13,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /** Shared top bar of the five tabs: the title plus Search, Favorites and Settings. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,9 +28,9 @@ fun AppTopBar(
     TopAppBar(
         title = { Text(title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge) },
         actions = {
-            IconButton(onClick = onSearch) { Icon(Icons.Default.Search, contentDescription = "بحث") }
-            IconButton(onClick = onFavorites) { Icon(Icons.Default.Star, contentDescription = "المفضلة") }
-            IconButton(onClick = onSettings) { Icon(Icons.Default.Settings, contentDescription = "الإعدادات") }
+            IconButton(onClick = onSearch) { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.action_search)) }
+            IconButton(onClick = onFavorites) { Icon(Icons.Default.Star, contentDescription = stringResource(R.string.action_favorites)) }
+            IconButton(onClick = onSettings) { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings_title)) }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
     )

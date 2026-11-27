@@ -38,10 +38,12 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.Locale
-
-private val GREGORIAN_MONTHS = listOf(
-    "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-)
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.gregorianMonthName
+import com.dailydeeds.reminder.ui.daysAwayText
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private fun money(value: BigDecimal): String =
     NumberFormat.getInstance(Locale.ENGLISH).apply { minimumFractionDigits = 2; maximumFractionDigits = 2 }.format(value)
@@ -68,80 +70,82 @@ fun KhumsScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack
         Khums.calculate(KhumsInput(parsed[0]!!, parsed[1]!!, parsed[2]!!, parsed[3]!!))
     } else null
 
-    ToolScaffold("حاسبة الخمس", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.khums_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             WorshipCard {
-                WorshipHeading("حساب فاضل السنة")
-                AmountField("إجمالي الأرباح والمكاسب خلال السنة", gains) { gains = it; saveDraft() }
-                AmountField("مصاريف المعيشة (المؤونة) خلال السنة", expenses) { expenses = it; saveDraft() }
-                AmountField("ديون وما يُستثنى منها", deductions) { deductions = it; saveDraft() }
-                AmountField("خمس دفعتَه سابقاً عن هذه السنة", paid) { paid = it; saveDraft() }
+                WorshipHeading(stringResource(R.string.khums_heading_surplus))
+                AmountField(stringResource(R.string.khums_gains), gains) { gains = it; saveDraft() }
+                AmountField(stringResource(R.string.khums_expenses), expenses) { expenses = it; saveDraft() }
+                AmountField(stringResource(R.string.khums_deductions), deductions) { deductions = it; saveDraft() }
+                AmountField(stringResource(R.string.khums_paid), paid) { paid = it; saveDraft() }
                 if (listOf(gains, expenses, deductions, paid).any { it.isNotBlank() }) {
                     TextButton(onClick = { gains = ""; expenses = ""; deductions = ""; paid = ""; saveDraft() }) {
-                        Text("مسح الأرقام")
+                        Text(stringResource(R.string.khums_clear))
                     }
                 }
                 if (result == null) {
-                    Text("أدخل أرقاماً صحيحة فقط.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.khums_invalid), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 } else {
-                    Text("الفاضل بعد المؤونة: ${money(result.surplus)}", style = MaterialTheme.typography.bodyLarge)
-                    Text("الخمس (20%): ${money(result.khums)}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("المتبقي عليك: ${money(result.remaining)}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                    WorshipNote("يُقسَّم نصفين: سهم الإمام (عج) ${money(result.shareOfImam)} وسهم السادة ${money(result.shareOfSadat)}.")
+                    Text(stringResource(R.string.khums_surplus, money(result.surplus)), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.khums_amount, money(result.khums)), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.khums_remaining, money(result.remaining)), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    WorshipNote(stringResource(R.string.khums_split, money(result.shareOfImam), money(result.shareOfSadat)))
                 }
             }
 
             WorshipCard {
-                WorshipHeading("رأس سنتك الخمسية")
+                WorshipHeading(stringResource(R.string.khums_heading_year))
                 val current = year
                 if (current == null) {
-                    WorshipNote("حدّد التاريخ الهجري الذي تبدأ به سنتك الخمسية (تاريخ أول ربح تحصّله) لتصلك تذكرة.")
+                    WorshipNote(stringResource(R.string.khums_year_hint))
                 } else {
                     val next = Khums.nextAnniversary(today, current, offset)
-                    Text("${current.day} ${ShiaCalendar.MONTH_NAMES[current.month - 1]}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("${current.day} ${CalendarNames.month(current.month, appLanguage())}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     if (next != null) {
                         val days = ChronoUnit.DAYS.between(today, next)
                         Text(
-                            "الموعد القادم: ${next.dayOfMonth} ${GREGORIAN_MONTHS[next.monthValue - 1]} ${next.year} " +
-                                if (days == 0L) "(اليوم)" else "(بعد $days يوماً)",
+                            stringResource(
+                                R.string.khums_next,
+                                "${next.dayOfMonth} ${gregorianMonthName(next.monthValue)} ${next.year}", daysAwayText(days)
+                            ),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                    SwitchLine("ذكّرني قبل أسبوع وفي اليوم نفسه", reminder) { worship.setKhumsReminder(it) }
+                    SwitchLine(stringResource(R.string.khums_remind), reminder) { worship.setKhumsReminder(it) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(onClick = {
                         val h = ShiaCalendar.toHijri(today, offset)
                         worship.setKhumsYear(KhumsYear(h.month, h.day))
-                    }, modifier = Modifier.weight(1f)) { Text("اجعل اليوم رأس السنة") }
-                    if (current != null) TextButton(onClick = { worship.setKhumsYear(null); worship.setKhumsReminder(false) }) { Text("إزالة") }
+                    }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.khums_set_today)) }
+                    if (current != null) TextButton(onClick = { worship.setKhumsYear(null); worship.setKhumsReminder(false) }) { Text(stringResource(R.string.common_remove)) }
                 }
                 if (current != null) {
-                    WorshipNote("شهر رأس السنة")
-                    ChoiceRow((1..12).toList(), current.month, { ShiaCalendar.MONTH_NAMES[it - 1] }) {
+                    WorshipNote(stringResource(R.string.khums_year_month))
+                    val language = appLanguage()
+                    ChoiceRow((1..12).toList(), current.month, { CalendarNames.month(it, language) }) {
                         worship.setKhumsYear(KhumsYear(it, current.day))
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedButton(onClick = { if (current.day > 1) worship.setKhumsYear(KhumsYear(current.month, current.day - 1)) }) { Text("−") }
-                        Text("اليوم ${current.day}", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.khums_day, current.day.toString()), style = MaterialTheme.typography.titleMedium)
                         OutlinedButton(onClick = { if (current.day < 30) worship.setKhumsYear(KhumsYear(current.month, current.day + 1)) }) { Text("+") }
                     }
                 }
             }
 
             WorshipCard {
-                WorshipHeading("معلومات")
+                WorshipHeading(stringResource(R.string.khums_heading_info))
                 listOf(
-                    "الخمس عشرون بالمئة مما يفضل عن مؤونة السنة من أرباح الكسب والتجارة وغيرها.",
-                    "تبدأ السنة من أول ربح تحصّله، ويجوز اعتماد تاريخ ثابت كل عام يُسمّى رأس السنة الخمسية.",
-                    "يُقسَّم الخمس نصفين: سهم الإمام (عج) وسهم السادة، ويُدفع إلى المرجع أو وكيله المأذون."
+                    stringResource(R.string.khums_info_1),
+                    stringResource(R.string.khums_info_2),
+                    stringResource(R.string.khums_info_3)
                 ).forEach { Text("• $it", style = MaterialTheme.typography.bodyMedium) }
                 WorshipNote(
-                    "هذه الأداة تقديرية لحساب الفاضل بالقاعدة العامة وليست فتوى. ما يُعدّ من المؤونة وكيفية احتساب الديون " +
-                        "والأموال المستثمرة تختلف بين المراجع؛ فراجع مكتب مرجعك أو وكيله قبل الدفع. لا يُدفع أي مال عبر التطبيق."
+                    stringResource(R.string.khums_disclaimer)
                 )
             }
         }

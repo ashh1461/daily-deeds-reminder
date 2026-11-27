@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.annotation.StringRes
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.LocaleSupport
 
 sealed interface RemoteVoicesState {
     data object Idle : RemoteVoicesState
@@ -42,12 +45,15 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
         _message.value = null
     }
 
+    private fun text(@StringRes id: Int, vararg args: Any): String =
+        LocaleSupport.localized(getApplication()).getString(id, *args)
+
     fun refreshCatalogue() {
         _remote.value = RemoteVoicesState.Loading
         viewModelScope.launch {
             _remote.value = downloader.fetchManifest().fold(
                 onSuccess = { RemoteVoicesState.Loaded(it.voices, it.rejected.size) },
-                onFailure = { RemoteVoicesState.Failed("تعذّر تحميل قائمة الأصوات. تحقق من الاتصال بالإنترنت.") }
+                onFailure = { RemoteVoicesState.Failed(text(R.string.voices_catalogue_failed)) }
             )
         }
     }
@@ -60,8 +66,8 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
             _progress.value = _progress.value - voice.id
             _installed.value = store.installed()
             _message.value = result.fold(
-                onSuccess = { "تم تنزيل «${voice.nameAr}»" },
-                onFailure = { "تعذّر تنزيل «${voice.nameAr}»: ${it.message ?: "خطأ غير معروف"}" }
+                onSuccess = { text(R.string.voices_downloaded, voice.nameAr) },
+                onFailure = { text(R.string.voices_download_failed, voice.nameAr, it.message ?: text(R.string.common_unknown_error)) }
             )
         }
     }
@@ -76,8 +82,8 @@ class VoiceViewModel(app: Application) : AndroidViewModel(app) {
             val result = withContext(Dispatchers.IO) { runCatching { store.importOwn(uri) } }
             _installed.value = store.installed()
             _message.value = result.fold(
-                onSuccess = { "تمت إضافة «${it.nameAr}»" },
-                onFailure = { "تعذّر استيراد الملف: ${it.message ?: "خطأ غير معروف"}" }
+                onSuccess = { text(R.string.voices_added, it.nameAr) },
+                onFailure = { text(R.string.voices_import_failed, it.message ?: text(R.string.common_unknown_error)) }
             )
         }
     }

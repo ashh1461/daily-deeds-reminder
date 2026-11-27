@@ -15,8 +15,8 @@ android {
         applicationId = "io.github.ashh1461.wird"
         minSdk = 26
         targetSdk = 36
-        versionCode = 23
-        versionName = "1.8.5"
+        versionCode = 24
+        versionName = "1.9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -69,6 +69,13 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    // The UI language is chosen inside the app (LocaleSupport), not from the device language, so an App Bundle must
+    // keep every language's resources in every install instead of splitting them by device locale.
+    bundle {
+        language {
+            enableSplit = false
         }
     }
     // The bundled adhan is played straight from the APK with AssetManager.openFd, which needs an uncompressed entry.

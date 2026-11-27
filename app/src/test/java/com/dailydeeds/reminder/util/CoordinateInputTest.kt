@@ -46,9 +46,12 @@ class CoordinateInputTest {
         assertEquals(CoordinateInput.Result.Empty, CoordinateInput.latitude("  "))
         assertEquals(CoordinateInput.Result.Valid(33.27), CoordinateInput.latitude("٣٣٫٢٧"))
         val outOfRange = CoordinateInput.latitude("95")
-        assertTrue(outOfRange is CoordinateInput.Result.Invalid)
-        assertTrue((outOfRange as CoordinateInput.Result.Invalid).messageArabic.contains("90"))
-        assertTrue(CoordinateInput.longitude("abc") is CoordinateInput.Result.Invalid)
+        assertEquals(CoordinateInput.Result.Invalid(CoordinateInput.Axis.LATITUDE, CoordinateInput.Reason.OUT_OF_RANGE), outOfRange)
+        assertEquals(90.0, CoordinateInput.Axis.LATITUDE.limit, 0.0)
+        assertEquals(
+            CoordinateInput.Result.Invalid(CoordinateInput.Axis.LONGITUDE, CoordinateInput.Reason.NOT_A_NUMBER),
+            CoordinateInput.longitude("abc")
+        )
         assertEquals(CoordinateInput.Result.Valid(-180.0), CoordinateInput.longitude("-180"))
         assertTrue(CoordinateInput.longitude("180.01") is CoordinateInput.Result.Invalid)
     }

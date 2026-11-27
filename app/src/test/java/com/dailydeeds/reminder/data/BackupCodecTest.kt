@@ -73,13 +73,13 @@ class BackupCodecTest {
 
     @Test
     fun rejectsFilesThatAreNotBackups() {
-        error("not json")
-        error("{}")
+        assertEquals(BackupCodec.Reason.NOT_A_BACKUP, error("not json").reason)
+        assertEquals(BackupCodec.Reason.OTHER_APP, error("{}").reason)
         error("""{"app":"other","version":1,"prefs":{"pref_favorites":{"t":"s","v":"x"}}}""")
         error("""{"app":"daily-deeds-backup","version":2,"prefs":{"pref_favorites":{"t":"s","v":"x"}}}""")
         error("""{"app":"daily-deeds-backup","version":1}""")
         error("""{"app":"daily-deeds-backup","version":1,"prefs":{}}""")
-        error("x".repeat(BackupCodec.MAX_BYTES + 1))
+        assertEquals(BackupCodec.Reason.TOO_LARGE, error("x".repeat(BackupCodec.MAX_BYTES + 1)).reason)
     }
 
     @Test

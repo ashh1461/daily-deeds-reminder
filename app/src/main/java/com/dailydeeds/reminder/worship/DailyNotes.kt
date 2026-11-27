@@ -7,6 +7,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import com.dailydeeds.reminder.calendar.CalendarNames
 
 data class DailyNote(val id: Int, val title: String, val body: String)
 
@@ -44,8 +45,8 @@ object DailyNotes {
             val occasions = ShiaCalendar.occasionsOn(today, dayOffset)
             if (occasions.isNotEmpty()) {
                 notes += DailyNote(
-                    ID_OCCASION, words.occasionTitle(ShiaCalendar.toHijri(today, dayOffset).toString()),
-                    occasions.joinToString("\n") { it.displayTitle }
+                    ID_OCCASION, words.occasionTitle(CalendarNames.date(ShiaCalendar.toHijri(today, dayOffset), words.language)),
+                    occasions.joinToString("\n") { CalendarNames.occasionDisplay(it, words.language) }
                 )
             }
         }
@@ -69,7 +70,7 @@ object DailyNotes {
             }?.let { e ->
                 val local = e.greatest.atZone(place.zone)
                 notes += DailyNote(
-                    ID_ECLIPSE, words.eclipseTitle(e.type), words.eclipseBody(local.format(CLOCK), place.name)
+                    ID_ECLIPSE, words.eclipseTitle(e.type), words.eclipseBody(local.format(CLOCK), CalendarNames.place(place, words.language))
                 )
             }
         }

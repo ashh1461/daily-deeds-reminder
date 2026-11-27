@@ -37,6 +37,8 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 /**
  * Heading of the screen's top edge, degrees clockwise from true north, or null without a compass. The sensor reports
@@ -106,7 +108,7 @@ fun QiblaScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
-            Text(stringResource(R.string.qibla_from, place.name), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.qibla_from, CalendarNames.place(place, appLanguage())), style = MaterialTheme.typography.titleMedium)
             Icon(
                 Icons.Default.Navigation,
                 contentDescription = stringResource(R.string.qibla_arrow),

@@ -23,7 +23,9 @@ object PlaceSearch {
         val latinKey: String = latin(name)
         val arabicKey: String = if (arabic.isEmpty()) "" else arabicKey(arabic)
 
-        fun toPlace(): Place = Place("${arabic.ifEmpty { name }} • $country", lat, lon, zone)
+        /** [latin]: the city's English name, for the English UI; otherwise its Arabic name when it has one. */
+        fun toPlace(latin: Boolean = false): Place =
+            Place("${if (latin) name else arabic.ifEmpty { name }} • $country", lat, lon, zone)
     }
 
     private val cities: List<City> by lazy { load() }
@@ -35,7 +37,7 @@ object PlaceSearch {
 
     val size: Int get() = cities.size
 
-    fun search(query: String, limit: Int = 30): List<Place> {
+    fun search(query: String, limit: Int = 30, latinNames: Boolean = false): List<Place> {
         val q = query.trim().take(60)
         if (q.length < 2) return emptyList()
         val isArabic = q.any { it in '؀'..'ۿ' }
@@ -53,14 +55,14 @@ object PlaceSearch {
             }
             if (starts.size >= limit) break
         }
-        return (starts + contains).take(limit).map { it.toPlace() }
+        return (starts + contains).take(limit).map { it.toPlace(latinNames) }
     }
 
     /** A bundled city near some coordinates: its display name, time zone and distance. */
     data class Nearest(val name: String, val zoneId: String, val km: Double)
 
     /** The bundled city closest to the coordinates, or null when none lies within [maxKm] (open sea, remote areas). */
-    fun nearest(latitude: Double, longitude: Double, maxKm: Double = NEAREST_MAX_KM): Nearest? {
+    fun nearest(latitude: Double, longitude: Double, maxKm: Double = NEAREST_MAX_KM, latinNames: Boolean = false): Nearest? {
         var best: City? = null
         var bestKm = Double.MAX_VALUE
         for (c in cities) {
@@ -72,7 +74,7 @@ object PlaceSearch {
         }
         val city = best ?: return null
         if (bestKm > maxKm) return null
-        return Nearest(city.arabic.ifEmpty { city.name }, city.zone, bestKm)
+        return Nearest(if (latinNames) city.name else city.arabic.ifEmpty { city.name }, city.zone, bestKm)
     }
 
     /**
@@ -80,9 +82,16 @@ object PlaceSearch {
      * so coordinates in another country get that country's clock, and it is labelled «[label] (قرب …)». With no
      * city nearby it keeps [fallbackZone].
      */
-    fun placeAt(latitude: Double, longitude: Double, label: String, fallbackZone: String): Place {
-        val near = nearest(latitude, longitude) ?: return Place(label, latitude, longitude, fallbackZone)
-        return Place("$label (قرب ${near.name})", latitude, longitude, near.zoneId)
+    fun placeAt(
+        latitude: Double,
+        longitude: Double,
+        label: String,
+        fallbackZone: String,
+        nearLabel: (String) -> String = { "قرب $it" },
+        latinNames: Boolean = false
+    ): Place {
+        val near = nearest(latitude, longitude, latinNames = latinNames) ?: return Place(label, latitude, longitude, fallbackZone)
+        return Place("$label (${nearLabel(near.name)})", latitude, longitude, near.zoneId)
     }
 
     /** Great-circle distance in kilometres (haversine). */

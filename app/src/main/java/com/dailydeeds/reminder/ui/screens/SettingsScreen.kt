@@ -48,6 +48,8 @@ import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import java.time.LocalDate
 import java.util.Locale
 import com.dailydeeds.reminder.notification.ReminderWording
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 /** All settings in one grouped screen: language, prayer, calendar, deed reminders, appearance and credits. */
 @Composable
@@ -82,7 +84,7 @@ fun SettingsScreen(
 
             SectionTitle(R.string.settings_section_prayer)
             SettingsCard {
-                Text(stringResource(R.string.settings_current_city, place.name), style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.settings_current_city, CalendarNames.place(place, appLanguage())), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = { onOpenRoute("prayer") }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.settings_prayer_times))
                 }

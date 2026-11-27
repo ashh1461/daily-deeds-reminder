@@ -18,6 +18,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.time.ZoneId
 import kotlin.coroutines.resume
 import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.AppLanguage
+import com.dailydeeds.reminder.util.LocaleSupport
 
 /** What «موقعي» found. */
 internal sealed interface LocationOutcome {
@@ -49,7 +51,7 @@ internal suspend fun locateDevice(context: Context): LocationOutcome {
     // The place is stored and exported in backups, so keep only ~1 km precision; prayer times move by seconds.
     val lat = roundCoordinate(loc.latitude)
     val lon = roundCoordinate(loc.longitude)
-    val near = withContext(Dispatchers.Default) { PlaceSearch.nearest(lat, lon) }
+    val near = withContext(Dispatchers.Default) { PlaceSearch.nearest(lat, lon, latinNames = LocaleSupport.current(context) == AppLanguage.ENGLISH) }
     val name = near?.let { context.getString(R.string.place_my_location_near, it.name) }
         ?: context.getString(R.string.place_my_location_name)
     return LocationOutcome.Found(Place(name, lat, lon, ZoneId.systemDefault().id))

@@ -37,6 +37,8 @@ import com.dailydeeds.reminder.model.PlacePresets
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 /**
  * The place used for prayer times, with every way to change it: suggested cities, offline search, the phone's
@@ -83,7 +85,7 @@ fun PlacePickerCard(
 
     Card(modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.place_current, place.name), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.place_current, CalendarNames.place(place, appLanguage())), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             extra()
             // FlowRow wraps the buttons onto a second line at large font sizes instead of clipping them.
             FlowRow(
@@ -94,7 +96,7 @@ fun PlacePickerCard(
                     OutlinedButton(onClick = { menuOpen = true }) { Text(stringResource(R.string.place_suggested)) }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         PlacePresets.all.forEach { p ->
-                            DropdownMenuItem(text = { Text(p.name) }, onClick = {
+                            DropdownMenuItem(text = { Text(CalendarNames.place(p, appLanguage())) }, onClick = {
                                 onPick(p)
                                 menuOpen = false
                             })

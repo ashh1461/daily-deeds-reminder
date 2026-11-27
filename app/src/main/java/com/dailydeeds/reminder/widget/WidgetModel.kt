@@ -8,6 +8,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import com.dailydeeds.reminder.util.Prayer
+import com.dailydeeds.reminder.calendar.HijriDay
+import com.dailydeeds.reminder.calendar.Occasion
 
 /** Text shown on the home-screen widget. */
 data class WidgetModel(
@@ -19,7 +21,11 @@ data class WidgetModel(
     val validUntil: ZonedDateTime?,
     val occasion: String?,
     /** The next prayer itself, so the widget can name it in the app language. */
-    val prayer: Prayer? = null
+    val prayer: Prayer? = null,
+    /** The data behind the texts above, so the widget can name them in the app language. */
+    val hijriDay: HijriDay? = null,
+    val occasionItem: Occasion? = null,
+    val placeItem: Place? = null
 ) {
     companion object {
         private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
@@ -35,7 +41,10 @@ data class WidgetModel(
                 nextTime = next?.time?.format(CLOCK) ?: "--:--",
                 validUntil = next?.time,
                 occasion = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull()?.displayTitle,
-                prayer = next?.prayer
+                prayer = next?.prayer,
+                hijriDay = ShiaCalendar.toHijri(today, dayOffset),
+                occasionItem = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull(),
+                placeItem = place
             )
         }
     }

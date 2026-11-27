@@ -36,6 +36,8 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private class LunarMonthsData(val sections: List<LunarMonthDeeds.Section>, val general: LunarMonthDeeds.Section)
 
@@ -61,7 +63,9 @@ fun LunarMonthsScreen(tools: ToolsViewModel, onNavigateBack: () -> Unit, onOpenI
         if (loaded == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
-            MonthsList(loaded, hijri.month, hijri.monthName, hijri.toString(), onOpenItem)
+            MonthsList(
+                loaded, hijri.month, CalendarNames.month(hijri.month, appLanguage()), CalendarNames.date(hijri, appLanguage()), onOpenItem
+            )
         }
     }
 }

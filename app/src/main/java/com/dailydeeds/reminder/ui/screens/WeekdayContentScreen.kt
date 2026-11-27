@@ -66,6 +66,8 @@ import java.time.LocalDate
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.theme.RtlContent
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 /**
  * شاشة الأدعية أو الزيارات الأسبوعية: شريط أيام الأسبوع (مع تمييز اليوم الحالي)
@@ -257,7 +259,7 @@ private fun DaySelectorRow(
                 label = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = WeekdayRepository.dayNameArabic(day),
+                            text = CalendarNames.weekday(day, appLanguage()),
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )

@@ -51,6 +51,8 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.appLocale
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
 private fun LocalTime?.clock() = this?.format(CLOCK) ?: "--:--"
@@ -73,8 +75,9 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
     val rows = remember(year, month, place, calc, offset) {
         runCatching { Timetable.month(year, month, place, calc, offset) }.getOrDefault(emptyList())
     }
-    val monthTitle = stringResource(R.string.hijri_month_year, ShiaCalendar.MONTH_NAMES[month - 1], year.toString())
+    val monthTitle = stringResource(R.string.hijri_month_year, CalendarNames.month(month, appLanguage()), year.toString())
 
+    val placeLabel = CalendarNames.place(place, appLanguage())
     val pdfLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         if (uri != null) {
             scope.launch {
@@ -84,7 +87,7 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
                         out.use {
                             TimetablePdf.write(
                                 context, rows, context.getString(R.string.ramadan_pdf_title, monthTitle),
-                                context.getString(R.string.ramadan_pdf_subtitle, place.name), it
+                                context.getString(R.string.ramadan_pdf_subtitle, placeLabel), it
                             )
                         }
                         context.getString(R.string.ramadan_pdf_saved)
@@ -115,7 +118,7 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
                     }
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(monthTitle, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(place.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(placeLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     OutlinedButton(onClick = { move(1) }) {
                         val nextLabel = stringResource(R.string.month_next)

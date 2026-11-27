@@ -17,6 +17,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import com.dailydeeds.reminder.util.LocaleSupport
 import com.dailydeeds.reminder.adhan.AlarmWords
+import com.dailydeeds.reminder.calendar.CalendarNames
 
 /** Draws the home-screen widget and keeps one inexact alarm pending so it moves on at each prayer. */
 object WidgetUpdater {
@@ -41,14 +42,15 @@ object WidgetUpdater {
         val model = WidgetModel.build(ZonedDateTime.now(), prefs.getPlace(), calc, prefs.getHijriOffset())
 
         val views = RemoteViews(app.packageName, R.layout.widget_prayer)
-        views.setTextViewText(R.id.widget_place, model.placeName)
-        views.setTextViewText(R.id.widget_hijri, model.hijriDate)
+        val language = LocaleSupport.current(app)
+        views.setTextViewText(R.id.widget_place, model.placeItem?.let { CalendarNames.place(it, language) } ?: model.placeName)
+        views.setTextViewText(R.id.widget_hijri, model.hijriDay?.let { CalendarNames.date(it, language) } ?: model.hijriDate)
         val words = AlarmWords.of(LocaleSupport.current(app))
         val nextName = model.prayer?.let(words::prayerName) ?: model.nextPrayer
         views.setTextViewText(R.id.widget_next_name, LocaleSupport.localized(app).getString(R.string.widget_next_prayer, nextName))
         views.setTextViewText(R.id.widget_next_time, model.nextTime)
         if (model.occasion != null) {
-            views.setTextViewText(R.id.widget_occasion, model.occasion)
+            views.setTextViewText(R.id.widget_occasion, model.occasionItem?.let { CalendarNames.occasionDisplay(it, language) } ?: model.occasion)
             views.setViewVisibility(R.id.widget_occasion, View.VISIBLE)
         } else {
             views.setViewVisibility(R.id.widget_occasion, View.GONE)

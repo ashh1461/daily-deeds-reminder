@@ -480,4 +480,5 @@
     <string name="reminder_thursday_title">Thursday morning readings</string>
     <string name="reminder_thursday_message">When going out to seek a need: the end of Al Imran, Ayat al-Kursi, al-Qadr and al-Fatihah.</string>
     <string name="widget_next_prayer">Next prayer: %1$s</string>
+    <string name="place_near">near %1$s</string>
 </resources>

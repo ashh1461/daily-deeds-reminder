@@ -29,6 +29,8 @@ import java.time.LocalDate
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.daysAwayText
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 @Composable
 fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
@@ -51,7 +53,7 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(hijri.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text(CalendarNames.date(hijri, appLanguage()), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                         Text(stringResource(R.string.calendar_corresponds, today.toString()), style = MaterialTheme.typography.bodyMedium)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(stringResource(R.string.calendar_adjust), style = MaterialTheme.typography.bodySmall)
@@ -89,9 +91,9 @@ fun CalendarScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
             items(upcoming, key = { "${it.date}_${it.occasion.title}" }) { u ->
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(u.occasion.displayTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text(CalendarNames.occasionDisplay(u.occasion, appLanguage()), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                         Text(
-                            "${u.hijri} • ${u.date} • " + daysAwayText(u.daysAway.toLong()),
+                            "${CalendarNames.date(u.hijri, appLanguage())} • ${u.date} • " + daysAwayText(u.daysAway.toLong()),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

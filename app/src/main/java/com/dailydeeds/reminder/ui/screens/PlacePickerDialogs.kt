@@ -36,15 +36,18 @@ import java.time.ZoneId
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.coordinateErrorText
+import com.dailydeeds.reminder.ui.appLanguage
+import com.dailydeeds.reminder.util.AppLanguage
 
 /** Offline city search (Arabic or Latin names) over the bundled GeoNames list. */
 @Composable
 fun CitySearchDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<Place>>(emptyList()) }
+    val latinNames = appLanguage() == AppLanguage.ENGLISH
     LaunchedEffect(query) {
         delay(200)
-        results = withContext(Dispatchers.Default) { PlaceSearch.search(query) }
+        results = withContext(Dispatchers.Default) { PlaceSearch.search(query, latinNames = latinNames) }
     }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -94,6 +97,8 @@ fun CoordinatesDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
     val latValue = (latResult as? CoordinateInput.Result.Valid)?.degrees
     val lonValue = (lonResult as? CoordinateInput.Result.Valid)?.degrees
     val customName = stringResource(R.string.place_custom_coordinates)
+    val nearFormat = stringResource(R.string.place_near, "%s")
+    val latinNames = appLanguage() == AppLanguage.ENGLISH
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.place_coordinates_title)) },
@@ -112,7 +117,10 @@ fun CoordinatesDialog(onDismiss: () -> Unit, onPick: (Place) -> Unit) {
                     saving = true
                     scope.launch {
                         val place = withContext(Dispatchers.Default) {
-                            PlaceSearch.placeAt(latValue, lonValue, customName, ZoneId.systemDefault().id)
+                            PlaceSearch.placeAt(
+                                latValue, lonValue, customName, ZoneId.systemDefault().id,
+                                nearLabel = { nearFormat.format(it) }, latinNames = latinNames
+                            )
                         }
                         onPick(place)
                     }

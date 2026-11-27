@@ -17,6 +17,7 @@ interface NoteWords {
     fun eclipseBody(clock: String, place: String): String
     val fridayNight: String
     val eveBody: String
+    val language: AppLanguage
 
     companion object {
         fun of(language: AppLanguage): NoteWords = when (language) {
@@ -38,6 +39,7 @@ object ArabicNoteWords : NoteWords {
         "ذروة الخسوف عند $clock بتوقيت $place. تجب صلاة الآيات على من يرى الخسوف في بلده."
     override val fridayNight = "ليلة الجمعة"
     override val eveBody = "تبدأ الليلة المباركة بأذان المغرب هذا المساء."
+    override val language = AppLanguage.ARABIC
 }
 
 object EnglishNoteWords : NoteWords {
@@ -57,6 +59,7 @@ object EnglishNoteWords : NoteWords {
         "The eclipse peaks at $clock, $place time. Salat al-Ayat is obligatory for whoever sees the eclipse in their land."
     override val fridayNight = "Eve of Friday"
     override val eveBody = "The blessed night begins with the Maghrib adhan this evening."
+    override val language = AppLanguage.ENGLISH
 }
 
 /** Drafted for v1.9.0; to be checked by a native speaker. */
@@ -77,4 +80,5 @@ object PersianNoteWords : NoteWords {
         "اوج خسوف ساعت $clock به وقت $place است. نماز آیات بر کسی که خسوف را در شهر خود ببیند واجب است."
     override val fridayNight = "شب جمعه"
     override val eveBody = "شب مبارک با اذان مغرب امروز آغاز می‌شود."
+    override val language = AppLanguage.PERSIAN
 }

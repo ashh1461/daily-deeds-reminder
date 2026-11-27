@@ -33,6 +33,8 @@ import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.gregorianMonthName
 import com.dailydeeds.reminder.ui.labelRes
 import com.dailydeeds.reminder.ui.theme.RtlContent
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
 
@@ -96,7 +98,7 @@ fun AyatScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack:
                 WorshipCard {
                     SwitchLine(stringResource(R.string.ayat_reminder), reminder) { worship.setEclipseReminder(it) }
                     WorshipNote(
-                        stringResource(R.string.ayat_reminder_note, place.name)
+                        stringResource(R.string.ayat_reminder_note, CalendarNames.place(place, appLanguage()))
                     )
                 }
                 if (upcoming.isEmpty()) {
@@ -121,7 +123,7 @@ private fun EclipseCard(e: Eclipse, zone: ZoneId, place: com.dailydeeds.reminder
         Text(
             stringResource(
                 R.string.eclipse_when, "${local.dayOfMonth} ${gregorianMonthName(local.monthValue)} ${local.year}",
-                local.format(CLOCK), place.name
+                local.format(CLOCK), CalendarNames.place(place, appLanguage())
             ),
             style = MaterialTheme.typography.bodyMedium
         )

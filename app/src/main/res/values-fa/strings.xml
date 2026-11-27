@@ -481,4 +481,5 @@
     <string name="reminder_thursday_title">قرائت‌های صبح پنجشنبه</string>
     <string name="reminder_thursday_message">هنگام بیرون رفتن برای طلب حاجت: آخر سوره آل عمران، آیة الکرسی، سوره قدر و سوره حمد.</string>
     <string name="widget_next_prayer">نماز بعدی: %1$s</string>
+    <string name="place_near">نزدیک %1$s</string>
 </resources>

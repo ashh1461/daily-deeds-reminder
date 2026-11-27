@@ -42,6 +42,8 @@ import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
 import com.dailydeeds.reminder.ui.gregorianMonthName
 import com.dailydeeds.reminder.ui.daysAwayText
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private fun money(value: BigDecimal): String =
     NumberFormat.getInstance(Locale.ENGLISH).apply { minimumFractionDigits = 2; maximumFractionDigits = 2 }.format(value)
@@ -101,7 +103,7 @@ fun KhumsScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack
                     WorshipNote(stringResource(R.string.khums_year_hint))
                 } else {
                     val next = Khums.nextAnniversary(today, current, offset)
-                    Text("${current.day} ${ShiaCalendar.MONTH_NAMES[current.month - 1]}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("${current.day} ${CalendarNames.month(current.month, appLanguage())}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     if (next != null) {
                         val days = ChronoUnit.DAYS.between(today, next)
                         Text(
@@ -123,7 +125,8 @@ fun KhumsScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack
                 }
                 if (current != null) {
                     WorshipNote(stringResource(R.string.khums_year_month))
-                    ChoiceRow((1..12).toList(), current.month, { ShiaCalendar.MONTH_NAMES[it - 1] }) {
+                    val language = appLanguage()
+                    ChoiceRow((1..12).toList(), current.month, { CalendarNames.month(it, language) }) {
                         worship.setKhumsYear(KhumsYear(it, current.day))
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {

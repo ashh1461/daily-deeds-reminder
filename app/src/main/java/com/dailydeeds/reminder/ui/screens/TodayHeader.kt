@@ -47,6 +47,8 @@ import com.dailydeeds.reminder.ui.labelRes
 import com.dailydeeds.reminder.ui.countdownText
 import com.dailydeeds.reminder.ui.localNumber
 import com.dailydeeds.reminder.ui.surahDisplayName
+import com.dailydeeds.reminder.calendar.CalendarNames
+import com.dailydeeds.reminder.ui.appLanguage
 
 private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -72,7 +74,7 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center
             )
             Text(
-                hijri.toString(),
+                CalendarNames.date(hijri, appLanguage()),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -81,7 +83,7 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
             Text("$today", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             OrnamentDivider(Modifier.padding(vertical = 8.dp), color = GoldBright)
             occasions.firstOrNull()?.let {
-                Text(it.displayTitle, style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
+                Text(CalendarNames.occasionDisplay(it, appLanguage()), style = MaterialTheme.typography.titleSmall, color = GoldBright, textAlign = TextAlign.Center)
             }
             if (next != null) {
                 Text(

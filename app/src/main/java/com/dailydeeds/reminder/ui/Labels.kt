@@ -20,6 +20,7 @@ import com.dailydeeds.reminder.model.Surah
 import com.dailydeeds.reminder.model.RevelationType
 import com.dailydeeds.reminder.model.SearchResultType
 import com.dailydeeds.reminder.util.ArabicDigits
+import com.dailydeeds.reminder.util.AppLanguage
 
 /*
  * UI wording of model values in the app language (v1.9.0). The models stay free of Android resources so they keep
@@ -113,6 +114,10 @@ val Visibility.labelRes: Int
 /** The locale of the app language, for dates and weekday names. */
 @Composable
 fun appLocale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+
+/** The app language, as set on the activity's configuration (LocaleSupport). */
+@Composable
+fun appLanguage(): AppLanguage = AppLanguage.fromTag(appLocale().language) ?: AppLanguage.ARABIC
 
 /** A Gregorian month name (1-12) in the app language. */
 @Composable

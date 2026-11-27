@@ -494,4 +494,5 @@
     <string name="widget_next_prayer">الصلاة القادمة: %1$s</string>
     <string name="dhikr_night" translatable="false">اللهم يا مغير الأحوال غير حالي إلى أحسن حال</string>
     <string name="dhikr_bedtime" translatable="false">ولكم فيها جمال حين تريحون وحين تسرحون</string>
+    <string name="place_near">قرب %1$s</string>
 </resources>

@@ -113,6 +113,8 @@ import com.dailydeeds.reminder.viewmodel.SahifaViewModel
 import com.dailydeeds.reminder.viewmodel.SearchViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import com.dailydeeds.reminder.util.LocaleSupport
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 
 class MainActivity : ComponentActivity() {
 
@@ -202,15 +204,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class AppTab(val route: String, val label: String, val title: String, val icon: ImageVector)
+private data class AppTab(val route: String, @StringRes val label: Int, @StringRes val title: Int, val icon: ImageVector)
 
 /** The five bottom tabs. Search, Favorites and Settings live in the shared top bar. */
 private val appTabs = listOf(
-    AppTab("home", "اليوم", "اليوم", Icons.Default.Today),
-    AppTab("worship", "العبادات", "العبادات", Icons.Default.Mosque),
-    AppTab("quran", "القرآن", "القرآن الكريم", Icons.Default.AutoStories),
-    AppTab("mafatih", "المفاتيح", "مفاتيح الجنان", Icons.Default.MenuBook),
-    AppTab("sahifa", "الصحيفة", "الصحيفة السجادية", Icons.Default.Book)
+    AppTab("home", R.string.tab_today, R.string.tab_today, Icons.Default.Today),
+    AppTab("worship", R.string.tab_worship, R.string.tab_worship, Icons.Default.Mosque),
+    AppTab("quran", R.string.tab_quran, R.string.tab_quran_title, Icons.Default.AutoStories),
+    AppTab("mafatih", R.string.tab_mafatih, R.string.tab_mafatih_title, Icons.Default.MenuBook),
+    AppTab("sahifa", R.string.tab_sahifa, R.string.tab_sahifa_title, Icons.Default.Book)
 )
 
 @Composable
@@ -272,7 +274,7 @@ fun AppNavigation(
         topBar = {
             if (currentTab != null) {
                 AppTopBar(
-                    title = currentTab.title,
+                    title = stringResource(currentTab.title),
                     onSearch = { go("search") },
                     onFavorites = { go("favorites") },
                     onSettings = { go("settings") }
@@ -295,8 +297,8 @@ fun AppNavigation(
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label, fontWeight = FontWeight.SemiBold) },
+                            icon = { Icon(tab.icon, contentDescription = stringResource(tab.label)) },
+                            label = { Text(stringResource(tab.label), fontWeight = FontWeight.SemiBold) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -592,12 +594,12 @@ private fun AdhanPlayingBanner() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "يُشغَّل الأذان الآن",
+                stringResource(R.string.adhan_playing_now),
                 Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 fontWeight = FontWeight.SemiBold
             )
-            Button(onClick = { AdhanService.stop(context) }) { Text("إيقاف الأذان") }
+            Button(onClick = { AdhanService.stop(context) }) { Text(stringResource(R.string.adhan_stop)) }
         }
     }
 }

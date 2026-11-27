@@ -41,6 +41,8 @@ import com.dailydeeds.reminder.util.PrayerSchedule
 import com.dailydeeds.reminder.util.TimeFormat
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -143,8 +145,8 @@ fun TodayWeekdayTiles(onDua: () -> Unit, onZiyarah: () -> Unit, modifier: Modifi
     val ziyarah = remember(day) { WeekdayRepository.get(DayContentKind.ZIYARAT, day) }
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf(
-            Triple("دعاء اليوم", dua.title, onDua),
-            Triple("زيارة اليوم", ziyarah.title, onZiyarah)
+            Triple(stringResource(R.string.today_dua_of_day), dua.title, onDua),
+            Triple(stringResource(R.string.today_ziyarah_of_day), ziyarah.title, onZiyarah)
         ).forEach { (label, title, click) ->
             Card(
                 modifier = Modifier.weight(1f).clickable(onClick = click),
@@ -194,7 +196,7 @@ fun ResumeTiles(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("تابع من حيث توقفت", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.today_resume_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             if (surahName != null) {
                 // In pages mode the tile reopens (and names) the last mushaf page; in the list, the last ayah.
                 val label = remember(surahName, lastSurah, pagesMode, lastPage, lastAyah) {
@@ -205,12 +207,12 @@ fun ResumeTiles(
             }
             if (mafatihTitle != null) {
                 OutlinedButton(onClick = { onMafatih(lastMafatihId!!) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("المفاتيح: $mafatihTitle", maxLines = 1)
+                    Text(stringResource(R.string.today_resume_mafatih, mafatihTitle), maxLines = 1)
                 }
             }
             if (sahifaTitle != null) {
                 OutlinedButton(onClick = { onSahifa(lastSahifaId!!) }, modifier = Modifier.fillMaxWidth()) {
-                    Text("الصحيفة: $sahifaTitle", maxLines = 1)
+                    Text(stringResource(R.string.today_resume_sahifa, sahifaTitle), maxLines = 1)
                 }
             }
         }

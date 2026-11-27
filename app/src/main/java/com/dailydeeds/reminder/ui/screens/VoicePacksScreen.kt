@@ -30,6 +30,8 @@ import com.dailydeeds.reminder.ui.components.cardBorder
 import com.dailydeeds.reminder.viewmodel.RemoteVoicesState
 import com.dailydeeds.reminder.viewmodel.VoiceViewModel
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /** Installed adhan voices, the downloadable catalogue, and importing a file from the phone. */
 @Composable
@@ -44,7 +46,7 @@ fun VoicePacksScreen(voices: VoiceViewModel, onNavigateBack: () -> Unit) {
         if (uri != null) voices.importOwn(uri)
     }
 
-    ToolScaffold("أصوات الأذان", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.voices_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -53,48 +55,48 @@ fun VoicePacksScreen(voices: VoiceViewModel, onNavigateBack: () -> Unit) {
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
                     Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                        TextButton(onClick = voices::clearMessage) { Text("حسناً") }
+                        TextButton(onClick = voices::clearMessage) { Text(stringResource(R.string.common_ok)) }
                     }
                 }
             }
 
-            Title("ملف من جهازك")
+            Title(stringResource(R.string.voices_own_file))
             Box2 {
                 Text(
-                    "اختر ملف أذان تملك حق استخدامه (mp3 أو ogg أو m4a، حتى 25 ميغابايت). يُنسخ إلى مساحة التطبيق الخاصة.",
+                    stringResource(R.string.voices_pick_note),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Button(onClick = { picker.launch(arrayOf("audio/*")) }, modifier = Modifier.fillMaxWidth()) { Text("اختيار ملف صوتي") }
+                Button(onClick = { picker.launch(arrayOf("audio/*")) }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.voices_pick_file)) }
             }
 
-            Title("المثبّتة")
+            Title(stringResource(R.string.voices_installed))
             if (installed.isEmpty()) {
-                Text("لا توجد أصوات منزّلة أو مستوردة بعد. يُستخدم الأذان المضمَّن في التطبيق.", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.voices_none_installed), style = MaterialTheme.typography.bodyMedium)
             }
             installed.forEach { v ->
                 Box2 {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(v.nameAr, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                            Text(if (v.own) "ملف من جهازك" else "حزمة صوت منزّلة", style = MaterialTheme.typography.bodySmall,
+                            Text(stringResource(if (v.own) R.string.voices_own_file else R.string.voices_downloaded_pack), style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        OutlinedButton(onClick = { voices.remove(v.id) }) { Text("حذف") }
+                        OutlinedButton(onClick = { voices.remove(v.id) }) { Text(stringResource(R.string.common_delete)) }
                     }
                 }
             }
 
-            Title("أصوات للتنزيل")
+            Title(stringResource(R.string.voices_available))
             when (val state = remote) {
                 RemoteVoicesState.Idle, RemoteVoicesState.Loading -> LinearProgressIndicator(Modifier.fillMaxWidth())
                 is RemoteVoicesState.Failed -> Box2 {
                     Text(state.reason, style = MaterialTheme.typography.bodyMedium)
-                    OutlinedButton(onClick = voices::refreshCatalogue) { Text("إعادة المحاولة") }
+                    OutlinedButton(onClick = voices::refreshCatalogue) { Text(stringResource(R.string.common_retry)) }
                 }
                 is RemoteVoicesState.Loaded -> {
                     if (state.voices.isEmpty()) {
                         Text(
-                            "لا توجد أصوات منشورة للتنزيل حالياً. تُضاف الأصوات هنا بعد توثيق حقوقها؛ ويمكنك في الأثناء استخدام ملف من جهازك.",
+                            stringResource(R.string.voices_none_published),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -104,26 +106,26 @@ fun VoicePacksScreen(voices: VoiceViewModel, onNavigateBack: () -> Unit) {
                         Box2 {
                             Text(v.nameAr, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                             Text(
-                                "المؤذن: ${v.reciter} • ${String.format(Locale.US, "%.1f", v.sizeBytes / 1_000_000.0)} م.ب" +
-                                    if (v.includesWilayah) " • يتضمن الشهادة الثالثة" else "",
+                                stringResource(R.string.voices_reciter_size, v.reciter, String.format(Locale.US, "%.1f", v.sizeBytes / 1_000_000.0)) +
+                                    if (v.includesWilayah) " " + stringResource(R.string.voices_includes_wilayah) else "",
                                 style = MaterialTheme.typography.bodySmall
                             )
-                            Text("الترخيص: ${v.licence}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.voices_licence, v.licence), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             when {
                                 p != null -> LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth())
-                                done -> Text("مثبّت", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                                else -> Button(onClick = { voices.download(v) }) { Text("تنزيل") }
+                                done -> Text(stringResource(R.string.voices_installed_badge), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                                else -> Button(onClick = { voices.download(v) }) { Text(stringResource(R.string.voices_download)) }
                             }
                         }
                     }
                     if (state.rejected > 0) {
-                        Text("${state.rejected} صوتاً في القائمة لم يُعرض لعدم اكتمال بيانات الترخيص.", style = MaterialTheme.typography.labelSmall,
+                        Text(stringResource(R.string.voices_rejected, state.rejected.toString()), style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
             Text(
-                "التنزيل لا يتم إلا بضغطك على «تنزيل»، عبر اتصال آمن (HTTPS) من مستودع التطبيق على GitHub، ويُتحقق من بصمة الملف (SHA-256) قبل تثبيته.",
+                stringResource(R.string.voices_download_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

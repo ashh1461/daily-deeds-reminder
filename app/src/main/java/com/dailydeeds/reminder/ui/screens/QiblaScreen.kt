@@ -35,6 +35,8 @@ import com.dailydeeds.reminder.util.Qibla
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /**
  * Heading of the screen's top edge, degrees clockwise from true north, or null without a compass. The sensor reports
@@ -98,30 +100,30 @@ fun QiblaScreen(viewModel: ToolsViewModel, onNavigateBack: () -> Unit) {
     val arrow = if (heading != null) (bearing.toFloat() - heading + 360f) % 360f else bearing.toFloat()
     val aligned = heading != null && abs(((arrow + 180f) % 360f) - 180f) < 5f
 
-    ToolScaffold("اتجاه القبلة", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.qibla_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
-            Text("من ${place.name}", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.qibla_from, place.name), style = MaterialTheme.typography.titleMedium)
             Icon(
                 Icons.Default.Navigation,
-                contentDescription = "سهم القبلة",
+                contentDescription = stringResource(R.string.qibla_arrow),
                 tint = if (aligned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(180.dp).rotate(arrow)
             )
-            Text("${bearing.roundToInt()}° من الشمال الحقيقي", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.qibla_bearing, bearing.roundToInt().toString()), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
             Text(
                 when {
-                    heading == null -> "لا يتوفر حساس البوصلة أو لم يبدأ بعد؛ يشير السهم نحو الشمال الأعلى، فاضبطه على الزاوية المذكورة بوصلتك."
-                    aligned -> "أنت متجه نحو القبلة"
-                    else -> "أدر الهاتف حتى يشير السهم إلى الأعلى"
+                    heading == null -> stringResource(R.string.qibla_no_compass)
+                    aligned -> stringResource(R.string.qibla_aligned)
+                    else -> stringResource(R.string.qibla_turn)
                 },
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                "ضع الهاتف أفقياً وابتعد عن المعادن والمغناطيس. غيّر المدينة من شاشة أوقات الصلاة.",
+                stringResource(R.string.qibla_tip),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -43,6 +43,8 @@ import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.res.stringResource
 import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.labelRes
+import com.dailydeeds.reminder.ui.countdownText
 
 private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -81,7 +83,7 @@ fun TodayHero(tools: ToolsViewModel, modifier: Modifier = Modifier) {
             }
             if (next != null) {
                 Text(
-                    "${next.prayer.nameArabic} ${next.time.format(HOUR_MINUTE)} • ${TimeFormat.countdown(now, next.time)}",
+                    "${stringResource(next.prayer.labelRes)} ${next.time.format(HOUR_MINUTE)} • ${countdownText(TimeFormat.countdown(now, next.time))}",
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
                     textAlign = TextAlign.Center,

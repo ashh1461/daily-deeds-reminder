@@ -9,7 +9,8 @@ object CoordinateInput {
 
     sealed interface Result {
         data class Valid(val degrees: Double) : Result
-        data class Invalid(val messageArabic: String) : Result
+        /** The UI words it (ui/Labels.kt coordinateErrorText). */
+        data class Invalid(val axis: Axis, val reason: Reason) : Result
         /** Nothing typed yet: no error to show. */
         data object Empty : Result
     }
@@ -35,16 +36,18 @@ object CoordinateInput {
         return sb.toString().toDoubleOrNull()?.takeIf { it.isFinite() }
     }
 
-    fun latitude(text: String): Result = check(text, 90.0, "خط العرض")
+    enum class Axis(val limit: Double) { LATITUDE(90.0), LONGITUDE(180.0) }
 
-    fun longitude(text: String): Result = check(text, 180.0, "خط الطول")
+    enum class Reason { NOT_A_NUMBER, OUT_OF_RANGE }
 
-    private fun check(text: String, limit: Double, label: String): Result {
+    fun latitude(text: String): Result = check(text, Axis.LATITUDE)
+
+    fun longitude(text: String): Result = check(text, Axis.LONGITUDE)
+
+    private fun check(text: String, axis: Axis): Result {
         if (text.isBlank()) return Result.Empty
-        val value = parse(text) ?: return Result.Invalid("$label: اكتب رقماً، مثل ٣٣٫٢٧ أو 33.27")
-        if (value < -limit || value > limit) {
-            return Result.Invalid("$label يجب أن يكون بين -${limit.toInt()} و ${limit.toInt()}")
-        }
+        val value = parse(text) ?: return Result.Invalid(axis, Reason.NOT_A_NUMBER)
+        if (value < -axis.limit || value > axis.limit) return Result.Invalid(axis, Reason.OUT_OF_RANGE)
         return Result.Valid(value)
     }
 }

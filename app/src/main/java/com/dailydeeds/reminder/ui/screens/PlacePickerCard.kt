@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.model.PlacePresets
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /**
  * The place used for prayer times, with every way to change it: suggested cities, offline search, the phone's
@@ -67,7 +69,7 @@ fun PlacePickerCard(
                 is LocationOutcome.Found -> onPick(outcome.place)
                 LocationOutcome.ServicesOff -> showServicesOff = true
                 LocationOutcome.Unavailable -> Toast.makeText(
-                    context, "تعذّر تحديد الموقع؛ ابحث عن مدينتك أو اخترها من القائمة.", Toast.LENGTH_LONG
+                    context, context.getString(R.string.place_locate_failed), Toast.LENGTH_LONG
                 ).show()
                 LocationOutcome.NoPermission -> Unit
             }
@@ -76,12 +78,12 @@ fun PlacePickerCard(
 
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) locate()
-        else Toast.makeText(context, "لم يُمنح إذن الموقع؛ اختر مدينتك بالبحث أو من القائمة.", Toast.LENGTH_LONG).show()
+        else Toast.makeText(context, context.getString(R.string.place_permission_denied), Toast.LENGTH_LONG).show()
     }
 
     Card(modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("المكان: ${place.name}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.place_current, place.name), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             extra()
             // FlowRow wraps the buttons onto a second line at large font sizes instead of clipping them.
             FlowRow(
@@ -89,7 +91,7 @@ fun PlacePickerCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Box {
-                    OutlinedButton(onClick = { menuOpen = true }) { Text("مدن مقترحة") }
+                    OutlinedButton(onClick = { menuOpen = true }) { Text(stringResource(R.string.place_suggested)) }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         PlacePresets.all.forEach { p ->
                             DropdownMenuItem(text = { Text(p.name) }, onClick = {
@@ -99,12 +101,12 @@ fun PlacePickerCard(
                         }
                     }
                 }
-                OutlinedButton(onClick = { showSearch = true }) { Text("بحث") }
+                OutlinedButton(onClick = { showSearch = true }) { Text(stringResource(R.string.action_search)) }
                 OutlinedButton(enabled = !locating, onClick = {
                     if (hasLocationPermission(context)) locate()
                     else permission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                }) { Text(if (locating) "جارٍ تحديد الموقع…" else "موقعي") }
-                OutlinedButton(onClick = { showCoordinates = true }) { Text("إدخال الإحداثيات") }
+                }) { Text(stringResource(if (locating) R.string.place_locating else R.string.place_my_location)) }
+                OutlinedButton(onClick = { showCoordinates = true }) { Text(stringResource(R.string.place_enter_coordinates)) }
             }
         }
     }
@@ -118,17 +120,17 @@ fun PlacePickerCard(
     if (showServicesOff) {
         AlertDialog(
             onDismissRequest = { showServicesOff = false },
-            title = { Text("خدمة الموقع متوقفة") },
-            text = { Text("فعّل خدمة الموقع في إعدادات الهاتف ثم اضغط «موقعي» مرة أخرى، أو اختر مدينتك بالبحث.") },
+            title = { Text(stringResource(R.string.place_services_off_title)) },
+            text = { Text(stringResource(R.string.place_services_off_text)) },
             confirmButton = {
                 TextButton(onClick = {
                     showServicesOff = false
                     runCatching {
                         context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
-                }) { Text("فتح الإعدادات") }
+                }) { Text(stringResource(R.string.common_open_settings)) }
             },
-            dismissButton = { TextButton(onClick = { showServicesOff = false }) { Text("إلغاء") } }
+            dismissButton = { TextButton(onClick = { showServicesOff = false }) { Text(stringResource(R.string.common_cancel)) } }
         )
     }
 }

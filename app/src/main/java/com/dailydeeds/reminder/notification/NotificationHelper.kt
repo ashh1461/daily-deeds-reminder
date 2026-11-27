@@ -12,6 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dailydeeds.reminder.MainActivity
 import com.dailydeeds.reminder.model.DeedCategory
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.LocaleSupport
 
 object NotificationHelper {
     private const val TAG = "NotificationHelper"
@@ -21,8 +23,6 @@ object NotificationHelper {
 
     /** Deed reminders and occasion alerts. */
     const val CHANNEL_ID = "daily_deeds_channel"
-    const val CHANNEL_NAME = "تنبيهات الأعمال اليومية"
-    const val CHANNEL_DESC = "تذكير بالأعمال والأوراد اليومية المباركة"
 
     /** Prayer-time and pre-adhan reminders that use the phone's notification sound. */
     const val CHANNEL_PRAYER_REMINDER = "prayer_reminder"
@@ -33,19 +33,23 @@ object NotificationHelper {
     /** Prayer-time notification without sound. */
     const val CHANNEL_PRAYER_SILENT = "prayer_silent"
 
-    /** Creates every channel once; safe to call repeatedly (Android ignores existing channels). */
+    /**
+     * Creates every channel; safe to call repeatedly. Names are in the app language, and calling it again after the
+     * language changed renames the existing channels (MainActivity calls it on every start).
+     */
     fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val res = LocaleSupport.localized(context)
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH).apply {
-                description = CHANNEL_DESC
+            NotificationChannel(CHANNEL_ID, res.getString(R.string.channel_reminders_name), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = res.getString(R.string.channel_reminders_desc)
                 enableVibration(true)
             }
         )
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_PRAYER_REMINDER, "تذكير أوقات الصلاة", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "إشعار عند دخول وقت الصلاة وقبله بدقائق"
+            NotificationChannel(CHANNEL_PRAYER_REMINDER, res.getString(R.string.channel_prayer_name), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = res.getString(R.string.channel_prayer_desc)
                 enableVibration(true)
                 setSound(
                     android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
@@ -54,15 +58,15 @@ object NotificationHelper {
             }
         )
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_PRAYER_ADHAN, "الأذان", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "إشعار أثناء تشغيل الأذان مع زر الإيقاف"
+            NotificationChannel(CHANNEL_PRAYER_ADHAN, res.getString(R.string.channel_adhan_name), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = res.getString(R.string.channel_adhan_desc)
                 setSound(null, null)
                 enableVibration(false)
             }
         )
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_PRAYER_SILENT, "أوقات الصلاة (صامت)", NotificationManager.IMPORTANCE_LOW).apply {
-                description = "إشعار بدخول الوقت دون صوت"
+            NotificationChannel(CHANNEL_PRAYER_SILENT, res.getString(R.string.channel_silent_name), NotificationManager.IMPORTANCE_LOW).apply {
+                description = res.getString(R.string.channel_silent_desc)
                 setSound(null, null)
             }
         )

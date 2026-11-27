@@ -47,6 +47,7 @@ import com.dailydeeds.reminder.viewmodel.ToolsViewModel
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import java.time.LocalDate
 import java.util.Locale
+import com.dailydeeds.reminder.notification.ReminderWording
 
 /** All settings in one grouped screen: language, prayer, calendar, deed reminders, appearance and credits. */
 @Composable
@@ -246,7 +247,7 @@ private fun ReminderSettingCard(
 ) {
     val context = LocalContext.current
     SettingsCard {
-        Text(type.title, style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(ReminderWording.titleRes(type)), style = MaterialTheme.typography.titleMedium)
         Text(
             stringResource(if (type.dayOfWeek != null) R.string.settings_reminder_thursday else R.string.settings_reminder_daily),
             style = MaterialTheme.typography.bodySmall,

@@ -7,6 +7,7 @@ import com.dailydeeds.reminder.util.PrayerSchedule
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.dailydeeds.reminder.util.Prayer
 
 /** Text shown on the home-screen widget. */
 data class WidgetModel(
@@ -16,7 +17,9 @@ data class WidgetModel(
     val nextTime: String,
     /** When the widget content stops being right: the next prayer time (or null if none is known). */
     val validUntil: ZonedDateTime?,
-    val occasion: String?
+    val occasion: String?,
+    /** The next prayer itself, so the widget can name it in the app language. */
+    val prayer: Prayer? = null
 ) {
     companion object {
         private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
@@ -31,7 +34,8 @@ data class WidgetModel(
                 nextPrayer = next?.prayer?.nameArabic ?: "—",
                 nextTime = next?.time?.format(CLOCK) ?: "--:--",
                 validUntil = next?.time,
-                occasion = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull()?.displayTitle
+                occasion = ShiaCalendar.occasionsOn(today, dayOffset).firstOrNull()?.displayTitle,
+                prayer = next?.prayer
             )
         }
     }

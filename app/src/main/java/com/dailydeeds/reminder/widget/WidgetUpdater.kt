@@ -15,6 +15,8 @@ import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.util.PrayerContext
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import com.dailydeeds.reminder.util.LocaleSupport
+import com.dailydeeds.reminder.adhan.AlarmWords
 
 /** Draws the home-screen widget and keeps one inexact alarm pending so it moves on at each prayer. */
 object WidgetUpdater {
@@ -41,7 +43,9 @@ object WidgetUpdater {
         val views = RemoteViews(app.packageName, R.layout.widget_prayer)
         views.setTextViewText(R.id.widget_place, model.placeName)
         views.setTextViewText(R.id.widget_hijri, model.hijriDate)
-        views.setTextViewText(R.id.widget_next_name, "الصلاة القادمة: ${model.nextPrayer}")
+        val words = AlarmWords.of(LocaleSupport.current(app))
+        val nextName = model.prayer?.let(words::prayerName) ?: model.nextPrayer
+        views.setTextViewText(R.id.widget_next_name, LocaleSupport.localized(app).getString(R.string.widget_next_prayer, nextName))
         views.setTextViewText(R.id.widget_next_time, model.nextTime)
         if (model.occasion != null) {
             views.setTextViewText(R.id.widget_occasion, model.occasion)

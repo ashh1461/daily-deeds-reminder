@@ -4,7 +4,7 @@
 <resources>
     <string name="app_subtitle">به توصیه سید الأسمی رضوان الله علیه</string>
     <string name="channel_reminders_name">یادآوری اعمال روزانه</string>
-    <string name="channel_reminders_desc">یادآوری اوراد صبح و شام و تعقیبات نماز</string>
+    <string name="channel_reminders_desc">یادآوری اعمال و اوراد مبارک روزانه</string>
     <string name="widget_description">نماز بعدی، تاریخ هجری قمری و مناسبت روز</string>
     <string name="widget_preview_place">بیروت</string>
     <string name="widget_preview_next">نماز بعدی: مغرب</string>
@@ -457,4 +457,28 @@
     <string name="search_type_weekday">دعاها و زیارت‌های روزها</string>
     <string name="search_type_deeds">اعمال روزانه</string>
     <string name="mizan_surah_title">المیزان · سوره %1$s</string>
+    <string name="channel_prayer_name">یادآوری اوقات نماز</string>
+    <string name="channel_prayer_desc">اعلان هنگام رسیدن وقت نماز و چند دقیقه پیش از آن</string>
+    <string name="channel_adhan_name">اذان</string>
+    <string name="channel_adhan_desc">در حین پخش اذان نمایش داده می‌شود، همراه دکمه توقف</string>
+    <string name="channel_silent_name">اوقات نماز (بی‌صدا)</string>
+    <string name="channel_silent_desc">اعلان رسیدن وقت بدون صدا</string>
+    <string name="adhan_test_title">آزمایش اذان</string>
+    <string name="adhan_title">اذان %1$s</string>
+    <string name="adhan_playing_body">اذان در حال پخش است. برای توقف، اعلان را لمس کنید.</string>
+    <string name="adhan_action_stop">توقف</string>
+    <string name="adhan_action_snooze">تعویق</string>
+    <string name="imsak_title">وقت امساک رسید</string>
+    <string name="imsak_body">وقت امساک آغاز شد. خداوند روزه‌تان را بپذیرد.</string>
+    <string name="reminder_morning_title">اوراد صبحگاهی</string>
+    <string name="reminder_morning_message">وقت اوراد صبحگاهی است.</string>
+    <string name="reminder_evening_title">اوراد شامگاهی</string>
+    <string name="reminder_evening_message">وقت اوراد شامگاهی است.</string>
+    <string name="reminder_night_title">دعای شب</string>
+    <string name="reminder_night_message">دعای شب: %1$s.</string>
+    <string name="reminder_bedtime_title">قرائت پیش از خواب</string>
+    <string name="reminder_bedtime_message">پیش از خواب: «%1$s» را سه بار بخوانید.</string>
+    <string name="reminder_thursday_title">قرائت‌های صبح پنجشنبه</string>
+    <string name="reminder_thursday_message">هنگام بیرون رفتن برای طلب حاجت: آخر سوره آل عمران، آیة الکرسی، سوره قدر و سوره حمد.</string>
+    <string name="widget_next_prayer">نماز بعدی: %1$s</string>
 </resources>

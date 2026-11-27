@@ -8,6 +8,8 @@ import com.dailydeeds.reminder.notification.NotificationHelper
 import com.dailydeeds.reminder.notification.ReligiousAlarms
 import com.dailydeeds.reminder.worship.DailyNotes
 import java.time.ZonedDateTime
+import com.dailydeeds.reminder.util.LocaleSupport
+import com.dailydeeds.reminder.worship.NoteWords
 
 /** The single morning alarm: occasion of the day, khums-year reminder and lunar-eclipse heads-up. */
 class OccasionAlarmReceiver : BroadcastReceiver() {
@@ -15,7 +17,10 @@ class OccasionAlarmReceiver : BroadcastReceiver() {
         val prefs = PreferencesManager(context)
         val config = ReligiousAlarms.notesConfig(prefs)
         if (config.any) {
-            DailyNotes.build(ZonedDateTime.now(), prefs.getPlace(), prefs.getHijriOffset(), config).forEach { note ->
+            DailyNotes.build(
+                ZonedDateTime.now(), prefs.getPlace(), prefs.getHijriOffset(), config,
+                words = NoteWords.of(LocaleSupport.current(context))
+            ).forEach { note ->
                 NotificationHelper.showNotification(context, note.id, note.title, note.body)
             }
         }

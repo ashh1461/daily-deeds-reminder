@@ -9,7 +9,7 @@
     <string name="app_name" translatable="false">ورد</string>
     <string name="app_subtitle">توصية السيد الأسمى رضوان الله عليه</string>
     <string name="channel_reminders_name">تنبيهات الأعمال اليومية</string>
-    <string name="channel_reminders_desc">تذكير بالأوراد الصباحية والمسائية وعقيب الصلوات</string>
+    <string name="channel_reminders_desc">تذكير بالأعمال والأوراد اليومية المباركة</string>
     <string name="widget_description">الصلاة القادمة والتاريخ الهجري ومناسبة اليوم</string>
     <!-- Sample text of the widget preview in the widget picker. -->
     <string name="widget_preview_place">بيروت</string>
@@ -468,4 +468,30 @@
     <string name="search_type_weekday">أدعية وزيارات الأيام</string>
     <string name="search_type_deeds">الأعمال اليومية</string>
     <string name="mizan_surah_title">الميزان · سورة %1$s</string>
+    <string name="channel_prayer_name">تذكير أوقات الصلاة</string>
+    <string name="channel_prayer_desc">إشعار عند دخول وقت الصلاة وقبله بدقائق</string>
+    <string name="channel_adhan_name">الأذان</string>
+    <string name="channel_adhan_desc">إشعار أثناء تشغيل الأذان مع زر الإيقاف</string>
+    <string name="channel_silent_name">أوقات الصلاة (صامت)</string>
+    <string name="channel_silent_desc">إشعار بدخول الوقت دون صوت</string>
+    <string name="adhan_test_title">تجربة الأذان</string>
+    <string name="adhan_title">أذان %1$s</string>
+    <string name="adhan_playing_body">يُشغَّل الأذان الآن. المس الإشعار لإيقافه.</string>
+    <string name="adhan_action_stop">إيقاف</string>
+    <string name="adhan_action_snooze">تأجيل</string>
+    <string name="imsak_title">حان وقت الإمساك</string>
+    <string name="imsak_body">بدأ وقت الإمساك. تقبّل الله صيامكم.</string>
+    <string name="reminder_morning_title">الأوراد الصباحية</string>
+    <string name="reminder_morning_message">حان وقت الأوراد الصباحية.</string>
+    <string name="reminder_evening_title">الأوراد المسائية</string>
+    <string name="reminder_evening_message">حان وقت الأوراد المسائية.</string>
+    <string name="reminder_night_title">دعاء الليل</string>
+    <string name="reminder_night_message">دعاء الليل: %1$s.</string>
+    <string name="reminder_bedtime_title">القراءة قبل النوم</string>
+    <string name="reminder_bedtime_message">قبل النوم: اقرأ «%1$s» ثلاث مرات.</string>
+    <string name="reminder_thursday_title">قراءات صباح الخميس</string>
+    <string name="reminder_thursday_message">عند الخروج لطلب الحاجة: آخر آل عمران، آية الكرسي، القدر، والفاتحة.</string>
+    <string name="widget_next_prayer">الصلاة القادمة: %1$s</string>
+    <string name="dhikr_night" translatable="false">اللهم يا مغير الأحوال غير حالي إلى أحسن حال</string>
+    <string name="dhikr_bedtime" translatable="false">ولكم فيها جمال حين تريحون وحين تسرحون</string>
 </resources>

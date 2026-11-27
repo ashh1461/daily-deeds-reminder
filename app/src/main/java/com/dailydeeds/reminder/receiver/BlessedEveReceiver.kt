@@ -8,6 +8,8 @@ import com.dailydeeds.reminder.data.PreferencesManager
 import com.dailydeeds.reminder.notification.NotificationHelper
 import com.dailydeeds.reminder.notification.ReligiousAlarms
 import java.time.Instant
+import com.dailydeeds.reminder.util.LocaleSupport
+import com.dailydeeds.reminder.worship.NoteWords
 
 /** The evening reminder before a blessed night (ليلة الجمعة, mid-Sha'ban, the Laylat al-Qadr nights). */
 class BlessedEveReceiver : BroadcastReceiver() {
@@ -19,7 +21,7 @@ class BlessedEveReceiver : BroadcastReceiver() {
         if (prefs.isBlessedEveReminderEnabled() && now - scheduledAt <= MAX_LATE_MILLIS) {
             // The eve the alarm was set for, not the date when it arrived.
             val eve = Instant.ofEpochMilli(scheduledAt).atZone(prefs.getPlace().zone).toLocalDate()
-            BlessedEves.note(eve, prefs.getHijriOffset())?.let { note ->
+            BlessedEves.note(eve, prefs.getHijriOffset(), NoteWords.of(LocaleSupport.current(context)))?.let { note ->
                 NotificationHelper.showNotification(context, note.id, note.title, note.body)
             }
         }

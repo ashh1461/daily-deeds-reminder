@@ -3,7 +3,7 @@
 <resources>
     <string name="app_subtitle">As recommended by Sayyid al-Asma, may God be pleased with him</string>
     <string name="channel_reminders_name">Daily deeds reminders</string>
-    <string name="channel_reminders_desc">Reminders for the morning and evening litanies and the acts after each prayer</string>
+    <string name="channel_reminders_desc">Reminders of the blessed daily deeds and litanies</string>
     <string name="widget_description">The next prayer, the Hijri date and the occasion of the day</string>
     <string name="widget_preview_place">Beirut</string>
     <string name="widget_preview_next">Next prayer: Maghrib</string>
@@ -456,4 +456,28 @@
     <string name="search_type_weekday">Duas and ziyarat of the days</string>
     <string name="search_type_deeds">Daily deeds</string>
     <string name="mizan_surah_title">al-Mizan · Surah %1$s</string>
+    <string name="channel_prayer_name">Prayer time reminders</string>
+    <string name="channel_prayer_desc">A notification when the prayer time comes, and a few minutes before</string>
+    <string name="channel_adhan_name">Adhan</string>
+    <string name="channel_adhan_desc">Shown while the adhan plays, with a stop button</string>
+    <string name="channel_silent_name">Prayer times (silent)</string>
+    <string name="channel_silent_desc">A notification when the time comes, without sound</string>
+    <string name="adhan_test_title">Adhan test</string>
+    <string name="adhan_title">%1$s adhan</string>
+    <string name="adhan_playing_body">The adhan is playing. Touch the notification to stop it.</string>
+    <string name="adhan_action_stop">Stop</string>
+    <string name="adhan_action_snooze">Snooze</string>
+    <string name="imsak_title">It is time for imsak</string>
+    <string name="imsak_body">Imsak has begun. May God accept your fast.</string>
+    <string name="reminder_morning_title">Morning litanies</string>
+    <string name="reminder_morning_message">It is time for the morning litanies.</string>
+    <string name="reminder_evening_title">Evening litanies</string>
+    <string name="reminder_evening_message">It is time for the evening litanies.</string>
+    <string name="reminder_night_title">Night dua</string>
+    <string name="reminder_night_message">Night dua: %1$s.</string>
+    <string name="reminder_bedtime_title">Reading before sleep</string>
+    <string name="reminder_bedtime_message">Before sleep: recite “%1$s” three times.</string>
+    <string name="reminder_thursday_title">Thursday morning readings</string>
+    <string name="reminder_thursday_message">When going out to seek a need: the end of Al Imran, Ayat al-Kursi, al-Qadr and al-Fatihah.</string>
+    <string name="widget_next_prayer">Next prayer: %1$s</string>
 </resources>

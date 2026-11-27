@@ -18,6 +18,9 @@ import com.dailydeeds.reminder.service.AdhanService
 import com.dailydeeds.reminder.util.Prayer
 import java.time.Instant
 import java.time.ZoneId
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.LocaleSupport
+import com.dailydeeds.reminder.adhan.AlarmWords
 
 class PrayerAlarmReceiver : BroadcastReceiver() {
 
@@ -56,11 +59,13 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
 
     private fun handle(context: Context, prayer: Prayer, kind: AlarmKind, scheduledAt: Long, snooze: Boolean) {
         val now = System.currentTimeMillis()
+        val words = AlarmWords.of(LocaleSupport.current(context))
         // An alarm delivered long after its time (Doze, or inexact alarms) must not announce "now".
         val late = PrayerAlarmText.isLate(scheduledAt, now)
         if (kind == AlarmKind.IMSAK) {
             if (!late) NotificationHelper.showNotification(
-                context, 5200, "حان وقت الإمساك", "بدأ وقت الإمساك. تقبّل الله صيامكم.",
+                context, 5200, LocaleSupport.localized(context).getString(R.string.imsak_title),
+                LocaleSupport.localized(context).getString(R.string.imsak_body),
                 channelId = NotificationHelper.CHANNEL_PRAYER_REMINDER
             )
             return
@@ -72,11 +77,11 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
 
         when {
             kind == AlarmKind.PRE -> show(
-                context, id + 100, PrayerAlarmText.pre(prayer, config.preMinutes, scheduledAt, now),
+                context, id + 100, PrayerAlarmText.pre(prayer, config.preMinutes, scheduledAt, now, words),
                 NotificationHelper.CHANNEL_PRAYER_REMINDER
             )
             config.mode == AdhanMode.SILENT -> show(
-                context, id, PrayerAlarmText.silent(prayer, scheduledAt, now, snooze), NotificationHelper.CHANNEL_PRAYER_SILENT
+                context, id, PrayerAlarmText.silent(prayer, scheduledAt, now, snooze, words), NotificationHelper.CHANNEL_PRAYER_SILENT
             )
             // A snooze follows the prayer's current mode: switched to a plain reminder since, it no longer plays the
             // adhan. With no visible notification (denied, or the adhan channel blocked) nothing could stop the
@@ -85,7 +90,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             // would only flash its notification): the prayer notification is shown, with the vibration if chosen.
             config.mode == AdhanMode.ADHAN && !late && AdhanService.silencedByRinger(context) -> {
                 AdhanService.vibrateIfChosenOnVibrateMode(context)
-                show(context, id, PrayerAlarmText.reminder(prayer, scheduledAt, now, snooze), NotificationHelper.CHANNEL_PRAYER_REMINDER)
+                show(context, id, PrayerAlarmText.reminder(prayer, scheduledAt, now, snooze, words), NotificationHelper.CHANNEL_PRAYER_REMINDER)
             }
             config.mode == AdhanMode.ADHAN && !late && NotificationHelper.canShowAdhanNotification(context) -> {
                 try {
@@ -93,11 +98,11 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 } catch (e: Exception) {
                     // Foreground-service start refused (background restrictions): fall back to a normal notification.
                     Log.w(TAG, "Could not start adhan service", e)
-                    show(context, id, PrayerAlarmText.reminder(prayer), NotificationHelper.CHANNEL_PRAYER_REMINDER)
+                    show(context, id, PrayerAlarmText.reminder(prayer, words = words), NotificationHelper.CHANNEL_PRAYER_REMINDER)
                 }
             }
             else -> show(
-                context, id, PrayerAlarmText.reminder(prayer, scheduledAt, now, snooze), NotificationHelper.CHANNEL_PRAYER_REMINDER
+                context, id, PrayerAlarmText.reminder(prayer, scheduledAt, now, snooze, words), NotificationHelper.CHANNEL_PRAYER_REMINDER
             )
         }
     }

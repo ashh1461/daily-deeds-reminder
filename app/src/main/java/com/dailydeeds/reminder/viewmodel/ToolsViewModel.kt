@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.dailydeeds.reminder.notification.NotificationHelper
+import com.dailydeeds.reminder.widget.WidgetUpdater
 
 /** State for the calendar, prayer times, qibla and favorites screens. */
 class ToolsViewModel(app: Application) : AndroidViewModel(app) {
@@ -85,6 +87,9 @@ class ToolsViewModel(app: Application) : AndroidViewModel(app) {
     fun setAppLanguage(pref: String) {
         prefs.setAppLanguagePref(pref)
         _appLanguage.value = pref
+        // Rename the notification channels and redraw the widget in the new language right away.
+        NotificationHelper.createChannels(getApplication())
+        WidgetUpdater.refresh(getApplication())
     }
 
     fun recordSahifa(id: String) {

@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1795723818.7965963,
-    "seen": 1795768874.0919857,
-    "ast_hash": "678f14fb3169e2de9724e48af9c22c69",
+    "mtime": 1795769157.7028224,
+    "seen": 1795769330.0021827,
+    "ast_hash": "7c72bfd893fdfbfdcd35e0bdd7e538d0",
     "semantic_hash": ""
   },
   "app/src/main/java/com/dailydeeds/reminder/MainActivity.kt": {
@@ -150,9 +150,9 @@
     "semantic_hash": "7ea3c94a2151ad7669b274060f899387"
   },
   "README.md": {
-    "mtime": 1795724008.5784974,
-    "seen": 1795768874.0939064,
-    "ast_hash": "0c90311234d1afd30f2400802c106b4d",
+    "mtime": 1795769275.357547,
+    "seen": 1795769330.0039678,
+    "ast_hash": "69b92956705af8486c603a8a7f0f6cb7",
     "semantic_hash": ""
   },
   "docs/releases/v1.1.0.md": {
@@ -1497,6 +1497,12 @@
     "mtime": 1795767044.1829686,
     "seen": 1795768874.0939064,
     "ast_hash": "909b561a0f4b1b02b913a5db3620f935",
+    "semantic_hash": ""
+  },
+  "docs/releases/v1.8.5.md": {
+    "mtime": 1795769213.1004367,
+    "seen": 1795769330.0039678,
+    "ast_hash": "c0404eb6abf08ad56fa52aa03c62a2c1",
     "semantic_hash": ""
   }
 }

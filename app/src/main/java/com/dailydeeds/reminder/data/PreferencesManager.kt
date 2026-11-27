@@ -22,8 +22,17 @@ import java.time.ZoneId
 
 class PreferencesManager(context: Context) {
 
-    /** Device-protected since 1.8.2, so prayer alarms can be restored before the first unlock ([PrefsStorage]). */
-    private val prefs: SharedPreferences = PrefsStorage.open(context)
+    private val appContext: Context = context.applicationContext ?: context
+
+    /**
+     * Two stores (finding F-1, see [PrefsStorage]). [boot] is device-protected and holds only the keys the
+     * boot/alarm path reads before the first unlock ([PrefsClassifier.isBootKey]); it is always safe to open.
+     * [user] is credential-protected and holds everything else; it is opened lazily so the locked boot path (which
+     * reads only boot keys) never touches credential storage before the first unlock. Each getter/setter uses the
+     * store its key belongs in.
+     */
+    private val boot: SharedPreferences = PrefsStorage.openDevice(appContext)
+    private val user: SharedPreferences by lazy { PrefsStorage.openUser(appContext) }
 
     companion object {
         const val KEY_LAST_ACTIVE_DATE = "pref_last_active_date"
@@ -72,46 +81,46 @@ class PreferencesManager(context: Context) {
     }
 
     fun isDeedCompleted(deedId: Int, date: String = getTodayDateString()): Boolean {
-        return prefs.getBoolean("deed_${deedId}_completed_$date", false)
+        return user.getBoolean("deed_${deedId}_completed_$date", false)
     }
 
     fun setDeedCompleted(deedId: Int, completed: Boolean, date: String = getTodayDateString()) {
-        prefs.edit().putBoolean("deed_${deedId}_completed_$date", completed).apply()
+        user.edit().putBoolean("deed_${deedId}_completed_$date", completed).apply()
     }
 
     fun getDeedCount(deedId: Int, date: String = getTodayDateString()): Int {
-        return prefs.getInt("deed_${deedId}_count_$date", 0)
+        return user.getInt("deed_${deedId}_count_$date", 0)
     }
 
     fun setDeedCount(deedId: Int, count: Int, date: String = getTodayDateString()) {
-        prefs.edit().putInt("deed_${deedId}_count_$date", count).apply()
+        user.edit().putInt("deed_${deedId}_count_$date", count).apply()
     }
 
     fun getDeedStage(deedId: Int, date: String = getTodayDateString()): Int {
-        return prefs.getInt("deed_${deedId}_stage_$date", 0)
+        return user.getInt("deed_${deedId}_stage_$date", 0)
     }
 
     fun setDeedStage(deedId: Int, stage: Int, date: String = getTodayDateString()) {
-        prefs.edit().putInt("deed_${deedId}_stage_$date", stage).apply()
+        user.edit().putInt("deed_${deedId}_stage_$date", stage).apply()
     }
 
     fun getLastActiveDate(): String {
-        return prefs.getString(KEY_LAST_ACTIVE_DATE, "") ?: ""
+        return user.getString(KEY_LAST_ACTIVE_DATE, "") ?: ""
     }
 
     fun setLastActiveDate(date: String) {
-        prefs.edit().putString(KEY_LAST_ACTIVE_DATE, date).apply()
+        user.edit().putString(KEY_LAST_ACTIVE_DATE, date).apply()
     }
 
     /** Removes per-day deed keys older than [RETENTION_DAYS] so the preferences file stays bounded. */
     fun pruneOldDeedState(today: String = getTodayDateString()) {
         val cutoff = LocalDate.parse(today).minusDays(RETENTION_DAYS)
-        val stale = prefs.all.keys.filter { key ->
+        val stale = user.all.keys.filter { key ->
             val date = DEED_DAY_KEY.matchEntire(key)?.groupValues?.get(1) ?: return@filter false
             runCatching { LocalDate.parse(date).isBefore(cutoff) }.getOrDefault(false)
         }
         if (stale.isEmpty()) return
-        val editor = prefs.edit()
+        val editor = user.edit()
         stale.forEach(editor::remove)
         editor.apply()
     }
@@ -143,7 +152,7 @@ class PreferencesManager(context: Context) {
     }
 
     fun resetToday(today: String = getTodayDateString()) {
-        val editor = prefs.edit()
+        val editor = user.edit()
         val allDeeds = DeedsRepository.getAllDeeds()
         for (deed in allDeeds) {
             editor.remove("deed_${deed.id}_completed_$today")
@@ -154,64 +163,64 @@ class PreferencesManager(context: Context) {
     }
 
     fun getReminder(type: ReminderType): ReminderSettings = ReminderSettings(
-        enabled = prefs.getBoolean("pref_${type.preferenceKey}_reminder_enabled", true),
-        hour = prefs.getInt("pref_${type.preferenceKey}_hour", type.defaultHour).coerceIn(0, 23),
-        minute = prefs.getInt("pref_${type.preferenceKey}_minute", 0).coerceIn(0, 59)
+        enabled = user.getBoolean("pref_${type.preferenceKey}_reminder_enabled", true),
+        hour = user.getInt("pref_${type.preferenceKey}_hour", type.defaultHour).coerceIn(0, 23),
+        minute = user.getInt("pref_${type.preferenceKey}_minute", 0).coerceIn(0, 59)
     )
 
     fun setReminder(type: ReminderType, settings: ReminderSettings) {
         require(settings.hour in 0..23 && settings.minute in 0..59)
-        prefs.edit()
+        user.edit()
             .putBoolean("pref_${type.preferenceKey}_reminder_enabled", settings.enabled)
             .putInt("pref_${type.preferenceKey}_hour", settings.hour)
             .putInt("pref_${type.preferenceKey}_minute", settings.minute)
             .apply()
     }
 
-    fun isMorningReminderEnabled(): Boolean = prefs.getBoolean(KEY_MORNING_ENABLED, true)
+    fun isMorningReminderEnabled(): Boolean = user.getBoolean(KEY_MORNING_ENABLED, true)
     fun setMorningReminderEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_MORNING_ENABLED, enabled).apply()
+        user.edit().putBoolean(KEY_MORNING_ENABLED, enabled).apply()
 
     fun getMorningReminderTime(): Pair<Int, Int> {
-        val hour = prefs.getInt(KEY_MORNING_HOUR, 7)
-        val minute = prefs.getInt(KEY_MORNING_MINUTE, 0)
+        val hour = user.getInt(KEY_MORNING_HOUR, 7)
+        val minute = user.getInt(KEY_MORNING_MINUTE, 0)
         return Pair(hour, minute)
     }
 
     fun setMorningReminderTime(hour: Int, minute: Int) {
-        prefs.edit().putInt(KEY_MORNING_HOUR, hour).putInt(KEY_MORNING_MINUTE, minute).apply()
+        user.edit().putInt(KEY_MORNING_HOUR, hour).putInt(KEY_MORNING_MINUTE, minute).apply()
     }
 
-    fun isEveningReminderEnabled(): Boolean = prefs.getBoolean(KEY_EVENING_ENABLED, true)
+    fun isEveningReminderEnabled(): Boolean = user.getBoolean(KEY_EVENING_ENABLED, true)
     fun setEveningReminderEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_EVENING_ENABLED, enabled).apply()
+        user.edit().putBoolean(KEY_EVENING_ENABLED, enabled).apply()
 
     fun getEveningReminderTime(): Pair<Int, Int> {
-        val hour = prefs.getInt(KEY_EVENING_HOUR, 20)
-        val minute = prefs.getInt(KEY_EVENING_MINUTE, 0)
+        val hour = user.getInt(KEY_EVENING_HOUR, 20)
+        val minute = user.getInt(KEY_EVENING_MINUTE, 0)
         return Pair(hour, minute)
     }
 
     fun setEveningReminderTime(hour: Int, minute: Int) {
-        prefs.edit().putInt(KEY_EVENING_HOUR, hour).putInt(KEY_EVENING_MINUTE, minute).apply()
+        user.edit().putInt(KEY_EVENING_HOUR, hour).putInt(KEY_EVENING_MINUTE, minute).apply()
     }
 
-    fun isPrayerReminderEnabled(): Boolean = prefs.getBoolean(KEY_PRAYER_ENABLED, true)
+    fun isPrayerReminderEnabled(): Boolean = user.getBoolean(KEY_PRAYER_ENABLED, true)
     fun setPrayerReminderEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_PRAYER_ENABLED, enabled).apply()
+        user.edit().putBoolean(KEY_PRAYER_ENABLED, enabled).apply()
 
-    fun isHapticsEnabled(): Boolean = prefs.getBoolean(KEY_HAPTICS_ENABLED, true)
+    fun isHapticsEnabled(): Boolean = user.getBoolean(KEY_HAPTICS_ENABLED, true)
     fun setHapticsEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_HAPTICS_ENABLED, enabled).apply()
+        user.edit().putBoolean(KEY_HAPTICS_ENABLED, enabled).apply()
 
 
     // --- Favorites and reading position ---------------------------------------------------
 
-    fun getFavorites(): List<FavoriteKey> = FavoritesList.parse(prefs.getString(KEY_FAVORITES, null))
+    fun getFavorites(): List<FavoriteKey> = FavoritesList.parse(user.getString(KEY_FAVORITES, null))
 
     fun toggleFavorite(key: FavoriteKey): List<FavoriteKey> {
         val updated = FavoritesList.toggle(getFavorites(), key)
-        prefs.edit().putString(KEY_FAVORITES, FavoritesList.serialize(updated)).apply()
+        user.edit().putString(KEY_FAVORITES, FavoritesList.serialize(updated)).apply()
         return updated
     }
 
@@ -223,53 +232,53 @@ class PreferencesManager(context: Context) {
 
     /** Replaces the whole list; used to undo a delete. */
     fun setFavorites(items: List<FavoriteKey>) =
-        prefs.edit().putString(KEY_FAVORITES, FavoritesList.serialize(items)).apply()
+        user.edit().putString(KEY_FAVORITES, FavoritesList.serialize(items)).apply()
 
-    fun getLastSurah(): Int = prefs.getInt(KEY_LAST_SURAH, 0)
-    fun setLastSurah(surah: Int) = prefs.edit().putInt(KEY_LAST_SURAH, surah).apply()
+    fun getLastSurah(): Int = user.getInt(KEY_LAST_SURAH, 0)
+    fun setLastSurah(surah: Int) = user.edit().putInt(KEY_LAST_SURAH, surah).apply()
 
     /** The ayah at the top of the list reader when it was last scrolled, in the last surah; 0 when none. */
-    fun getLastAyah(): Int = prefs.getInt(KEY_LAST_AYAH, 0)
-    fun setLastAyah(ayah: Int) = prefs.edit().putInt(KEY_LAST_AYAH, ayah).apply()
+    fun getLastAyah(): Int = user.getInt(KEY_LAST_AYAH, 0)
+    fun setLastAyah(ayah: Int) = user.edit().putInt(KEY_LAST_AYAH, ayah).apply()
 
     /** Last mushaf page read (1..604), 0 when none. */
-    fun getLastQuranPage(): Int = prefs.getInt(KEY_LAST_PAGE, 0)
-    fun setLastQuranPage(page: Int) = prefs.edit().putInt(KEY_LAST_PAGE, page).apply()
+    fun getLastQuranPage(): Int = user.getInt(KEY_LAST_PAGE, 0)
+    fun setLastQuranPage(page: Int) = user.edit().putInt(KEY_LAST_PAGE, page).apply()
 
     /** The Quran tab opens the mushaf page by page (default) or as a scrolling list of ayahs. */
-    fun getQuranPagesMode(): Boolean = prefs.getBoolean(KEY_QURAN_PAGES_MODE, true)
-    fun setQuranPagesMode(pages: Boolean) = prefs.edit().putBoolean(KEY_QURAN_PAGES_MODE, pages).apply()
+    fun getQuranPagesMode(): Boolean = user.getBoolean(KEY_QURAN_PAGES_MODE, true)
+    fun setQuranPagesMode(pages: Boolean) = user.edit().putBoolean(KEY_QURAN_PAGES_MODE, pages).apply()
 
     /** A reader's saved text size ([ReaderFonts]); the reader's default until it is first changed. */
     fun getReaderFontSp(key: String, range: ReaderFonts.Range): Float =
-        if (prefs.contains(key)) ReaderFonts.fromStored(prefs.getInt(key, 0), range) else range.defaultSp
+        if (user.contains(key)) ReaderFonts.fromStored(user.getInt(key, 0), range) else range.defaultSp
 
-    fun setReaderFontSp(key: String, sp: Float) = prefs.edit().putInt(key, ReaderFonts.toStored(sp)).apply()
+    fun setReaderFontSp(key: String, sp: Float) = user.edit().putInt(key, ReaderFonts.toStored(sp)).apply()
 
     /** The latest planned prayer alarm handled (epoch ms), so a clock moved back does not play it again. Not backed up. */
-    fun getLastHandledAlarm(): Long = prefs.getLong(KEY_LAST_HANDLED_ALARM, 0L)
-    fun setLastHandledAlarm(at: Long) = prefs.edit().putLong(KEY_LAST_HANDLED_ALARM, at).apply()
+    fun getLastHandledAlarm(): Long = boot.getLong(KEY_LAST_HANDLED_ALARM, 0L)
+    fun setLastHandledAlarm(at: Long) = boot.edit().putLong(KEY_LAST_HANDLED_ALARM, at).apply()
 
     /** Snoozes waiting to play ([PendingSnoozes]), restored after a reboot. Not backed up. */
-    fun getPendingSnoozes(): Map<Int, Long> = PendingSnoozes.decode(prefs.getString(KEY_PENDING_SNOOZES, null))
+    fun getPendingSnoozes(): Map<Int, Long> = PendingSnoozes.decode(boot.getString(KEY_PENDING_SNOOZES, null))
     fun setPendingSnoozes(snoozes: Map<Int, Long>) =
-        prefs.edit().putString(KEY_PENDING_SNOOZES, PendingSnoozes.encode(snoozes)).apply()
+        boot.edit().putString(KEY_PENDING_SNOOZES, PendingSnoozes.encode(snoozes)).apply()
 
     /** Whether each mushaf page picks the largest text size that fits the screen (the default). */
-    fun getMushafFit(): Boolean = prefs.getBoolean(ReaderFonts.KEY_MUSHAF_FIT, true)
-    fun setMushafFit(fit: Boolean) = prefs.edit().putBoolean(ReaderFonts.KEY_MUSHAF_FIT, fit).apply()
+    fun getMushafFit(): Boolean = user.getBoolean(ReaderFonts.KEY_MUSHAF_FIT, true)
+    fun setMushafFit(fit: Boolean) = user.edit().putBoolean(ReaderFonts.KEY_MUSHAF_FIT, fit).apply()
 
-    fun getLastMafatihId(): String? = prefs.getString(KEY_LAST_MAFATIH, null)
-    fun setLastMafatihId(id: String) = prefs.edit().putString(KEY_LAST_MAFATIH, id).apply()
+    fun getLastMafatihId(): String? = user.getString(KEY_LAST_MAFATIH, null)
+    fun setLastMafatihId(id: String) = user.edit().putString(KEY_LAST_MAFATIH, id).apply()
 
     // --- Place, calendar offset and religious reminders ------------------------------------
 
     fun getPlace(): Place {
-        val name = prefs.getString(KEY_PLACE_NAME, null) ?: return PlacePresets.default
+        val name = boot.getString(KEY_PLACE_NAME, null) ?: return PlacePresets.default
         return runCatching {
-            val lat = Double.fromBits(prefs.getLong(KEY_PLACE_LAT, 0L))
-            val lng = Double.fromBits(prefs.getLong(KEY_PLACE_LNG, 0L))
-            val zone = prefs.getString(KEY_PLACE_ZONE, "UTC") ?: "UTC"
+            val lat = Double.fromBits(boot.getLong(KEY_PLACE_LAT, 0L))
+            val lng = Double.fromBits(boot.getLong(KEY_PLACE_LNG, 0L))
+            val zone = boot.getString(KEY_PLACE_ZONE, "UTC") ?: "UTC"
             require(lat.isFinite() && lng.isFinite() && lat in -90.0..90.0 && lng in -180.0..180.0)
             ZoneId.of(zone)
             Place(name, lat, lng, zone)
@@ -277,7 +286,7 @@ class PreferencesManager(context: Context) {
     }
 
     fun setPlace(place: Place) {
-        prefs.edit()
+        boot.edit()
             .putString(KEY_PLACE_NAME, place.name)
             .putLong(KEY_PLACE_LAT, place.latitude.toRawBits())
             .putLong(KEY_PLACE_LNG, place.longitude.toRawBits())
@@ -285,76 +294,85 @@ class PreferencesManager(context: Context) {
             .apply()
     }
 
-    fun getHijriOffset(): Int = prefs.getInt(KEY_HIJRI_OFFSET, 0).coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)
+    fun getHijriOffset(): Int = boot.getInt(KEY_HIJRI_OFFSET, 0).coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)
     fun setHijriOffset(days: Int) =
-        prefs.edit().putInt(KEY_HIJRI_OFFSET, days.coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)).apply()
+        boot.edit().putInt(KEY_HIJRI_OFFSET, days.coerceIn(-ShiaCalendar.MAX_OFFSET, ShiaCalendar.MAX_OFFSET)).apply()
 
     /**
      * Alarm configuration of one prayer. Installs from before the adhan feature stored a single on/off
      * switch; "on" becomes the notification mode so nobody is silently switched to audio.
      */
     fun getAlarmConfig(prayer: Prayer): PrayerAlarmConfig {
-        PrayerAlarmConfig.decode(prefs.getString("pref_alarm_cfg_${prayer.id}", null))?.let { return it }
-        val legacyOn = prefs.getBoolean("pref_prayer_alarm_${prayer.id}", false)
+        PrayerAlarmConfig.decode(boot.getString("pref_alarm_cfg_${prayer.id}", null))?.let { return it }
+        val legacyOn = boot.getBoolean("pref_prayer_alarm_${prayer.id}", false)
         return PrayerAlarmConfig(mode = if (legacyOn) AdhanMode.NOTIFICATION else AdhanMode.OFF)
     }
 
     fun setAlarmConfig(prayer: Prayer, config: PrayerAlarmConfig) =
-        prefs.edit().putString("pref_alarm_cfg_${prayer.id}", config.encode()).apply()
+        boot.edit().putString("pref_alarm_cfg_${prayer.id}", config.encode()).apply()
 
-    fun getAdhanGlobal(): AdhanGlobalSettings = AdhanGlobalSettings.decode(prefs.getString(KEY_ADHAN_GLOBAL, null)) ?: AdhanGlobalSettings()
-    fun setAdhanGlobal(settings: AdhanGlobalSettings) = prefs.edit().putString(KEY_ADHAN_GLOBAL, settings.encode()).apply()
+    fun getAdhanGlobal(): AdhanGlobalSettings = AdhanGlobalSettings.decode(boot.getString(KEY_ADHAN_GLOBAL, null)) ?: AdhanGlobalSettings()
+    fun setAdhanGlobal(settings: AdhanGlobalSettings) = boot.edit().putString(KEY_ADHAN_GLOBAL, settings.encode()).apply()
 
-    fun getPrayerSettings(): PrayerSettings = PrayerSettings.decode(prefs.getString(KEY_PRAYER_SETTINGS, null)) ?: PrayerSettings()
-    fun setPrayerSettings(settings: PrayerSettings) = prefs.edit().putString(KEY_PRAYER_SETTINGS, settings.encode()).apply()
+    fun getPrayerSettings(): PrayerSettings = PrayerSettings.decode(boot.getString(KEY_PRAYER_SETTINGS, null)) ?: PrayerSettings()
+    fun setPrayerSettings(settings: PrayerSettings) = boot.edit().putString(KEY_PRAYER_SETTINGS, settings.encode()).apply()
 
-    fun isOccasionReminderEnabled(): Boolean = prefs.getBoolean(KEY_OCCASION_REMINDER, false)
+    fun isOccasionReminderEnabled(): Boolean = user.getBoolean(KEY_OCCASION_REMINDER, false)
     fun setOccasionReminderEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
+        user.edit().putBoolean(KEY_OCCASION_REMINDER, enabled).apply()
 
     /** The evening reminder before blessed nights and ليلة الجمعة (opt-in). */
-    fun isBlessedEveReminderEnabled(): Boolean = prefs.getBoolean(KEY_BLESSED_EVE, false)
-    fun setBlessedEveReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_BLESSED_EVE, enabled).apply()
+    fun isBlessedEveReminderEnabled(): Boolean = user.getBoolean(KEY_BLESSED_EVE, false)
+    fun setBlessedEveReminderEnabled(enabled: Boolean) = user.edit().putBoolean(KEY_BLESSED_EVE, enabled).apply()
 
     // --- Worship tools --------------------------------------------------------------------
 
-    fun getTasbih(): TasbihState = TasbihState.decode(prefs.getString(KEY_TASBIH, null))
-    fun setTasbih(state: TasbihState) = prefs.edit().putString(KEY_TASBIH, state.encode()).apply()
+    fun getTasbih(): TasbihState = TasbihState.decode(user.getString(KEY_TASBIH, null))
+    fun setTasbih(state: TasbihState) = user.edit().putString(KEY_TASBIH, state.encode()).apply()
 
-    fun getQada(): QadaState = QadaState.decode(prefs.getString(KEY_QADA, null))
-    fun setQada(state: QadaState) = prefs.edit().putString(KEY_QADA, state.encode()).apply()
+    fun getQada(): QadaState = QadaState.decode(user.getString(KEY_QADA, null))
+    fun setQada(state: QadaState) = user.edit().putString(KEY_QADA, state.encode()).apply()
 
-    fun getKhumsYear(): KhumsYear? = KhumsYear.decode(prefs.getString(KEY_KHUMS_YEAR, null))
+    fun getKhumsYear(): KhumsYear? = KhumsYear.decode(user.getString(KEY_KHUMS_YEAR, null))
     fun setKhumsYear(year: KhumsYear?) {
-        if (year == null) prefs.edit().remove(KEY_KHUMS_YEAR).apply()
-        else prefs.edit().putString(KEY_KHUMS_YEAR, year.encode()).apply()
+        if (year == null) user.edit().remove(KEY_KHUMS_YEAR).apply()
+        else user.edit().putString(KEY_KHUMS_YEAR, year.encode()).apply()
     }
 
-    fun getKhumsDraft(): KhumsDraft = KhumsDraft.decode(prefs.getString(KEY_KHUMS_DRAFT, null))
+    fun getKhumsDraft(): KhumsDraft = KhumsDraft.decode(user.getString(KEY_KHUMS_DRAFT, null))
     fun setKhumsDraft(draft: KhumsDraft) {
-        if (draft.isEmpty) prefs.edit().remove(KEY_KHUMS_DRAFT).apply()
-        else prefs.edit().putString(KEY_KHUMS_DRAFT, draft.encode()).apply()
+        if (draft.isEmpty) user.edit().remove(KEY_KHUMS_DRAFT).apply()
+        else user.edit().putString(KEY_KHUMS_DRAFT, draft.encode()).apply()
     }
 
-    fun isImsakAlarmEnabled(): Boolean = prefs.getBoolean(KEY_IMSAK_ALARM, false)
-    fun setImsakAlarmEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_IMSAK_ALARM, enabled).apply()
+    fun isImsakAlarmEnabled(): Boolean = boot.getBoolean(KEY_IMSAK_ALARM, false)
+    fun setImsakAlarmEnabled(enabled: Boolean) = boot.edit().putBoolean(KEY_IMSAK_ALARM, enabled).apply()
 
-    fun isKhumsReminderEnabled(): Boolean = prefs.getBoolean(KEY_KHUMS_REMINDER, false)
-    fun setKhumsReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_KHUMS_REMINDER, enabled).apply()
+    fun isKhumsReminderEnabled(): Boolean = user.getBoolean(KEY_KHUMS_REMINDER, false)
+    fun setKhumsReminderEnabled(enabled: Boolean) = user.edit().putBoolean(KEY_KHUMS_REMINDER, enabled).apply()
 
-    fun isEclipseReminderEnabled(): Boolean = prefs.getBoolean(KEY_ECLIPSE_REMINDER, false)
-    fun setEclipseReminderEnabled(enabled: Boolean) = prefs.edit().putBoolean(KEY_ECLIPSE_REMINDER, enabled).apply()
+    fun isEclipseReminderEnabled(): Boolean = user.getBoolean(KEY_ECLIPSE_REMINDER, false)
+    fun setEclipseReminderEnabled(enabled: Boolean) = user.edit().putBoolean(KEY_ECLIPSE_REMINDER, enabled).apply()
 
     // --- Backup ---------------------------------------------------------------------------
 
-    /** Everything that belongs in a backup file (see [BackupCodec]). */
-    fun exportForBackup(): String = BackupCodec.export(prefs.all, java.time.Instant.now().toString())
+    /**
+     * Everything that belongs in a backup file (see [BackupCodec]). Backed-up keys live in both stores — place and
+     * alarm configs in the device store, the rest in the user store — so the backup reads the union of the two.
+     */
+    fun exportForBackup(): String = BackupCodec.export(boot.all + user.all, java.time.Instant.now().toString())
 
-    /** Replaces the backed-up settings with [entries], which [BackupCodec.parse] has already validated. */
+    /**
+     * Replaces the backed-up settings with [entries], which [BackupCodec.parse] has already validated. Each key is
+     * written to the store it belongs in, so a restored key round-trips regardless of which store holds it.
+     */
     fun importFromBackup(entries: Map<String, Any>) {
-        val editor = prefs.edit()
-        prefs.all.keys.filter { BackupCodec.isAllowedKey(it) }.forEach(editor::remove)
+        val bootEditor = boot.edit()
+        val userEditor = user.edit()
+        boot.all.keys.filter { BackupCodec.isAllowedKey(it) }.forEach(bootEditor::remove)
+        user.all.keys.filter { BackupCodec.isAllowedKey(it) }.forEach(userEditor::remove)
         entries.forEach { (key, value) ->
+            val editor = if (PrefsClassifier.isBootKey(key)) bootEditor else userEditor
             when (value) {
                 is Boolean -> editor.putBoolean(key, value)
                 is Int -> editor.putInt(key, value)
@@ -362,16 +380,17 @@ class PreferencesManager(context: Context) {
                 is String -> editor.putString(key, value)
             }
         }
-        editor.commit()
+        bootEditor.commit()
+        userEditor.commit()
     }
 
-    fun getLastSahifaId(): String? = prefs.getString(KEY_LAST_SAHIFA, null)
-    fun setLastSahifaId(id: String) = prefs.edit().putString(KEY_LAST_SAHIFA, id).apply()
+    fun getLastSahifaId(): String? = user.getString(KEY_LAST_SAHIFA, null)
+    fun setLastSahifaId(id: String) = user.edit().putString(KEY_LAST_SAHIFA, id).apply()
 
     /** "system", "light" or "dark". */
-    fun getThemeMode(): String = prefs.getString(KEY_THEME_MODE, "system") ?: "system"
-    fun setThemeMode(mode: String) = prefs.edit().putString(KEY_THEME_MODE, mode).apply()
+    fun getThemeMode(): String = user.getString(KEY_THEME_MODE, "system") ?: "system"
+    fun setThemeMode(mode: String) = user.edit().putString(KEY_THEME_MODE, mode).apply()
 
-    fun hasAskedNotificationPermission(): Boolean = prefs.getBoolean(KEY_ASKED_NOTIFICATIONS, false)
-    fun setAskedNotificationPermission() = prefs.edit().putBoolean(KEY_ASKED_NOTIFICATIONS, true).apply()
+    fun hasAskedNotificationPermission(): Boolean = user.getBoolean(KEY_ASKED_NOTIFICATIONS, false)
+    fun setAskedNotificationPermission() = user.edit().putBoolean(KEY_ASKED_NOTIFICATIONS, true).apply()
 }

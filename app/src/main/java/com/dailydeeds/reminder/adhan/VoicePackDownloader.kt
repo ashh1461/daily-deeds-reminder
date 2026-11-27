@@ -16,10 +16,16 @@ class VoicePackDownloader(private val store: VoiceStore) {
 
     suspend fun fetchManifest(): Result<VoiceManifest.ParseResult> = withContext(Dispatchers.IO) {
         runCatching {
-            val text = open(VoiceUrlPolicy.MANIFEST_URL).use { conn ->
+            val bytes = open(VoiceUrlPolicy.MANIFEST_URL).use { conn ->
                 conn.inputStream.use { it.readLimited(MAX_MANIFEST_BYTES) }
-            }.toString(Charsets.UTF_8)
-            VoiceManifest.parse(text)
+            }
+            // The manifest is pinned to an immutable commit and to this exact digest (audit F-2): reject anything
+            // else before parsing, so a manifest swapped at the origin cannot be trusted even though it and its
+            // per-voice hashes share one origin.
+            if (!VoiceManifest.matchesPinnedDigest(bytes)) {
+                throw IOException("the voice manifest does not match the version this app was built with")
+            }
+            VoiceManifest.parse(bytes.toString(Charsets.UTF_8))
         }
     }
 

@@ -28,12 +28,12 @@ class DirectBootTest {
         assertTrue(DirectBoot.canReadSettings(unlocked = true, deviceCopyExists = false))
     }
 
-    /** The settings move once: unlocked, still in credential storage, and not yet in device storage. */
+    /** The store split runs once, after the first unlock; never while locked, and never a second time. */
     @Test
-    fun theSettingsMoveOnlyOnce() {
-        assertTrue(DirectBoot.shouldMove(unlocked = true, deviceCopyExists = false, credentialCopyExists = true))
-        assertFalse(DirectBoot.shouldMove(unlocked = true, deviceCopyExists = true, credentialCopyExists = true))
-        assertFalse(DirectBoot.shouldMove(unlocked = true, deviceCopyExists = false, credentialCopyExists = false))
-        assertFalse(DirectBoot.shouldMove(unlocked = false, deviceCopyExists = false, credentialCopyExists = true))
+    fun theStoreSplitsOnlyOnceAfterUnlock() {
+        assertTrue(DirectBoot.shouldSplit(unlocked = true, splitDone = false))
+        assertFalse(DirectBoot.shouldSplit(unlocked = true, splitDone = true))
+        assertFalse(DirectBoot.shouldSplit(unlocked = false, splitDone = false))
+        assertFalse(DirectBoot.shouldSplit(unlocked = false, splitDone = true))
     }
 }

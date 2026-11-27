@@ -4,6 +4,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.URI
+import java.security.MessageDigest
 
 /** A downloadable adhan voice. Only voices with a recorded licence and permission are ever listed. */
 data class RemoteVoice(
@@ -21,7 +22,16 @@ data class RemoteVoice(
 
 /** Where voice packs may be fetched from. HTTPS and a small host allow-list only. */
 object VoiceUrlPolicy {
-    const val MANIFEST_URL = "https://raw.githubusercontent.com/ashh1461/daily-deeds-reminder/master/voices/manifest.json"
+    /**
+     * The manifest is pinned to an **immutable commit**, not the mutable `master` branch (audit F-2). GitHub serves
+     * a raw blob by commit SHA permanently and by content, so a force-push to a branch cannot change what a released
+     * build fetches, and the bytes for this path can never differ from what was reviewed. Update this together with
+     * [VoiceManifest.EXPECTED_SHA256] whenever the manifest changes (push the new manifest, then bump both constants
+     * and release). The test `theRepoManifestMatchesThePinnedDigest` keeps the pin honest.
+     */
+    const val MANIFEST_COMMIT = "e05caa253c8e85444226857f18e3968b44daf885"
+    const val MANIFEST_URL =
+        "https://raw.githubusercontent.com/ashh1461/daily-deeds-reminder/$MANIFEST_COMMIT/voices/manifest.json"
 
     private val ALLOWED_HOSTS = setOf(
         "raw.githubusercontent.com",
@@ -46,6 +56,22 @@ object VoiceManifest {
     const val MAX_VOICE_BYTES = 25_000_000L
     private val ID = Regex("[a-z0-9_]{1,40}")
     private val SHA256 = Regex("[0-9a-f]{64}")
+
+    /**
+     * SHA-256 of the exact `voices/manifest.json` the shipped build trusts (audit F-2). The downloader verifies the
+     * fetched bytes against this pin before parsing, so a manifest swapped at the origin is rejected even though the
+     * file and its per-voice hashes share that origin. The APK is owner-signed, so this constant is as trustworthy
+     * as a public key baked into the build — no separate signing key is needed. Update it together with
+     * [VoiceUrlPolicy.MANIFEST_COMMIT] when the manifest changes; `theRepoManifestMatchesThePinnedDigest` enforces it.
+     */
+    const val EXPECTED_SHA256 = "bb67932dc44ea1ce967a8960499867802fc29471752fc10c56b4f182a9e9892c"
+
+    /** Lower-case hex SHA-256 of [bytes]. */
+    fun sha256Of(bytes: ByteArray): String =
+        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+
+    /** Whether [bytes] are exactly the pinned manifest. Checked before [parse] on every fetch. */
+    fun matchesPinnedDigest(bytes: ByteArray): Boolean = sha256Of(bytes) == EXPECTED_SHA256
 
     data class ParseResult(val voices: List<RemoteVoice>, val rejected: List<String>)
 

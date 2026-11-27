@@ -1,3 +1,6 @@
 # Bundled content is hashed by tests: never convert line endings.
 app/src/main/resources/** -text
 app/src/main/assets/** binary
+# The voice manifest is served raw by GitHub and pinned by SHA-256 in the build
+# (VoiceManifest.EXPECTED_SHA256); its bytes must be identical on every platform.
+voices/manifest.json -text

@@ -89,6 +89,30 @@ class VoiceAndPolicyTest {
     }
 
     @Test
+    fun theManifestUrlIsPinnedToAnImmutableCommitNotMaster() {
+        // Audit F-2: a force-push to a branch must not change what a released build fetches.
+        assertTrue(Regex("[0-9a-f]{40}").matches(VoiceUrlPolicy.MANIFEST_COMMIT))
+        assertTrue(VoiceUrlPolicy.MANIFEST_URL.contains(VoiceUrlPolicy.MANIFEST_COMMIT))
+        assertFalse("the manifest must not be fetched from the mutable master branch", VoiceUrlPolicy.MANIFEST_URL.contains("/master/"))
+        assertTrue(VoiceUrlPolicy.isAllowed(VoiceUrlPolicy.MANIFEST_URL))
+    }
+
+    @Test
+    fun theRepoManifestMatchesThePinnedDigest() {
+        // Keeps the baked-in pin in lockstep with the actual file: editing the manifest without bumping
+        // VoiceManifest.EXPECTED_SHA256 (and VoiceUrlPolicy.MANIFEST_COMMIT) fails the build here.
+        val bytes = File("../voices/manifest.json").readBytes()
+        assertEquals(VoiceManifest.EXPECTED_SHA256, VoiceManifest.sha256Of(bytes))
+        assertTrue(VoiceManifest.matchesPinnedDigest(bytes))
+    }
+
+    @Test
+    fun aTamperedManifestIsRejectedByTheDigestGate() {
+        assertFalse(VoiceManifest.matchesPinnedDigest("""{"version":1,"voices":[]}""".toByteArray()))
+        assertFalse(VoiceManifest.matchesPinnedDigest(ByteArray(0)))
+    }
+
+    @Test
     fun manifestPermissionsAreExactlyTheReviewedSet() {
         val xml = File("src/main/AndroidManifest.xml").readText()
         val declared = Regex("<uses-permission android:name=\"([^\"]+)\"").findAll(xml).map { it.groupValues[1] }.toSet()

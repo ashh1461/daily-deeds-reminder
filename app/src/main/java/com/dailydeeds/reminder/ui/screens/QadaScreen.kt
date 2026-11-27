@@ -31,6 +31,10 @@ import androidx.compose.ui.unit.dp
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import com.dailydeeds.reminder.worship.QadaKind
 import java.time.LocalDate
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.qadaTitle
+import com.dailydeeds.reminder.ui.labelRes
 
 private sealed interface QadaDialog {
     class AddTo(val kind: QadaKind) : QadaDialog
@@ -43,31 +47,31 @@ fun QadaScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
     val state by viewModel.qada.collectAsState()
     var dialog by remember { mutableStateOf<QadaDialog?>(null) }
 
-    ToolScaffold("القضاء", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.qada_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             WorshipCard {
-                WorshipHeading("المجموع")
-                Text("الصلوات: ${state.totalPrayers}    ·    الصيام: ${state.totalFasts} يوماً", style = MaterialTheme.typography.titleMedium)
-                WorshipNote("سجّل ما عليك من صلوات وصيام فائت، وأنقص العدد كلما قضيتَ شيئاً. تُحفظ الأرقام على جهازك فقط.")
+                WorshipHeading(stringResource(R.string.qada_total))
+                Text(stringResource(R.string.qada_totals, state.totalPrayers.toString(), state.totalFasts.toString()), style = MaterialTheme.typography.titleMedium)
+                WorshipNote(stringResource(R.string.qada_note))
                 OutlinedButton(onClick = { dialog = QadaDialog.Bulk }, modifier = Modifier.fillMaxWidth()) {
-                    Text("إضافة صلوات عن عدد من الأيام")
+                    Text(stringResource(R.string.qada_add_days))
                 }
             }
 
             WorshipCard {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("يوم كامل", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.qada_full_day), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(
-                            "يُنقص واحدة من كل صلاة من الصلوات الخمس، ويُتراجع عنه دفعة واحدة.",
+                            stringResource(R.string.qada_full_day_note),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     FilledTonalButton(onClick = { viewModel.markQadaFullDay() }, enabled = state.canMarkFullDay) {
-                        Text("قضيتُ يوماً كاملاً")
+                        Text(stringResource(R.string.qada_did_full_day))
                     }
                 }
             }
@@ -77,16 +81,16 @@ fun QadaScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(
-                                if (kind.isFast) "قضاء الصيام" else "قضاء صلاة ${kind.labelArabic}",
+                                qadaTitle(kind),
                                 style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                             )
-                            Text("المتبقي: ${state.owed(kind)}", style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.qada_remaining, state.owed(kind).toString()), style = MaterialTheme.typography.bodyMedium)
                         }
-                        FilledTonalButton(onClick = { viewModel.markQada(kind) }, enabled = state.owed(kind) > 0) { Text("قضيتُ 1") }
+                        FilledTonalButton(onClick = { viewModel.markQada(kind) }, enabled = state.owed(kind) > 0) { Text(stringResource(R.string.qada_did_one)) }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = { viewModel.addQada(kind, 1) }) { Text("+1") }
-                        OutlinedButton(onClick = { dialog = QadaDialog.AddTo(kind) }) { Text("إضافة عدد") }
+                        OutlinedButton(onClick = { dialog = QadaDialog.AddTo(kind) }) { Text(stringResource(R.string.qada_add_count)) }
                     }
                 }
             }
@@ -94,13 +98,15 @@ fun QadaScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
             if (state.history.isNotEmpty()) {
                 WorshipCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        WorshipHeading("آخر التغييرات")
+                        WorshipHeading(stringResource(R.string.qada_recent))
                         Column(Modifier.weight(1f)) {}
-                        TextButton(onClick = { viewModel.undoQada() }) { Text("تراجع عن الأخير") }
+                        TextButton(onClick = { viewModel.undoQada() }) { Text(stringResource(R.string.qada_undo)) }
                     }
                     state.history.takeLast(8).reversed().forEach { e ->
-                        val what = if (e.kind.isFast) "الصيام" else "صلاة ${e.kind.labelArabic}"
-                        val verb = if (e.delta > 0) "أضفتَ ${e.delta}" else "قضيتَ ${-e.delta}"
+                        val what = if (e.kind.isFast) stringResource(e.kind.labelRes)
+                        else stringResource(R.string.qada_history_prayer, stringResource(e.kind.labelRes))
+                        val verb = if (e.delta > 0) stringResource(R.string.qada_history_added, e.delta.toString())
+                        else stringResource(R.string.qada_history_done, (-e.delta).toString())
                         Text("${LocalDate.ofEpochDay(e.epochDay)} — $verb: $what", style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -110,13 +116,13 @@ fun QadaScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
 
     when (val d = dialog) {
         is QadaDialog.AddTo -> NumberDialog(
-            title = "إضافة إلى ${if (d.kind.isFast) "قضاء الصيام" else "قضاء صلاة ${d.kind.labelArabic}"}",
-            label = "العدد", confirm = "إضافة",
+            title = stringResource(R.string.qada_add_to, qadaTitle(d.kind)),
+            label = stringResource(R.string.qada_count), confirm = stringResource(R.string.common_add),
             onDismiss = { dialog = null }
         ) { viewModel.addQada(d.kind, it) }
         QadaDialog.Bulk -> NumberDialog(
-            title = "إضافة صلوات الأيام",
-            label = "عدد الأيام (تُضاف إلى الصلوات الخمس)", confirm = "إضافة",
+            title = stringResource(R.string.qada_add_days_title),
+            label = stringResource(R.string.qada_days_count), confirm = stringResource(R.string.common_add),
             onDismiss = { dialog = null }
         ) { viewModel.addQadaDays(it) }
         null -> Unit
@@ -140,6 +146,6 @@ private fun NumberDialog(title: String, label: String, confirm: String, onDismis
         confirmButton = {
             Button(onClick = { value?.let(onConfirm); onDismiss() }, enabled = value != null) { Text(confirm) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("إلغاء") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } }
     )
 }

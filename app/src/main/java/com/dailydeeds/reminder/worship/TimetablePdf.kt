@@ -10,13 +10,17 @@ import com.dailydeeds.reminder.R
 import java.io.OutputStream
 import java.time.format.TextStyle
 import java.util.Locale
+import android.view.View
 
 /** One-page PDF of a monthly timetable (Imsak and Iftar), drawn with the app's Tajawal font. */
 object TimetablePdf {
     private const val PAGE_WIDTH = 595
     private const val PAGE_HEIGHT = 842
     private const val MARGIN = 28f
-    private val HEADERS = listOf("اليوم", "التاريخ", "الإمساك", "الفجر", "الشروق", "الظهر", "المغرب", "العشاء")
+    private val HEADERS = listOf(
+        R.string.table_day, R.string.table_date, R.string.time_imsak, R.string.prayer_fajr,
+        R.string.time_sunrise, R.string.prayer_dhuhr, R.string.prayer_maghrib, R.string.prayer_isha
+    )
 
     fun write(context: Context, rows: List<TimetableRow>, title: String, subtitle: String, out: OutputStream) {
         val regular = ResourcesCompat.getFont(context, R.font.tajawal_regular) ?: Typeface.DEFAULT
@@ -41,18 +45,23 @@ object TimetablePdf {
             val colWidth = tableWidth / HEADERS.size
             val rowHeight = 21f
             var y = 100f
-            // Right-to-left: the first column sits at the right edge.
-            fun centerX(col: Int) = PAGE_WIDTH - MARGIN - colWidth * (col + 0.5f)
+            // [context] carries the app language (LocaleSupport): in Arabic and Persian the first column sits at
+            // the right edge, in English at the left.
+            val config = context.resources.configuration
+            val rtl = config.layoutDirection == View.LAYOUT_DIRECTION_RTL
+            val locale = config.locales[0] ?: Locale.getDefault()
+            fun centerX(col: Int) =
+                if (rtl) PAGE_WIDTH - MARGIN - colWidth * (col + 0.5f) else MARGIN + colWidth * (col + 0.5f)
 
             c.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + rowHeight, fillHead)
-            HEADERS.forEachIndexed { i, h -> c.drawText(h, centerX(i), y + 14.5f, headPaint) }
+            HEADERS.forEachIndexed { i, h -> c.drawText(context.getString(h), centerX(i), y + 14.5f, headPaint) }
             y += rowHeight
 
             rows.take(31).forEachIndexed { index, row ->
                 if (row.qadrNight != null) c.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + rowHeight, fillQadr)
                 else if (index % 2 == 1) c.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + rowHeight, fillBand)
                 val t = row.times
-                val weekday = row.date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("ar"))
+                val weekday = row.date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
                 val cells = listOf(
                     "${row.hijri.day} $weekday",
                     "${row.date.dayOfMonth}/${row.date.monthValue}",
@@ -65,10 +74,10 @@ object TimetablePdf {
             y += 18f
             val note = paint(regular, 9.5f, Paint.Align.CENTER, Color.DKGRAY)
             if (rows.any { it.qadrNight != null }) {
-                c.drawText("الأسطر الملوّنة: اليوم الذي تبدأ بمغربه ليلة من ليالي القدر (19 و21 و23).", PAGE_WIDTH / 2f, y, note)
+                c.drawText(context.getString(R.string.ramadan_pdf_qadr_rows), PAGE_WIDTH / 2f, y, note)
                 y += 14f
             }
-            c.drawText("المواعيد تقريبية بحسب الحساب الفلكي؛ احتط في الإمساك وأفطر عند تحقق المغرب. تطبيق ورد.", PAGE_WIDTH / 2f, y, note)
+            c.drawText(context.getString(R.string.ramadan_pdf_footer), PAGE_WIDTH / 2f, y, note)
             doc.finishPage(page)
             doc.writeTo(out)
         } finally {

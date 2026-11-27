@@ -48,6 +48,9 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.appLocale
 
 private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
 private fun LocalTime?.clock() = this?.format(CLOCK) ?: "--:--"
@@ -70,7 +73,7 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
     val rows = remember(year, month, place, calc, offset) {
         runCatching { Timetable.month(year, month, place, calc, offset) }.getOrDefault(emptyList())
     }
-    val monthTitle = "${ShiaCalendar.MONTH_NAMES[month - 1]} $year هـ"
+    val monthTitle = stringResource(R.string.hijri_month_year, ShiaCalendar.MONTH_NAMES[month - 1], year.toString())
 
     val pdfLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         if (uri != null) {
@@ -78,9 +81,14 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
                 message = withContext(Dispatchers.IO) {
                     runCatching {
                         val out = context.contentResolver.openOutputStream(uri, "wt") ?: error("no stream")
-                        out.use { TimetablePdf.write(context, rows, "جدول أوقات $monthTitle", "${place.name} — بحسب إعدادات الحساب في التطبيق", it) }
-                        "تم حفظ الجدول بصيغة PDF"
-                    }.getOrElse { "تعذّر حفظ الملف" }
+                        out.use {
+                            TimetablePdf.write(
+                                context, rows, context.getString(R.string.ramadan_pdf_title, monthTitle),
+                                context.getString(R.string.ramadan_pdf_subtitle, place.name), it
+                            )
+                        }
+                        context.getString(R.string.ramadan_pdf_saved)
+                    }.getOrElse { context.getString(R.string.ramadan_pdf_failed) }
                 }
             }
         }
@@ -94,7 +102,7 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
         if (y in Timetable.MIN_YEAR..Timetable.MAX_YEAR) { month = m; year = y }
     }
 
-    ToolScaffold("رمضان والإمساك", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.ramadan_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -102,44 +110,48 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
             WorshipCard {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     OutlinedButton(onClick = { move(-1) }) {
-                        Text("‹", Modifier.clearAndSetSemantics { contentDescription = "الشهر السابق" })
+                        val previousLabel = stringResource(R.string.month_previous)
+                        Text("‹", Modifier.clearAndSetSemantics { contentDescription = previousLabel })
                     }
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(monthTitle, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(place.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     OutlinedButton(onClick = { move(1) }) {
-                        Text("›", Modifier.clearAndSetSemantics { contentDescription = "الشهر التالي" })
+                        val nextLabel = stringResource(R.string.month_next)
+                        Text("›", Modifier.clearAndSetSemantics { contentDescription = nextLabel })
                     }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { year = Timetable.nextRamadanYear(today, offset); month = 9 }, modifier = Modifier.weight(1f)) {
-                        Text("رمضان القادم")
+                        Text(stringResource(R.string.ramadan_next))
                     }
                     Button(
                         onClick = { pdfLauncher.launch("timetable-$year-${month.toString().padStart(2, '0')}.pdf") },
                         enabled = rows.isNotEmpty(), modifier = Modifier.weight(1f)
-                    ) { Text("حفظ PDF") }
+                    ) { Text(stringResource(R.string.ramadan_save_pdf)) }
                 }
                 message?.let { WorshipNote(it) }
             }
 
             WorshipCard {
-                SwitchLine("تنبيه وقت الإمساك في أيام رمضان", imsakAlarm) { worship.setImsakAlarm(it) }
+                SwitchLine(stringResource(R.string.ramadan_imsak_alarm), imsakAlarm) { worship.setImsakAlarm(it) }
                 WorshipNote(
-                    "الإمساك قبل الفجر بعدد الدقائق المحدد في إعدادات الأذان (10 دقائق افتراضياً). " +
-                        "للتنبيه عند الإفطار فعّل أذان المغرب أو تنبيهه من «إعدادات الأذان»."
+                    stringResource(R.string.ramadan_imsak_note)
                 )
             }
 
             if (rows.isEmpty()) {
-                WorshipNote("تعذّر إنشاء الجدول لهذا الشهر.")
+                WorshipNote(stringResource(R.string.ramadan_no_table))
             } else {
                 Row(
                     Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small).padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    listOf("اليوم", "التاريخ", "الإمساك", "الفجر", "الشروق", "الظهر", "المغرب", "العشاء").forEach {
+                    listOf(
+                        R.string.table_day, R.string.table_date, R.string.time_imsak, R.string.prayer_fajr,
+                        R.string.time_sunrise, R.string.prayer_dhuhr, R.string.prayer_maghrib, R.string.prayer_isha
+                    ).map { stringResource(it) }.forEach {
                         Cell(it, header = true)
                     }
                 }
@@ -150,7 +162,7 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
                         else -> MaterialTheme.colorScheme.surface
                     }
                     Row(Modifier.fillMaxWidth().background(tint, MaterialTheme.shapes.extraSmall).padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Cell("${r.hijri.day} " + r.date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("ar")))
+                        Cell("${r.hijri.day} " + r.date.dayOfWeek.getDisplayName(TextStyle.SHORT, appLocale()))
                         Cell("${r.date.dayOfMonth}/${r.date.monthValue}")
                         Cell(r.times.imsak.clock(), bold = true)
                         Cell(r.times.fajr.clock())
@@ -161,9 +173,9 @@ fun RamadanScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBa
                     }
                 }
                 if (rows.any { it.qadrNight != null }) {
-                    WorshipNote("الأسطر الذهبية: اليوم الذي تبدأ عند مغربه ليلة من ليالي القدر (19 و21 و23).")
+                    WorshipNote(stringResource(R.string.ramadan_qadr_rows))
                 }
-                WorshipNote("الأوقات تقريبية بحسب الحساب الفلكي وإعدادات طريقة الحساب؛ احتط في الإمساك وأفطر عند تحقق المغرب.")
+                WorshipNote(stringResource(R.string.ramadan_times_note))
             }
         }
     }

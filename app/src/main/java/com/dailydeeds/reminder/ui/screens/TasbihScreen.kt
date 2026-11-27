@@ -41,6 +41,8 @@ import com.dailydeeds.reminder.ui.components.rememberStrongBuzz
 import com.dailydeeds.reminder.viewmodel.WorshipViewModel
 import com.dailydeeds.reminder.worship.TasbihState
 import com.dailydeeds.reminder.worship.ZahraStages
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
 
 /** Tasbih al-Zahra with its three stages, and a free counter with an optional target. */
 @Composable
@@ -56,13 +58,14 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
     var pendingTarget by rememberSaveable { mutableStateOf<Int?>(null) }
     KeepScreenOn()
 
-    ToolScaffold("المسبحة", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.tasbih_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ChoiceRow(listOf(0, 1), mode, { if (it == 0) "تسبيح الزهراء (ع)" else "عدّاد حر" }) { mode = it }
+            val modeLabels = listOf(stringResource(R.string.tasbih_mode_zahra), stringResource(R.string.tasbih_mode_free))
+            ChoiceRow(listOf(0, 1), mode, { modeLabels[it] }) { mode = it }
 
             if (mode == 0) {
                 ZahraPanel(state)
@@ -96,16 +99,16 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
                     else -> viewModel.resetFree()
                 }
             }) {
-                Text("إعادة العدّ")
+                Text(stringResource(R.string.tasbih_reset))
             }
-            WorshipNote("إجمالي ما سبّحته عبر التطبيق: ${state.lifetime}")
+            WorshipNote(stringResource(R.string.tasbih_lifetime, state.lifetime.toString()))
         }
     }
 
     if (confirmReset) {
         val count = if (mode == 0) state.zahraCount else state.freeCount
         ClearCountDialog(
-            text = "سيُمسح العدّ الحالي ($count). هل تريد البدء من جديد؟",
+            text = stringResource(R.string.tasbih_reset_confirm, count.toString()),
             onConfirm = {
                 confirmReset = false
                 if (mode == 0) viewModel.resetZahra() else viewModel.resetFree()
@@ -115,7 +118,7 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
     }
     pendingTarget?.let { target ->
         ClearCountDialog(
-            text = "تغيير الهدف يبدأ العدّ من جديد، وسيُمسح العدّ الحالي (${state.freeCount}). هل تريد المتابعة؟",
+            text = stringResource(R.string.tasbih_target_confirm, state.freeCount.toString()),
             onConfirm = {
                 pendingTarget = null
                 viewModel.setFreeTarget(target)
@@ -129,10 +132,10 @@ fun TasbihScreen(viewModel: WorshipViewModel, onNavigateBack: () -> Unit) {
 private fun ClearCountDialog(text: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("مسح العدّ؟") },
+        title = { Text(stringResource(R.string.tasbih_clear_title)) },
         text = { Text(text) },
-        confirmButton = { TextButton(onClick = onConfirm) { Text("مسح العدّ") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("إبقاء العدّ") } }
+        confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(R.string.tasbih_clear)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.tasbih_keep)) } }
     )
 }
 
@@ -141,7 +144,7 @@ private fun ZahraPanel(state: TasbihState) {
     val stage = ZahraStages.stageIndex(state.zahraCount)
     WorshipCard {
         Text(
-            "تسبيح فاطمة الزهراء (ع): 34 تكبيرة، ثم 33 تحميدة، ثم 33 تسبيحة، عقيب كل صلاة.",
+            stringResource(R.string.tasbih_zahra_note),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         ZahraStages.STAGES.forEachIndexed { index, s ->
@@ -162,7 +165,7 @@ private fun ZahraPanel(state: TasbihState) {
         }
         if (state.zahraDone) {
             Text(
-                "أتممتَ التسبيح. تقبّل الله منك. (عدد مرات الإتمام: ${state.zahraCompletions})",
+                stringResource(R.string.tasbih_zahra_done, state.zahraCompletions.toString()),
                 style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary
             )
         }
@@ -172,10 +175,11 @@ private fun ZahraPanel(state: TasbihState) {
 @Composable
 private fun FreePanel(state: TasbihState, onPickTarget: (Int) -> Unit) {
     WorshipCard {
-        WorshipHeading("الهدف")
-        ChoiceRow(TasbihState.TARGETS, state.freeTarget, { if (it == 0) "مفتوح" else "$it" }, onPickTarget)
+        WorshipHeading(stringResource(R.string.tasbih_target))
+        val openLabel = stringResource(R.string.tasbih_target_open)
+        ChoiceRow(TasbihState.TARGETS, state.freeTarget, { if (it == 0) openLabel else "$it" }, onPickTarget)
         if (state.freeDone) {
-            Text("بلغتَ الهدف.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.tasbih_target_reached), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -190,7 +194,7 @@ private fun CounterButton(count: Int, finished: Boolean, onTap: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("$count", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
             Text(
-                if (finished) "اكتمل" else "اضغط للعدّ",
+                stringResource(if (finished) R.string.tasbih_done else R.string.tasbih_tap),
                 style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary, textAlign = TextAlign.Center
             )
         }

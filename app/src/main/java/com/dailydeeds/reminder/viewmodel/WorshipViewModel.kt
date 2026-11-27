@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.annotation.StringRes
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.util.LocaleSupport
 
 /** Outcome of a backup export or import, shown once on the settings screen. */
 data class BackupStatus(val message: String, val ok: Boolean)
@@ -122,16 +125,30 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
         _backup.value = null
     }
 
+    private fun text(@StringRes id: Int, vararg args: Any): String =
+        LocaleSupport.localized(getApplication()).getString(id, *args)
+
+    @StringRes
+    private fun reasonText(reason: BackupCodec.Reason): Int = when (reason) {
+        BackupCodec.Reason.TOO_LARGE -> R.string.backup_error_too_large
+        BackupCodec.Reason.NOT_A_BACKUP -> R.string.backup_error_not_backup
+        BackupCodec.Reason.OTHER_APP -> R.string.backup_error_other_app
+        BackupCodec.Reason.UNSUPPORTED_VERSION -> R.string.backup_error_version
+        BackupCodec.Reason.EMPTY -> R.string.backup_error_empty
+        BackupCodec.Reason.TOO_MANY_ENTRIES -> R.string.backup_error_too_many
+        BackupCodec.Reason.NO_VALID_DATA -> R.string.backup_error_no_data
+    }
+
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
             _backup.value = withContext(Dispatchers.IO) {
                 runCatching {
                     val bytes = prefs.exportForBackup().toByteArray(Charsets.UTF_8)
                     val out = getApplication<Application>().contentResolver.openOutputStream(uri, "wt")
-                        ?: return@runCatching BackupStatus("تعذّر فتح الملف للكتابة", false)
+                        ?: return@runCatching BackupStatus(text(R.string.backup_open_write_failed), false)
                     out.use { it.write(bytes) }
-                    BackupStatus("تم حفظ النسخة الاحتياطية", true)
-                }.getOrElse { BackupStatus("تعذّر حفظ النسخة الاحتياطية", false) }
+                    BackupStatus(text(R.string.backup_saved), true)
+                }.getOrElse { BackupStatus(text(R.string.backup_save_failed), false) }
             }
         }
     }
@@ -141,22 +158,22 @@ class WorshipViewModel(app: Application) : AndroidViewModel(app) {
             _backup.value = withContext(Dispatchers.IO) {
                 runCatching {
                     val input = getApplication<Application>().contentResolver.openInputStream(uri)
-                        ?: return@runCatching BackupStatus("تعذّر فتح الملف", false)
-                    val text = input.use { readCapped(it) }
-                        ?: return@runCatching BackupStatus("الملف أكبر من الحد المسموح", false)
-                    when (val result = BackupCodec.parse(text)) {
-                        is BackupCodec.Import.Error -> BackupStatus(result.message, false)
+                        ?: return@runCatching BackupStatus(text(R.string.backup_open_failed), false)
+                    val json = input.use { readCapped(it) }
+                        ?: return@runCatching BackupStatus(text(R.string.backup_error_too_large), false)
+                    when (val result = BackupCodec.parse(json)) {
+                        is BackupCodec.Import.Error -> BackupStatus(text(reasonText(result.reason)), false)
                         is BackupCodec.Import.Ok -> {
                             prefs.importFromBackup(result.entries)
                             DataReloads.backupImported()
                             AlarmScheduler.scheduleAllReminders(getApplication())
-                            val skipped = if (result.skipped > 0) " (تم تجاهل ${result.skipped} عنصر غير صالح)" else ""
+                            val skipped = if (result.skipped > 0) " " + text(R.string.backup_skipped, result.skipped.toString()) else ""
                             // Every screen reads the imported values again (DataReloads) and the alarms are set
                             // from them above, so no restart is needed any more.
-                            BackupStatus("تم استيراد ${result.entries.size} عنصر$skipped.", true)
+                            BackupStatus(text(R.string.backup_imported, result.entries.size.toString()) + skipped, true)
                         }
                     }
-                }.getOrElse { BackupStatus("تعذّر قراءة النسخة الاحتياطية", false) }
+                }.getOrElse { BackupStatus(text(R.string.backup_read_failed), false) }
             }
         }
     }

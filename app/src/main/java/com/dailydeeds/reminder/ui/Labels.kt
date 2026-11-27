@@ -9,6 +9,13 @@ import com.dailydeeds.reminder.adhan.CalcMethod
 import com.dailydeeds.reminder.util.CoordinateInput
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.util.TimeFormat
+import androidx.compose.ui.platform.LocalConfiguration
+import com.dailydeeds.reminder.worship.QadaKind
+import com.dailydeeds.reminder.worship.EclipseType
+import com.dailydeeds.reminder.worship.Visibility
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.Locale
 
 /*
  * UI wording of model values in the app language (v1.9.0). The models stay free of Android resources so they keep
@@ -61,4 +68,56 @@ fun coordinateErrorText(e: CoordinateInput.Result.Invalid): String {
         CoordinateInput.Reason.OUT_OF_RANGE ->
             stringResource(R.string.coord_error_range, axis, e.axis.limit.toInt().toString())
     }
+}
+
+@get:StringRes
+val QadaKind.labelRes: Int
+    get() = when (this) {
+        QadaKind.FAJR -> R.string.qada_kind_fajr
+        QadaKind.DHUHR -> R.string.prayer_dhuhr
+        QadaKind.ASR -> R.string.qada_kind_asr
+        QadaKind.MAGHRIB -> R.string.prayer_maghrib
+        QadaKind.ISHA -> R.string.prayer_isha
+        QadaKind.FAST -> R.string.qada_kind_fast
+    }
+
+/** "Make-up fasts" or "Make-up Fajr prayer". */
+@Composable
+fun qadaTitle(kind: QadaKind): String =
+    if (kind.isFast) stringResource(R.string.qada_fast_title)
+    else stringResource(R.string.qada_prayer_title, stringResource(kind.labelRes))
+
+@get:StringRes
+val EclipseType.labelRes: Int
+    get() = when (this) {
+        EclipseType.TOTAL -> R.string.eclipse_type_total
+        EclipseType.PARTIAL -> R.string.eclipse_type_partial
+        EclipseType.PENUMBRAL -> R.string.eclipse_type_penumbral
+        EclipseType.ANNULAR -> R.string.eclipse_type_annular
+        EclipseType.HYBRID -> R.string.eclipse_type_hybrid
+    }
+
+@get:StringRes
+val Visibility.labelRes: Int
+    get() = when (this) {
+        Visibility.VISIBLE -> R.string.eclipse_visible
+        Visibility.NEAR_HORIZON -> R.string.eclipse_near_horizon
+        Visibility.BELOW_HORIZON -> R.string.eclipse_below_horizon
+        Visibility.CHECK_LOCALLY -> R.string.eclipse_check_locally
+    }
+
+/** The locale of the app language, for dates and weekday names. */
+@Composable
+fun appLocale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+
+/** A Gregorian month name (1-12) in the app language. */
+@Composable
+fun gregorianMonthName(month: Int): String = Month.of(month).getDisplayName(TextStyle.FULL, appLocale())
+
+/** "today", "tomorrow" or "in N days". */
+@Composable
+fun daysAwayText(days: Long): String = when (days) {
+    0L -> stringResource(R.string.days_today)
+    1L -> stringResource(R.string.days_tomorrow)
+    else -> stringResource(R.string.days_in_n, days.toString())
 }

@@ -28,13 +28,18 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import com.dailydeeds.reminder.R
+import com.dailydeeds.reminder.ui.gregorianMonthName
+import com.dailydeeds.reminder.ui.labelRes
+import com.dailydeeds.reminder.ui.theme.RtlContent
 
-private val GREGORIAN_MONTHS = listOf(
-    "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-)
 private val CLOCK = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
 
-/** Which events call for the prayer of signs, and how it is performed. A summary: the marja's book decides. */
+/**
+ * Which events call for the prayer of signs, and how it is performed. A summary: the marja's book decides. This is
+ * fiqh guidance, kept in its original Arabic in every UI language (v1.9.0) and shown right to left.
+ */
 private val GUIDE: List<Pair<String, List<String>>> = listOf(
     "متى تجب؟" to listOf(
         "عند كسوف الشمس وخسوف القمر ولو كان جزئياً، وعند الزلزلة.",
@@ -67,36 +72,39 @@ fun AyatScreen(tools: ToolsViewModel, worship: WorshipViewModel, onNavigateBack:
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val upcoming = remember { Eclipses.upcoming(Instant.now(), 12) }
 
-    ToolScaffold("صلاة الآيات", onNavigateBack) {
+    ToolScaffold(stringResource(R.string.ayat_title), onNavigateBack) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ChoiceRow(listOf(0, 1), tab, { if (it == 0) "كيف تُصلّى" else "الخسوف والكسوف القادم" }) { tab = it }
+            val tabLabels = listOf(stringResource(R.string.ayat_tab_how), stringResource(R.string.ayat_tab_upcoming))
+            ChoiceRow(listOf(0, 1), tab, { tabLabels[it] }) { tab = it }
 
             if (tab == 0) {
-                GUIDE.forEach { (title, lines) ->
-                    WorshipCard {
-                        WorshipHeading(title)
-                        lines.forEach { Text("• $it", style = MaterialTheme.typography.bodyMedium) }
+                RtlContent {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        GUIDE.forEach { (title, lines) ->
+                            WorshipCard {
+                                WorshipHeading(title)
+                                lines.forEach { Text("• $it", style = MaterialTheme.typography.bodyMedium) }
+                            }
+                        }
                     }
                 }
-                WorshipNote("هذه خلاصة مأخوذة من الرسائل العملية المتداولة، وقد تختلف التفاصيل بين المراجع؛ فراجع رسالة مرجع تقليدك.")
+                WorshipNote(stringResource(R.string.ayat_summary_note))
             } else {
                 WorshipCard {
-                    SwitchLine("تنبيه صباح يوم الخسوف المرئي في مدينتي", reminder) { worship.setEclipseReminder(it) }
+                    SwitchLine(stringResource(R.string.ayat_reminder), reminder) { worship.setEclipseReminder(it) }
                     WorshipNote(
-                        "المدينة: ${place.name}. يصلك تنبيه الساعة 8 صباحاً إذا كان خسوف قمري مرئي من مدينتك " +
-                            "خلال الـ 24 ساعة التالية (يُحسب ارتفاع القمر في مدينتك). الكسوف الشمسي غير مشمول بالتنبيه."
+                        stringResource(R.string.ayat_reminder_note, place.name)
                     )
                 }
                 if (upcoming.isEmpty()) {
-                    WorshipNote("انتهى نطاق الجدول المدمج (حتى سنة ${Eclipses.LAST_YEAR}).")
+                    WorshipNote(stringResource(R.string.ayat_table_ended, Eclipses.LAST_YEAR.toString()))
                 }
                 upcoming.forEach { EclipseCard(it, place.zone, place) }
                 WorshipNote(
-                    "المصدر: كتالوج ناسا لخسوف وكسوف الأرض والقمر (F. Espenak, NASA/GSFC)، 2021–${Eclipses.LAST_YEAR}. " +
-                        "رؤية الكسوف الشمسي تتطلب حساباً محلياً غير مدمج، فتحقق من المناطق المذكورة أو من مصدر موثوق."
+                    stringResource(R.string.ayat_source, Eclipses.LAST_YEAR.toString())
                 )
             }
         }
@@ -108,26 +116,29 @@ private fun EclipseCard(e: Eclipse, zone: ZoneId, place: com.dailydeeds.reminder
     val local = e.greatest.atZone(zone)
     val visibility = Eclipses.visibility(e, place)
     WorshipCard {
-        val kind = if (e.kind == EclipseKind.LUNAR) "خسوف القمر" else "كسوف الشمس"
-        Text("$kind ${e.type.labelArabic}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        val kind = stringResource(if (e.kind == EclipseKind.LUNAR) R.string.eclipse_lunar else R.string.eclipse_solar)
+        Text(stringResource(R.string.eclipse_title, kind, stringResource(e.type.labelRes)), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(
-            "${local.dayOfMonth} ${GREGORIAN_MONTHS[local.monthValue - 1]} ${local.year} — ذروة الحدث ${local.format(CLOCK)} بتوقيت ${place.name}",
+            stringResource(
+                R.string.eclipse_when, "${local.dayOfMonth} ${gregorianMonthName(local.monthValue)} ${local.year}",
+                local.format(CLOCK), place.name
+            ),
             style = MaterialTheme.typography.bodyMedium
         )
-        Text("المناطق: ${e.regionArabic}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.eclipse_regions, e.regionArabic), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (e.kind == EclipseKind.LUNAR && e.umbralMinutes > 0) {
-            Text("مدة الطور الظلّي: ${e.umbralMinutes / 60} ساعة و${e.umbralMinutes % 60} دقيقة", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.eclipse_umbral, (e.umbralMinutes / 60).toString(), (e.umbralMinutes % 60).toString()), style = MaterialTheme.typography.bodySmall)
         }
         Text(
-            visibility.labelArabic,
+            stringResource(visibility.labelRes),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = if (visibility == Visibility.VISIBLE) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (!e.needsPrayer) {
-            WorshipNote("الخسوف شبه الظلّي لا يُرى بالعين غالباً ولا تُعدّ له صلاة الآيات عادةً.")
+            WorshipNote(stringResource(R.string.eclipse_penumbral_note))
         } else {
-            WorshipNote("تجب صلاة الآيات على من يرى ${if (e.kind == EclipseKind.LUNAR) "الخسوف" else "الكسوف"} في بلده.")
+            WorshipNote(stringResource(if (e.kind == EclipseKind.LUNAR) R.string.eclipse_prayer_lunar else R.string.eclipse_prayer_solar))
         }
     }
 }

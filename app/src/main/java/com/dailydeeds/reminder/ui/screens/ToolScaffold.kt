@@ -12,30 +12,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.LayoutDirection
+import com.dailydeeds.reminder.R
 
-/** Shared frame for the tool screens: right-to-left layout, title and a back button. */
+/**
+ * Shared frame for the tool screens: title and a back button. The layout direction is the app's (right to left for
+ * Arabic and Persian, left to right for English), set once by the theme.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolScaffold(title: String, onNavigateBack: () -> Unit, content: @Composable (Modifier) -> Unit) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(title, fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع")
-                        }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(title, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                     }
-                )
-            }
-        ) { inner ->
-            Column(Modifier.fillMaxSize().padding(inner)) { content(Modifier) }
+                }
+            )
         }
+    ) { inner ->
+        Column(Modifier.fillMaxSize().padding(inner)) { content(Modifier) }
     }
 }

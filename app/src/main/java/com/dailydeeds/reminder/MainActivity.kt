@@ -15,6 +15,7 @@ import com.dailydeeds.reminder.ui.screens.QadaScreen
 import com.dailydeeds.reminder.ui.screens.RamadanScreen
 import com.dailydeeds.reminder.ui.screens.TasbihScreen
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -111,6 +112,7 @@ import com.dailydeeds.reminder.viewmodel.QuranViewModel
 import com.dailydeeds.reminder.viewmodel.SahifaViewModel
 import com.dailydeeds.reminder.viewmodel.SearchViewModel
 import com.dailydeeds.reminder.viewmodel.ToolsViewModel
+import com.dailydeeds.reminder.util.LocaleSupport
 
 class MainActivity : ComponentActivity() {
 
@@ -121,6 +123,11 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             AlarmScheduler.scheduleAllReminders(this)
         }
+
+    // The UI language picked in Settings (v1.9.0); changing it recreates the activity, which comes back through here.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleSupport.localized(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Android 15+ draws every app edge to edge when it targets SDK 35+; doing it on all versions keeps one layout.

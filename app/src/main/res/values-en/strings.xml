@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English UI strings. Same keys and placeholders as values/strings.xml (StringResourcesTest). -->
+<resources>
+    <string name="app_name">Wird</string>
+    <string name="app_subtitle">As recommended by Sayyid al-Asma, may God be pleased with him</string>
+    <string name="channel_reminders_name">Daily deeds reminders</string>
+    <string name="channel_reminders_desc">Reminders for the morning and evening litanies and the acts after each prayer</string>
+    <string name="widget_description">The next prayer, the Hijri date and the occasion of the day</string>
+    <string name="widget_preview_place">Beirut</string>
+    <string name="widget_preview_next">Next prayer: Maghrib</string>
+    <string name="widget_preview_hijri">17 Jumada al-Akhirah 1448 AH</string>
+    <string name="widget_preview_occasion">Eve of Friday</string>
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_system">Device language</string>
+    <string name="settings_language_note">Only the app\'s interface is translated. The Quran, the supplications and the books stay in their original Arabic.</string>
+    <string name="settings_section_prayer">Adhan and prayer</string>
+    <string name="settings_current_city">Current city: %1$s</string>
+    <string name="settings_prayer_times">Prayer times</string>
+    <string name="settings_adhan_and_method">Adhan and calculation method</string>
+    <string name="settings_section_calendar">Calendar</string>
+    <string name="settings_calendar_desc">Adjust the moon sighting and the reminders for the occasions of the Ahl al-Bayt (AS).</string>
+    <string name="settings_calendar_open">Calendar and occasions</string>
+    <string name="settings_section_reminders">Deed reminders</string>
+    <string name="settings_reminders_note">The night, bedtime and Thursday-morning times are suggestions you can change. All times follow the device clock.</string>
+    <string name="settings_reminders_anytime_note">The short ziyarah and the supplication for entrusting the future are under “Any time” and have no set time.</string>
+    <string name="settings_reminder_thursday">Every Thursday morning, when going out to seek a need</string>
+    <string name="settings_reminder_daily">Every day</string>
+    <string name="settings_change_time">Change time</string>
+    <string name="settings_section_appearance">Appearance and interaction</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_haptics">Vibrate while counting</string>
+    <string name="settings_section_widget">Widget</string>
+    <string name="settings_widget_desc">Add the “Next prayer” widget to your home screen: long-press an empty area, choose Widgets, then “Wird”.</string>
+    <string name="settings_section_backup">Data and backup</string>
+    <string name="settings_backup_desc">Export your favorites, reading positions, deed history, tasbih and make-up prayer counters, and prayer and alert settings to a file, then import them on another device. Nothing is sent to any server, and the backup does not include voice files.</string>
+    <string name="settings_backup_export">Export a backup</string>
+    <string name="settings_backup_import">Import a backup</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_about_desc">The app holds the daily deeds, the complete Holy Quran, the complete Tafsir al-Mizan, the complete Mafatih al-Jinan, the complete al-Sahifa al-Sajjadiyya, prayer times, the qibla and the calendar.</string>
+    <string name="settings_credit_quran">Text of the Holy Quran: the Tanzil project (tanzil.net), Hafs narration in the Uthmani script.</string>
+    <string name="settings_credit_books">Mafatih al-Jinan by Shaykh Abbas al-Qummi, al-Sahifa al-Sajjadiyya of Imam Zayn al-Abidin (AS), and al-Mizan fi Tafsir al-Quran by Allamah Sayyid Muhammad Husayn Tabatabai: texts adapted from the OpenITI corpus, from the digitisations of al-Maktaba al-Shamela, rafed.net and altafsir.com.</string>
+    <string name="settings_credit_changes">Changes: the texts were split into the sections the app shows, OpenITI markup was converted or removed, verses quoted in al-Mizan were put between ornate brackets, and page numbers were kept as markers. Not a letter of al-Mizan was removed, and no word was altered or abridged.</string>
+    <string name="settings_credit_license">Licence of these texts: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0). The app is free and non-commercial. Licence text:</string>
+    <string name="settings_credit_geonames">City names for offline search: GeoNames (geonames.org), under CC BY 4.0:</string>
+    <string name="settings_credit_eclipses">Eclipse table for Salat al-Ayat: NASA/GSFC, prepared by Fred Espenak.</string>
+    <string name="settings_credit_fonts">Fonts: Amiri and Tajawal (SIL OFL licence).</string>
+    <string name="settings_credit_adhan">The two bundled adhan recordings (the shrine of Imam Husayn in Karbala and the shrine of Imam Rida in Mashhad) were provided by the project owner, who confirmed they are free of licence restrictions; the muezzin is not named in either file. Silence was trimmed from the start of the Karbala adhan and the end of the Mashhad adhan, loudness was normalised, and both were encoded as Opus. Details in docs/licenses/ADHAN_AUDIO.md.</string>
+</resources>

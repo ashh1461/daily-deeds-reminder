@@ -11,6 +11,7 @@ import com.dailydeeds.reminder.calendar.ShiaCalendar
 import com.dailydeeds.reminder.model.Place
 import com.dailydeeds.reminder.model.PlacePresets
 import com.dailydeeds.reminder.model.ReminderSettings
+import com.dailydeeds.reminder.util.AppLanguage
 import com.dailydeeds.reminder.util.Prayer
 import com.dailydeeds.reminder.model.ReminderType
 import com.dailydeeds.reminder.worship.KhumsDraft
@@ -53,6 +54,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_LAST_MAFATIH = "pref_last_mafatih"
         private const val KEY_LAST_SAHIFA = "pref_last_sahifa"
         private const val KEY_THEME_MODE = "pref_theme_mode"
+        const val KEY_APP_LANGUAGE = "pref_app_language"
         private const val KEY_ADHAN_GLOBAL = "pref_adhan_global"
         private const val KEY_PRAYER_SETTINGS = "pref_prayer_settings"
         private const val KEY_ASKED_NOTIFICATIONS = "pref_asked_notifications"
@@ -390,6 +392,10 @@ class PreferencesManager(context: Context) {
     /** "system", "light" or "dark". */
     fun getThemeMode(): String = user.getString(KEY_THEME_MODE, "system") ?: "system"
     fun setThemeMode(mode: String) = user.edit().putString(KEY_THEME_MODE, mode).apply()
+
+    /** A language tag ("ar", "en", "fa") or [AppLanguage.SYSTEM]; Arabic until the user picks one. Boot store. */
+    fun getAppLanguagePref(): String = boot.getString(KEY_APP_LANGUAGE, AppLanguage.DEFAULT_PREF) ?: AppLanguage.DEFAULT_PREF
+    fun setAppLanguagePref(pref: String) = boot.edit().putString(KEY_APP_LANGUAGE, pref).commit()
 
     fun hasAskedNotificationPermission(): Boolean = user.getBoolean(KEY_ASKED_NOTIFICATIONS, false)
     fun setAskedNotificationPermission() = user.edit().putBoolean(KEY_ASKED_NOTIFICATIONS, true).apply()

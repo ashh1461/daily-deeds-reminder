@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Persian UI strings. Same keys and placeholders as values/strings.xml (StringResourcesTest).
+     Drafted for v1.9.0; to be checked by a native speaker. -->
+<resources>
+    <string name="app_name">ورد</string>
+    <string name="app_subtitle">به توصیه سید الأسمی رضوان الله علیه</string>
+    <string name="channel_reminders_name">یادآوری اعمال روزانه</string>
+    <string name="channel_reminders_desc">یادآوری اوراد صبح و شام و تعقیبات نماز</string>
+    <string name="widget_description">نماز بعدی، تاریخ هجری قمری و مناسبت روز</string>
+    <string name="widget_preview_place">بیروت</string>
+    <string name="widget_preview_next">نماز بعدی: مغرب</string>
+    <string name="widget_preview_hijri">۱۷ جمادی‌الثانی ۱۴۴۸ ق</string>
+    <string name="widget_preview_occasion">شب جمعه</string>
+
+    <!-- Common -->
+    <string name="common_back">بازگشت</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_section_language">زبان</string>
+    <string name="settings_language_system">زبان دستگاه</string>
+    <string name="settings_language_note">فقط رابط برنامه ترجمه می‌شود؛ قرآن، دعاها و کتاب‌ها به متن اصلی عربی باقی می‌مانند.</string>
+    <string name="settings_section_prayer">اذان و نماز</string>
+    <string name="settings_current_city">شهر فعلی: %1$s</string>
+    <string name="settings_prayer_times">اوقات نماز</string>
+    <string name="settings_adhan_and_method">اذان و روش محاسبه</string>
+    <string name="settings_section_calendar">تقویم</string>
+    <string name="settings_calendar_desc">تنظیم رؤیت هلال و یادآوری مناسبت‌های اهل بیت (ع).</string>
+    <string name="settings_calendar_open">تقویم و مناسبت‌ها</string>
+    <string name="settings_section_reminders">یادآوری اعمال</string>
+    <string name="settings_reminders_note">زمان‌های شب، خواب و صبح پنجشنبه پیشنهادی‌اند و قابل تغییرند. همه زمان‌ها بر اساس ساعت دستگاه است.</string>
+    <string name="settings_reminders_anytime_note">زیارت مختصر و دعای استیداع آینده در بخش «هر زمان» قرار دارند و زمان مشخصی ندارند.</string>
+    <string name="settings_reminder_thursday">هر پنجشنبه صبح، هنگام بیرون رفتن برای طلب حاجت</string>
+    <string name="settings_reminder_daily">هر روز</string>
+    <string name="settings_change_time">تغییر زمان</string>
+    <string name="settings_section_appearance">ظاهر و تعامل</string>
+    <string name="settings_theme_system">پیش‌فرض سیستم</string>
+    <string name="settings_theme_light">روشن</string>
+    <string name="settings_theme_dark">تیره</string>
+    <string name="settings_haptics">لرزش هنگام شمارش</string>
+    <string name="settings_section_widget">ویجت</string>
+    <string name="settings_widget_desc">ویجت «نماز بعدی» را به صفحه اصلی اضافه کنید: روی یک فضای خالی انگشت خود را نگه دارید، ابزارک‌ها (Widgets) را انتخاب کنید، سپس «ورد».</string>
+    <string name="settings_section_backup">داده‌ها و پشتیبان‌گیری</string>
+    <string name="settings_backup_desc">علاقه‌مندی‌ها، محل‌های مطالعه، سابقه اعمال، تسبیح و شمارنده قضا و تنظیمات نماز و هشدارها را در یک فایل ذخیره کنید و سپس در دستگاه دیگری وارد کنید. هیچ داده‌ای به سرور فرستاده نمی‌شود و فایل‌های صوتی در نسخه پشتیبان نیستند.</string>
+    <string name="settings_backup_export">تهیه نسخه پشتیبان</string>
+    <string name="settings_backup_import">بازیابی نسخه پشتیبان</string>
+    <string name="settings_section_about">درباره برنامه</string>
+    <string name="settings_about_desc">برنامه شامل اعمال روزانه، قرآن کریم کامل، تفسیر المیزان کامل، مفاتیح الجنان کامل، صحیفه سجادیه کامل، اوقات نماز، قبله و تقویم است.</string>
+    <string name="settings_credit_quran">متن قرآن کریم: پروژه تنزیل (tanzil.net) به روایت حفص با رسم الخط عثمانی.</string>
+    <string name="settings_credit_books">مفاتیح الجنان شیخ عباس قمی، صحیفه سجادیه امام زین العابدین (ع) و المیزان فی تفسیر القرآن علامه سید محمدحسین طباطبایی: متن‌ها برگرفته از مجموعه OpenITI، بر پایه دیجیتال‌سازی المکتبة الشاملة و پایگاه‌های rafed.net و altafsir.com.</string>
+    <string name="settings_credit_changes">تغییرات: متن‌ها به بخش‌هایی که برنامه نمایش می‌دهد تقسیم شدند، نشانه‌های OpenITI تبدیل یا حذف شدند، آیات نقل‌شده در المیزان میان دو کمانک تزئینی قرار گرفتند و شماره صفحات به صورت نشانه باقی ماندند. حتی یک حرف از متن المیزان حذف نشده و هیچ واژه‌ای تغییر نکرده یا خلاصه نشده است.</string>
+    <string name="settings_credit_license">مجوز این متن‌ها: کریتیو کامنز، انتساب - غیرتجاری - اشتراک همسان ۴.۰ بین‌المللی (CC BY-NC-SA 4.0). برنامه رایگان و غیرتجاری است. متن مجوز:</string>
+    <string name="settings_credit_geonames">نام شهرها برای جستجوی آفلاین: GeoNames (geonames.org)، با مجوز CC BY 4.0:</string>
+    <string name="settings_credit_eclipses">جدول خسوف و کسوف برای نماز آیات: NASA/GSFC، تهیه‌شده توسط Fred Espenak.</string>
+    <string name="settings_credit_fonts">قلم‌ها: امیری و تجوال (مجوز SIL OFL).</string>
+    <string name="settings_credit_adhan">دو صدای اذان همراه برنامه (حرم امام حسین (ع) در کربلا و حرم امام رضا (ع) در مشهد) را مالک پروژه فراهم کرده و تأیید کرده است که محدودیت مجوز ندارند؛ نام مؤذن در هیچ‌یک از دو فایل نیامده است. سکوت از ابتدای اذان کربلا و انتهای اذان مشهد حذف شد، بلندی صدا یکسان شد و هر دو با قالب Opus فشرده شدند. جزئیات در docs/licenses/ADHAN_AUDIO.md.</string>
+</resources>

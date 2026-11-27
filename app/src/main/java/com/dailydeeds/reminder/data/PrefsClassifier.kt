@@ -30,7 +30,8 @@ object PrefsClassifier {
         "pref_place_name",        // location for prayer-time calculation (see class note / PRIVACY.md)
         "pref_place_lat",
         "pref_place_lng",
-        "pref_place_zone"
+        "pref_place_zone",
+        "pref_app_language"       // UI language: the locked adhan notification is written in it (v1.9.0)
     )
 
     /** Per-prayer alarm configuration, current (`pref_alarm_cfg_1..4`) and legacy (`pref_prayer_alarm_1..4`). */

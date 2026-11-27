@@ -71,6 +71,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    // The UI language is chosen inside the app (LocaleSupport), not from the device language, so an App Bundle must
+    // keep every language's resources in every install instead of splitting them by device locale.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     // The bundled adhan is played straight from the APK with AssetManager.openFd, which needs an uncompressed entry.
     androidResources {
         noCompress += "ogg"

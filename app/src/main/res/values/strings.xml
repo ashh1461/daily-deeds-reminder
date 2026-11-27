@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  UI strings. Arabic is the default; values-en and values-fa must carry exactly the same keys and placeholders
+  (StringResourcesTest). Religious text (Quran, supplications, Mafatih, Sahifa, al-Mizan) is content, not UI: it is
+  never put here and never translated.
+-->
 <resources>
     <string name="app_name">ورد</string>
     <string name="app_subtitle">توصية السيد الأسمى رضوان الله عليه</string>
@@ -8,7 +13,54 @@
     <!-- Sample text of the widget preview in the widget picker. -->
     <string name="widget_preview_place">بيروت</string>
     <string name="widget_preview_next">الصلاة القادمة: المغرب</string>
-    <string name="widget_preview_time">16:42</string>
+    <string name="widget_preview_time" translatable="false">16:42</string>
     <string name="widget_preview_hijri">١٧ جمادى الآخرة ١٤٤٨ هـ</string>
     <string name="widget_preview_occasion">ليلة الجمعة</string>
+
+    <!-- Common -->
+    <string name="common_back">رجوع</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_section_language">اللغة</string>
+    <string name="settings_language_system">لغة الجهاز</string>
+    <string name="settings_language_note">تُترجَم واجهة التطبيق فقط؛ القرآن والأدعية والكتب تبقى بنصها العربي.</string>
+    <string name="settings_section_prayer">الأذان والصلاة</string>
+    <string name="settings_current_city">المدينة الحالية: %1$s</string>
+    <string name="settings_prayer_times">أوقات الصلاة</string>
+    <string name="settings_adhan_and_method">الأذان وطريقة الحساب</string>
+    <string name="settings_section_calendar">التقويم</string>
+    <string name="settings_calendar_desc">تعديل رؤية الهلال وتذكير مناسبات أهل البيت (ع).</string>
+    <string name="settings_calendar_open">التقويم والمناسبات</string>
+    <string name="settings_section_reminders">تذكيرات الأعمال</string>
+    <string name="settings_reminders_note">أوقات الليل والنوم وصباح الخميس أوقات تذكير مقترحة قابلة للتعديل. جميع الأوقات بحسب توقيت الجهاز.</string>
+    <string name="settings_reminders_anytime_note">الزيارة المختصرة ودعاء استيداع المستقبل متاحان ضمن «في أي وقت» وليس لهما موعد محدد.</string>
+    <string name="settings_reminder_thursday">كل خميس صباحاً، عند الخروج لطلب الحاجة</string>
+    <string name="settings_reminder_daily">كل يوم</string>
+    <string name="settings_change_time">تعديل الوقت</string>
+    <string name="settings_section_appearance">المظهر والتفاعل</string>
+    <string name="settings_theme_system">حسب النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
+    <string name="settings_haptics">الاهتزاز أثناء العد</string>
+    <string name="settings_section_widget">الودجت</string>
+    <string name="settings_widget_desc">أضف ودجت «الصلاة القادمة» إلى شاشتك الرئيسية: اضغط مطولاً على مساحة فارغة، اختر الأدوات (Widgets)، ثم «ورد».</string>
+    <string name="settings_section_backup">البيانات والنسخ الاحتياطي</string>
+    <string name="settings_backup_desc">صدّر المفضلة وأماكن القراءة وسجل الأعمال والمسبحة والقضاء وإعدادات الصلاة والتنبيهات إلى ملف، ثم استوردها على جهاز آخر. لا تُرسَل البيانات إلى أي خادم، ولا تشمل النسخة ملفات الأصوات.</string>
+    <string name="settings_backup_export">تصدير نسخة احتياطية</string>
+    <string name="settings_backup_import">استيراد نسخة احتياطية</string>
+    <string name="settings_section_about">حول التطبيق</string>
+    <string name="settings_about_desc">يضم التطبيق الأعمال اليومية، والقرآن الكريم كاملاً، وتفسير الميزان كاملاً، ومفاتيح الجنان كاملاً، والصحيفة السجادية الكاملة، وأوقات الصلاة والقبلة والتقويم.</string>
+    <!-- Attribution required by the data licences; keep in step with docs/licenses/DATA_LICENSE.md,
+         THIRD_PARTY_NOTICES.md and ADHAN_AUDIO.md in every language. -->
+    <string name="settings_credit_quran">نص القرآن الكريم: مشروع تنزيل (tanzil.net) برواية حفص بالرسم العثماني.</string>
+    <string name="settings_credit_books">مفاتيح الجنان للشيخ عباس القمي، والصحيفة السجادية للإمام زين العابدين (ع)، والميزان في تفسير القرآن للعلامة السيد محمد حسين الطباطبائي: نصوص مقتبسة من مدونة OpenITI، عن رقمنة المكتبة الشاملة وموقعَي rafed.net و altafsir.com.</string>
+    <string name="settings_credit_changes">التعديلات: قُسِّمت النصوص إلى المواضع التي يعرضها التطبيق، وحُوِّلت علامات OpenITI أو أُزيلت، ووُضعت الآيات المقتبسة في الميزان بين قوسين مزخرفين، وأُبقيت أرقام الصفحات علاماتٍ. لم يُحذف حرف من نص الميزان، ولم يُعدَّل لفظ ولم يُختصر.</string>
+    <string name="settings_credit_license">رخصة هذه النصوص: المشاع الإبداعي، نَسب المصنَّف - غير تجاري - الترخيص بالمثل 4.0 الدولية (CC BY-NC-SA 4.0)، والتطبيق مجاني وغير تجاري. نص الرخصة:</string>
+    <string name="settings_credit_license_url" translatable="false">https://creativecommons.org/licenses/by-nc-sa/4.0/</string>
+    <string name="settings_credit_geonames">أسماء المدن للبحث دون اتصال: GeoNames (geonames.org)، برخصة CC BY 4.0:</string>
+    <string name="settings_credit_geonames_url" translatable="false">https://creativecommons.org/licenses/by/4.0/</string>
+    <string name="settings_credit_eclipses">جدول الكسوف والخسوف لصلاة الآيات: NASA/GSFC، إعداد Fred Espenak.</string>
+    <string name="settings_credit_fonts">الخطوط: أميري وتجوال (رخصة SIL OFL).</string>
+    <string name="settings_credit_adhan">تسجيلا الأذان المضمَّنان (الحرم الحسيني في كربلاء، والحرم الرضوي في مشهد): قدّمهما مالكُ المشروع وأكّد أنهما خاليان من قيود الترخيص، ولا يرد اسم المؤذن في الملفين. قُصَّ الصمت من بداية أذان كربلاء ومن نهاية أذان مشهد، ووُحِّدت شدة الصوت، وضُغطا بصيغة Opus. التفاصيل في docs/licenses/ADHAN_AUDIO.md.</string>
 </resources>
